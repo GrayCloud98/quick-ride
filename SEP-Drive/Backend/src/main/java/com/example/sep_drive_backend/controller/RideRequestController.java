@@ -39,6 +39,12 @@ public class RideRequestController {
         boolean hasActive = rideRequestService.hasActiveRideRequest(username);
         return ResponseEntity.ok(hasActive);
     }
+    @GetMapping("/{username}/is-customer")
+    public ResponseEntity<Boolean> isCustomer (@PathVariable String username) {
+        boolean isCustomer = rideRequestService.isCustomer(username);
+        return ResponseEntity.ok(isCustomer);
+    }
+
 
     @GetMapping("/{username}")
     public ResponseEntity<RideRequestDTO> getActiveRideRequest(@PathVariable String username) {
