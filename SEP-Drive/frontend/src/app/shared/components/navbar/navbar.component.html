@@ -2,7 +2,7 @@
   <button mat-button class="navbar-title" (click)="goHome()">SEP-Drive</button>
 
   <button
-    *ngIf="isLoggedIn"
+    *ngIf="isLoggedIn && isCustomer"
     mat-raised-button
     color="accent"
     class="nav-btn"

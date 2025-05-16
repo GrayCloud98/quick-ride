@@ -6,6 +6,7 @@ import {FormControl} from '@angular/forms';
 import {Observable} from 'rxjs';
 import {AuthService} from '../../../auth/auth.service';
 import {RideRequestService} from '../../../ride/services/ride-request.service';
+import {log} from '@angular-devkit/build-angular/src/builders/ssr-dev-server';
 
 @Component({
   selector: 'app-navbar',
@@ -20,6 +21,7 @@ export class NavbarComponent implements OnInit {
   username: string = '';
   photoUrl: string = '';
   usernameControl = new FormControl();
+  isCustomer: boolean = false;
   options: string[] = [];
   filteredOptions!: Observable<string[]>;
 
@@ -43,6 +45,11 @@ export class NavbarComponent implements OnInit {
         this.photoUrl = '';
       }
     });
+
+    this.authService.isCustomer(this.username).subscribe({
+      next: isCustomer => this.isCustomer = isCustomer,
+      error: err => console.log(err)
+    })
 
     this.rideService.updateActiveRideStatus(this.username);
     this.rideService.activeRideStatus$.subscribe({

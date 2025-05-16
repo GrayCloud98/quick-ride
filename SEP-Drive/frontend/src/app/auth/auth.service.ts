@@ -7,7 +7,6 @@ import {map} from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AuthService {
-
   private apiUrl = 'http://localhost:8080/api/auth/login';
   private apiUrl2fa = 'http://localhost:8080/api/auth/verify';
 
@@ -116,5 +115,9 @@ export class AuthService {
       })
     );
   }
+
+  public isCustomer(username: string): Observable<boolean>{
+    return this.http.get<boolean>(`http://localhost:8080/api/ride-requests/${username}/is-customer`);
+}
 
 }
