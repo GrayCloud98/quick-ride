@@ -6,7 +6,6 @@ import {FormControl} from '@angular/forms';
 import {Observable} from 'rxjs';
 import {AuthService} from '../../../auth/auth.service';
 import {RideRequestService} from '../../../ride/services/ride-request.service';
-import {log} from '@angular-devkit/build-angular/src/builders/ssr-dev-server';
 
 @Component({
   selector: 'app-navbar',
