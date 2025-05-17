@@ -3,6 +3,8 @@ import {Ride, VehicleClass} from '../../models/ride.model';
 import {Location} from '../../models/location.model'
 import {Router} from '@angular/router';
 import {RideRequestService} from '../../services/ride-request.service';
+import {AuthService} from '../../../auth/auth.service';
+import {filter, switchMap, tap} from 'rxjs';
 
 @Component({
   selector: 'app-active-ride-page',
@@ -13,23 +15,22 @@ import {RideRequestService} from '../../services/ride-request.service';
 })
 export class ActiveRidePageComponent implements OnInit {
 
-  activeRide!: Ride;
+  username: string = '';
+  accessAllowed: boolean = false;
   userHasActiveRide: boolean = true;
+  activeRide!: Ride;
 
   constructor(
     private rideService: RideRequestService,
+    private authService: AuthService,
     private router: Router) {
   }
 
 
   deactivateRide() {
-
-    const user = JSON.parse(<string>localStorage.getItem('currentUser'));
-    const username = user?.username;
-
-    this.rideService.deactivateRide(username).subscribe({
+    this.rideService.deactivateRide(this.username).subscribe({
       next: () => {
-        this.rideService.updateActiveRideStatus(username);
+        this.rideService.updateActiveRideStatus(this.username);
         this.router.navigate(['/ride/request']);
       },
       error: (err) => {
@@ -39,24 +40,20 @@ export class ActiveRidePageComponent implements OnInit {
   }
 
   ngOnInit() {
-
-    const user = JSON.parse(<string>localStorage.getItem('currentUser'));
-    const username = user?.username;
-
-    this.rideService.userHasActiveRide(username).subscribe({
-      next: hasActive => {
-        this.userHasActiveRide = hasActive;
-        if (hasActive) {
-          this.rideService.getRide(username).subscribe({
-            next: response => {
-              this.activeRide = this.mapToRide(response);
-            },
-            error: err => console.log(err)
-          });
-        }
-      },
+    this.authService.currentUser.pipe(
+      filter(user => !!user?.username),
+      tap(user => this.username = user!.username!),
+      switchMap(() => this.authService.isCustomer(this.username)),
+      tap(isCustomer => this.accessAllowed = isCustomer),
+      filter(isCustomer => isCustomer),
+      switchMap(() => this.rideService.userHasActiveRide(this.username)),
+      tap(hasActive => this.userHasActiveRide = hasActive),
+      filter(hasActive => hasActive),
+      switchMap(() => this.rideService.getRide(this.username)),
+    ).subscribe({
+      next: ride => this.activeRide = this.mapToRide(ride),
       error: err => console.log(err)
-    });
+    })
   }
 
   private mapToRide(raw: any): Ride {

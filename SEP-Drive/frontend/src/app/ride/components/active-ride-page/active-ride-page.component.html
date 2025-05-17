@@ -1,29 +1,36 @@
-<div *ngIf="userHasActiveRide" class="centered-box" style="width: 500px">
+<div *ngIf="accessAllowed">
+  <div *ngIf="userHasActiveRide" class="centered-box" style="width: 500px">
 
-  <app-location-card
-    [location]="activeRide.pickup"
-    label="Pick up at">
-  </app-location-card>
+    <app-location-card
+      [location]="activeRide.pickup"
+      label="Pick up at">
+    </app-location-card>
 
-  <app-location-card
-    [location]="activeRide.dropoff"
-    label="Drop off at">
-  </app-location-card>
+    <app-location-card
+      [location]="activeRide.dropoff"
+      label="Drop off at">
+    </app-location-card>
 
-  <mat-card class="vehicle-card" appearance="outlined">
-    <div class="vehicle-header">
-      <mat-icon>local_taxi</mat-icon>
-      <span class="vehicle-label">Selected Vehicle Class</span></div>
-    <mat-card-content><span class="vehicle-class">{{ activeRide.vehicleClass }}</span></mat-card-content>
-  </mat-card>
+    <mat-card class="vehicle-card" appearance="outlined">
+      <div class="vehicle-header">
+        <mat-icon>local_taxi</mat-icon>
+        <span class="vehicle-label">Selected Vehicle Class</span></div>
+      <mat-card-content><span class="vehicle-class">{{ activeRide.vehicleClass }}</span></mat-card-content>
+    </mat-card>
 
 
-  <button mat-fab extended class="deactivation-btn" (click)="deactivateRide()">
-    Deactivate your ride
-  </button>
+    <button mat-fab extended class="deactivation-btn" (click)="deactivateRide()">
+      Deactivate your ride
+    </button>
 
+  </div>
+
+  <div *ngIf="!userHasActiveRide" class="centered-box alert error" style="width: 500px">
+    Please submit a request first.
+  </div>
 </div>
 
-<div *ngIf="!userHasActiveRide" class="centered-box alert error" style="width: 500px">
-  Please submit a request first.
+
+<div *ngIf="!accessAllowed">
+  access denied
 </div>
