@@ -1,5 +1,6 @@
 package com.example.sep_drive_backend.services;// package: com.example.sep_drive_backend.services
 
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,11 @@ public class EmailService {
         message.setTo(to);
         message.setSubject("Your Login Verification Code");
         message.setText("Your verification code is: " + code);
-        mailSender.send(message);
+        try {
+            mailSender.send(message);
+        } catch (MailException e) {
+            throw new RuntimeException("Failed to send verification email. Please try again later.");
+        }
+
     }
 }
