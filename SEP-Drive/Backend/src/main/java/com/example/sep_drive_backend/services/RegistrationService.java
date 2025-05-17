@@ -54,25 +54,22 @@ public class RegistrationService {
             }
         }
 
-        // 📝 If the role is Customer, save it and return the object
+        // If the role is Customer, save it and return the object
         if (role == RoleEnum.Customer) {
             Customer customer = new Customer(username, firstName, lastName, email, birthDate,
                     passwordEncoder.encode(password), role, fileName != null ? "/uploads/" + fileName : null);
 
-            // 🔍 Save and get the saved object
-            return customerRepository.save(customer);  // 🔍 Return the saved Customer
+            return customerRepository.save(customer);  // Return the saved Customer
         }
 
-        // 📝 If the role is Driver, save it and return the object
+        // If the role is Driver, save it and return the object
         else if (role == RoleEnum.Driver) {
             Driver driver = new Driver(username, firstName, lastName, email, birthDate,
                     passwordEncoder.encode(password), role, fileName != null ? "/uploads/" + fileName : null, vehicleClass);
 
-            // 🔍 Save and get the saved object
-            return driverRepository.save(driver);  // 🔍 Return the saved Driver
+            return driverRepository.save(driver);  // Return the saved Driver
         }
-
-        // If something goes wrong, return null
+        // else return null
         return null;
     }
 

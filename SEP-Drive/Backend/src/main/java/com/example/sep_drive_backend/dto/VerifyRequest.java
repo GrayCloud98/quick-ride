@@ -4,7 +4,6 @@ public class VerifyRequest {
     private String username;
     private String code;
 
-    // Getters and setters
     public String getUsername() {
         return username;
     }

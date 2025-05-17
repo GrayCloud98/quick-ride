@@ -2,17 +2,15 @@ package com.example.sep_drive_backend.models;
 
 import com.example.sep_drive_backend.constants.RoleEnum;
 import com.example.sep_drive_backend.constants.VehicleClassEnum;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
 import java.util.Date;
 
 @Entity
-public class Driver extends users {
+public class Driver extends User {
 
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = true)
     private VehicleClassEnum vehicleClass;
 
     public Driver() {}

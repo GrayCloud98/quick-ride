@@ -1,13 +1,12 @@
 package com.example.sep_drive_backend.models;
 
 import com.example.sep_drive_backend.constants.RoleEnum;
-import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 import java.util.Date;
 
 @Entity
-public class Customer extends users {
+public class Customer extends User {
 
     private boolean active;
 

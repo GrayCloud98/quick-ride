@@ -1,4 +1,4 @@
-package com.example.sep_drive_backend.services;// package: com.example.sep_drive_backend.services
+package com.example.sep_drive_backend.services;
 
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
@@ -14,7 +14,6 @@ public class EmailService {
     }
 
     public void sendVerificationCode(String to, String code) {
-        System.out.println("Sending verification code ");
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
         message.setSubject("Your Login Verification Code");

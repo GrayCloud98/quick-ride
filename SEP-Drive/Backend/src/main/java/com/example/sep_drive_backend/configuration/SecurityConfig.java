@@ -8,8 +8,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-
 
 @EnableWebSecurity
 @Configuration
@@ -32,19 +30,15 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/h2-console/**", "/api/auth/**", "/api/ride-requests/**")
                 )
-                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))  // für H2-Konsole
-                .formLogin(form -> form.disable()) // Form Login deaktivieren
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
+                .formLogin(form -> form.disable())
                 .logout(logout -> logout.logoutUrl("/api/auth/logout"))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // JWT-Filter hinzufügen
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-
-
 }

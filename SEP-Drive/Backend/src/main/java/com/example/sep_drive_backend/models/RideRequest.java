@@ -18,6 +18,26 @@ public class RideRequest {
     @JoinColumn(name = "customer_username", referencedColumnName = "username", nullable = false)
     private Customer customer; // This will be the reference to the Customer entity via 'username'
 
+    @Column
+    private String startAddress;
+
+    private Double startLatitude;
+    private Double startLongitude;
+    @Column (nullable = true)
+    private String startLocationName;
+    @Column (nullable = true)
+    private String DestinationLocationName;
+
+    @Column
+    private String destinationAddress;
+
+    private Double destinationLatitude;
+    private Double destinationLongitude;
+
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private VehicleClassEnum vehicleClass;
 
     public Customer getCustomer() {
         return customer;
@@ -28,20 +48,21 @@ public class RideRequest {
     }
 
     public RideRequest() {}
-    public RideRequest(Long id, String startAddress, String destinationAddress, VehicleClassEnum vehicleClass, Customer customer) {
+    public RideRequest(Long id, String startAddress, String startLocationName, String destinationLocationName, String destinationAddress, Double startLatitude, Double startLongitude, Double destinationLatitude, Double destinationLongitude, VehicleClassEnum vehicleClass, Customer customer) {
         this.id = id;
-
         this.startAddress = startAddress;
         this.destinationAddress = destinationAddress;
+        this.startLatitude = startLatitude;
+        this.startLongitude = startLongitude;
+        this.destinationLatitude = destinationLatitude;
+        this.destinationLongitude = destinationLongitude;
         this.vehicleClass = vehicleClass;
         this.customer = customer;
+        this.startLocationName = startLocationName;
+        this.DestinationLocationName = destinationLocationName;
     }
 
-    @Column
-    private String startAddress;
 
-    private Double startLatitude;
-    private Double startLongitude;
 
     public String getStartLocationName() {
         return startLocationName;
@@ -59,21 +80,7 @@ public class RideRequest {
         DestinationLocationName = destinationLocationName;
     }
 
-    @Column (nullable = true)
-    private String startLocationName;
-    @Column (nullable = true)
-    private String DestinationLocationName;
 
-    @Column
-    private String destinationAddress;
-
-    private Double destinationLatitude;
-    private Double destinationLongitude;
-
-
-    @Column
-    @Enumerated(EnumType.STRING)
-    private VehicleClassEnum vehicleClass; // SMALL, MEDIUM, LARGE
     public Double getStartLatitude() {
         return startLatitude;
     }
@@ -105,11 +112,6 @@ public class RideRequest {
     public void setDestinationLongitude(Double destinationLongitude) {
         this.destinationLongitude = destinationLongitude;
     }
-
-
-
-
-    // === GETTERS & SETTERS ===
 
     public Long getId() {
         return id;

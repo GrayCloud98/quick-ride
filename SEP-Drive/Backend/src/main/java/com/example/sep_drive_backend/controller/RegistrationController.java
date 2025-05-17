@@ -3,6 +3,7 @@ package com.example.sep_drive_backend.controller;
 import com.example.sep_drive_backend.constants.RoleEnum;
 import com.example.sep_drive_backend.constants.VehicleClassEnum;
 import com.example.sep_drive_backend.services.RegistrationService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -27,34 +28,31 @@ public class RegistrationController {
 
     @PostMapping(value = "/register", consumes = {"multipart/form-data"})
     public ResponseEntity<String> register(
-            @RequestParam("username") String username,
-            @RequestParam("password") String password,
-            @RequestParam("email") String email,
-            @RequestParam("firstName") String firstName,
-            @RequestParam("lastName") String lastName,
-            @RequestParam("birthDate") @DateTimeFormat(pattern = "MM/dd/yyyy") Date birthDate,
-            @RequestParam("role") RoleEnum role,
-            @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture,
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String email,
+            @RequestParam String firstName,
+            @RequestParam String lastName,
+            @RequestParam @DateTimeFormat(pattern = "MM/dd/yyyy") Date birthDate,
+            @RequestParam RoleEnum role,
+            @RequestParam(required = false) MultipartFile profilePicture,
             @RequestParam(value = "vehicleClass", required = false) VehicleClassEnum vehicleClass) {
 
         System.out.println("Received Vehicle Class: " + vehicleClass);
 
-        // ✅ Register the user and get the saved object
-        Object savedUser = registrationService.registerUser(username, password, email, firstName, lastName, birthDate, role, profilePicture, vehicleClass);
+        Object savedUser = registrationService.registerUser(
+                username, password, email, firstName, lastName, birthDate, role, profilePicture, vehicleClass
+        );
 
-        if (savedUser != null) {
-            // ✅ Manually convert the user to JSON
-            String json;
-            try {
-                json = new ObjectMapper().writeValueAsString(savedUser); // 🔍 Convert to JSON
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to serialize user");
-            }
-
-            // ✅ Return the JSON string
-            return ResponseEntity.status(HttpStatus.CREATED).body(json);
-        } else {
+        if (savedUser == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to register user");
+        }
+
+        try {
+            String json = new ObjectMapper().writeValueAsString(savedUser);
+            return ResponseEntity.status(HttpStatus.CREATED).body(json);
+        } catch (JsonProcessingException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to serialize user");
         }
     }
 

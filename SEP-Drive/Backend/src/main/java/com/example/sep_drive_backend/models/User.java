@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class users{
+public abstract class User {
 
 
     @Id
@@ -29,17 +29,14 @@ public abstract class users{
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RoleEnum role;
-    @Column(nullable = true)
     private String profilePicture;
-    @Column(nullable = true)
     private int totalRides;
-    @Column(nullable = true)
     private float rating;
 
 
-    public users() {}
+    public User() {}
 
-    public users(String username, String firstName, String lastName, String email, Date birthDate, String password, RoleEnum role, String profilePicture) {
+    public User(String username, String firstName, String lastName, String email, Date birthDate, String password, RoleEnum role, String profilePicture) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;

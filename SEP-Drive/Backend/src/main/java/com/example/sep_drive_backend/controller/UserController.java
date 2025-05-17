@@ -4,7 +4,7 @@ import com.example.sep_drive_backend.dto.CustomerProfileResponse;
 import com.example.sep_drive_backend.dto.DriverProfileResponse;
 import com.example.sep_drive_backend.models.Customer;
 import com.example.sep_drive_backend.models.Driver;
-import com.example.sep_drive_backend.models.users;
+import com.example.sep_drive_backend.models.User;
 import com.example.sep_drive_backend.repository.CustomerRepository;
 import com.example.sep_drive_backend.repository.DriverRepository;
 import com.example.sep_drive_backend.repository.UserRepository;
@@ -46,12 +46,12 @@ public class UserController {
 
         String username = jwtTokenProvider.getUsername(token);
 
-        Optional<users> userOpt = userRepository.findByUsername(username);
+        Optional<User> userOpt = userRepository.findByUsername(username);
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        users user = userOpt.get();
+        User user = userOpt.get();
 
         if (user instanceof Customer) {
             Customer customer = (Customer) user;
@@ -84,10 +84,10 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
-    // Get all user profiles (No authentication required)
+    // Get user profiles (No authentication required)
     @GetMapping("/")
     public ResponseEntity<List<?>> getAllUserProfiles() {
-        List<users> allUsers = userRepository.findAll();  // Fetch all users
+        List<User> allUsers = userRepository.findAll();  // Fetch all User
         List<Object> userProfiles = allUsers.stream()
                 .map(user -> {
                     if (user instanceof Customer) {
