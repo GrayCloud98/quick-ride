@@ -32,8 +32,11 @@ export class ProfilePageComponent implements OnInit {
             this.profileData = data.find(user => user.username === username);
 
             if (this.profileData) {
-              console.log('User Found:', this.profileData);
-            } else {
+              if (this.profileData.profilePicture && !this.profileData.profilePicture.startsWith('http')) {
+                this.profileData.profilePicture = `http://localhost:8080${this.profileData.profilePicture}`;
+              }
+            }
+            else {
               console.warn('User not found!');
             }
           },
