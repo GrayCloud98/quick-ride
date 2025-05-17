@@ -54,9 +54,12 @@ public class LoginService {
             System.out.println("🔍 Password Match Result: " + match);
 
             if (match) {
-                sendVerificationCode(customer.get().getEmail(), customer.get().getUsername());
-                System.out.println("📧 Verification code sent to: " + customer.get().getEmail());
-                return "Email verification required. Check your inbox.";
+                try {
+                    sendVerificationCode(customer.get().getEmail(), customer.get().getUsername());
+                    return "Email verification required. Check your inbox.";
+                } catch (RuntimeException e) {
+                    return "Failed to send verification email.";
+                }
             } else {
                 System.out.println("❌ Password did not match for Customer.");
             }
