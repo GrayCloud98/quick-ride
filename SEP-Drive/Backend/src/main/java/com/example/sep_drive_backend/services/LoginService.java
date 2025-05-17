@@ -76,9 +76,12 @@ public class LoginService {
             System.out.println("🔍 Password Match Result: " + match);
 
             if (match) {
-                sendVerificationCode(driver.get().getEmail(), driver.get().getUsername());
-                System.out.println("📧 Verification code sent to: " + driver.get().getEmail());
-                return "Email verification required. Check your inbox.";
+                try {
+                    sendVerificationCode(driver.get().getEmail(), driver.get().getUsername());
+                    return "Email verification required. Check your inbox.";
+                } catch (RuntimeException e) {
+                    return "Failed to send verification email.";
+                }
             } else {
                 System.out.println("❌ Password did not match for Driver.");
             }
