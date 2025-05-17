@@ -97,6 +97,10 @@ export class RegisterComponent {
       this.showAlert('Please select a vehicle class.', 'error');
       return;
     }
+    if (!this.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      this.showAlert('Please enter a valid email address.', 'error');
+      return;
+    }
     if (this.profilePicture) {
       formData.append('profilePicture', this.profilePicture);
     }

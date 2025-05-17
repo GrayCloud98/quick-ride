@@ -19,17 +19,17 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+
         String loginResponse = loginService.loginUser(loginRequest);
 
-        if (loginResponse.equals("Email verification required. Check your inbox.")) {
-            return ResponseEntity.status(401).body(loginResponse);
-        }
+        return switch (loginResponse) {
+            case "Failed to send verification email." -> ResponseEntity.status(500).body(loginResponse);
+            case "Email verification required. Check your inbox." -> ResponseEntity.status(401).body(loginResponse);
+            case "Login successful!" -> ResponseEntity.ok(loginResponse);
+            default -> ResponseEntity.status(401).body("Invalid username or password");
+        };
 
-        if (loginResponse.equals("Login successful!")) {
-            return ResponseEntity.ok(loginResponse);
-        }
 
-        return ResponseEntity.status(401).body("Invalid username or password");
     }
 
     @PostMapping("/verify")
