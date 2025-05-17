@@ -1,120 +1,119 @@
-import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {BehaviorSubject, catchError, Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject, catchError, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+
+export interface UserResponse {
+  username: string;
+  email: string;
+  role: string;
+  photoUrl?: string;
+  token?: string;
+}
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-
   private apiUrl = 'http://localhost:8080/api/auth/login';
   private apiUrl2fa = 'http://localhost:8080/api/auth/verify';
 
-  // BehaviourSubject to store the logged-in user
+  // BehaviorSubjects for user data and photo URL
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser = this.currentUserSubject.asObservable();
+  private photoUrlSubject = new BehaviorSubject<string>('assets/placeholder.png');
+  public photoUrl$ = this.photoUrlSubject.asObservable();
 
   constructor(private http: HttpClient) {
-    // Check if user data is already in local storage
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
-      this.currentUserSubject.next(JSON.parse(storedUser));
+      const parsedUser = JSON.parse(storedUser);
+      this.currentUserSubject.next(parsedUser);
+      const resolvedPath = this.resolveImagePath(parsedUser.profilePicture);
+      this.updatePhotoUrl(resolvedPath);
     }
   }
 
-  loginUser(username: string, password: string): Observable<any> {
-    console.log("Sending login request with:", username, password);
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
+  loginUser(username: string, password: string): Observable<UserResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const body = { username, password };
 
-    const body = {
-      username: username,
-      password: password
-    };
-
-    console.log("Headers:", headers);
-    console.log("Request Body:", body);
-
-    return this.http.post(this.apiUrl, body, {headers});
-  }
-
-
-  verifyCode(username: string, code: string): Observable<any> {
-    console.log("Sending verification request with:", username, code);
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-    });
-
-    const body = JSON.stringify({
-      username: username,
-      code: code,
-    });
-
-    console.log('Request Body:', body);
-
-    // 🔍 Adding logs for errors
-    return this.http.post(this.apiUrl2fa, body, { headers }).pipe(
-      map((response) => {
-        console.log("🌐 Full Response from Backend:", response);
-        if(response) {
+    return this.http.post<UserResponse>(this.apiUrl, body, { headers }).pipe(
+      map((response: UserResponse) => {
+        if (response) {
           localStorage.setItem('currentUser', JSON.stringify(response));
           this.currentUserSubject.next(response);
-          console.log("User data stored in local storage:", response);
-        } else {
-          console.warn("Response is undefined or null");
+          const resolvedPath = this.resolveImagePath(response.photoUrl);
+          this.updatePhotoUrl(resolvedPath);
+        }
+        return response;
+      })
+    );
+  }
+
+  verifyCode(username: string, code: string): Observable<UserResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const body = JSON.stringify({ username, code });
+
+    return this.http.post<UserResponse>(this.apiUrl2fa, body, { headers }).pipe(
+      map((response: UserResponse) => {
+        if (response) {
+          localStorage.setItem('currentUser', JSON.stringify(response));
+          this.currentUserSubject.next(response);
+          const resolvedPath = this.resolveImagePath(response.photoUrl);
+          this.updatePhotoUrl(resolvedPath);
         }
         return response;
       }),
       catchError((error) => {
-        console.error("❌ Error during 2FA verification:", error.message);
+        console.error("Error during 2FA verification:", error.message);
         return [];
       })
     );
   }
 
-  //Method to Store User Data
   storeUserData(userData: any) {
     localStorage.setItem('currentUser', JSON.stringify(userData));
-    this.currentUserSubject.next(userData); // Update BehaviorSubject
+    this.currentUserSubject.next(userData);
   }
 
-  //Method to Clear User Data (Logout)
   clearUserData() {
     localStorage.removeItem('currentUser');
     this.currentUserSubject.next(null);
+    this.updatePhotoUrl('assets/placeholder.png');
     window.location.href = '/';
   }
 
   getUserInfo(username: string): Observable<any> {
     const token = localStorage.getItem('authToken');
-
     if (!token) {
-      console.error("❌ No auth token found. Cannot fetch user info.");
-      // @ts-ignore
-      return;
+      return new Observable();
     }
-
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     });
-
     const apiUrl = `http://localhost:8080/api/users/${username}`;
-
-    console.log("🚀 Fetching user info from backend with headers:", headers);
-
     return this.http.get(apiUrl, { headers }).pipe(
-      map((response) => {
-        console.log("✅ User info received from backend:", response);
-        return response;
-      }),
+      map((response) => response),
       catchError((error) => {
-        console.error("❌ Failed to fetch user info:", error.message);
+        console.error("Failed to fetch user info:", error.message);
         throw error;
       })
     );
   }
 
+  private resolveImagePath(imagePath: string | undefined): string {
+    if (imagePath) {
+      return imagePath.startsWith('http')
+        ? imagePath
+        : `http://localhost:8080${imagePath}`;
+    }
+    return 'assets/placeholder.png';
+  }
+
+  updatePhotoUrl(newUrl: string) {
+    this.photoUrlSubject.next(newUrl ?? 'assets/placeholder.png');
+  }
 }

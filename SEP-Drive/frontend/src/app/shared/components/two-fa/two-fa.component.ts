@@ -21,7 +21,6 @@ export class TwoFaComponent {
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.username = data.username;
-    console.log("✅ Received Username in 2FA Dialog:", this.username);
   }
   closeDialog(): void {
     this.dialogRef.close();
@@ -32,7 +31,6 @@ export class TwoFaComponent {
       this.errorMessage = "Invalid code length. Please try again.";
       return;
     }
-    console.log('Entered Code:', this.verificationCode);
 
     const username = this.username;
 
@@ -47,7 +45,9 @@ export class TwoFaComponent {
         console.log('✅ Verification successful:', response);
 
         // ✅ Store the token separately
-        localStorage.setItem('authToken', response.token);
+        if (response.token != null) {
+          localStorage.setItem('authToken', response.token);
+        }
 
         // ✅ Fetch the user info from backend
         this.authService.getUserInfo(username).subscribe({

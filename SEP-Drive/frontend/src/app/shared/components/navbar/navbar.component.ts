@@ -28,20 +28,32 @@ export class NavbarComponent implements OnInit {
     private readonly router: Router,
     private readonly authService: AuthService,
     private readonly rideService: RideRequestService
-  ) {
-  }
+  ) {}
 
   ngOnInit(): void {
     this.authService.currentUser.subscribe((user) => {
       if (user) {
         this.isLoggedIn = true;
         this.username = user.username ? user.username : 'No username';
-        this.photoUrl = user.photoUrl ? user.photoUrl : 'assets/placeholder.png';
+
+        if (user && user.photoUrl) {
+          if (!user.photoUrl.startsWith('http')) {
+            this.photoUrl = `http://localhost:8080${user.photoUrl}`;
+          } else {
+            this.photoUrl = user.photoUrl;
+          }
+        } else {
+          this.photoUrl = 'assets/placeholder.png';
+        }
       } else {
         this.isLoggedIn = false;
         this.username = '';
         this.photoUrl = '';
       }
+    });
+
+    this.authService.photoUrl$.subscribe((newUrl) => {
+      this.photoUrl = newUrl;
     });
 
     this.rideService.updateActiveRideStatus(this.username);
@@ -65,7 +77,6 @@ export class NavbarComponent implements OnInit {
   }
 
   searchUser(username: string) {
-    console.log('searching for user:', username);
     if (username && username.trim().length > 0) {
       console.log('searching for user:', username);
       this.router.navigate([`/${username}`]).then(() => {
@@ -75,12 +86,10 @@ export class NavbarComponent implements OnInit {
   }
 
   goToProfile() {
-    console.log('going to profile');
     this.router.navigate([`/${(this.username)}`]);
   }
 
   goHome() {
-    console.log('going home');
     this.router.navigate(['/']);
   }
 

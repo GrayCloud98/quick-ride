@@ -9,6 +9,7 @@ import { AuthService } from '../auth/auth.service';
   templateUrl: './profile-page.component.html',
   styleUrls: ['./profile-page.component.scss']
 })
+
 export class ProfilePageComponent implements OnInit {
   profileData: any = {};
 
@@ -20,20 +21,16 @@ export class ProfilePageComponent implements OnInit {
     ) {}
 
   ngOnInit(): void {
-    // Subscribe to route changes
     this.route.paramMap.subscribe(params => {
       const username = params.get('username');
-      console.log('Fetching data for:', username);
-
       if (username) {
-        // Fetch the data from the backend
         this.profileService.getAllProfiles().subscribe({
           next: (data: any[]) => {
             this.profileData = data.find(user => user.username === username);
-
             if (this.profileData) {
               if (this.profileData.profilePicture && !this.profileData.profilePicture.startsWith('http')) {
                 this.profileData.profilePicture = `http://localhost:8080${this.profileData.profilePicture}`;
+                this.authService.updatePhotoUrl(this.profileData.profilePicture);
               }
             }
             else {
@@ -52,8 +49,6 @@ export class ProfilePageComponent implements OnInit {
   }
 
   logout() {
-    console.log("🚪 Logging out from profile page...");
-
     if (this.authService.clearUserData) {
       this.authService.clearUserData();
     } else {
