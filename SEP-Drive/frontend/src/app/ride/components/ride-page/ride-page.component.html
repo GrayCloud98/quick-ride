@@ -1,9 +1,16 @@
-<div style="display: flex; height: 100vh;">
-  <div style="width: 500px; padding: 20px; box-sizing: border-box;">
-    <ride-form></ride-form>
-  </div>
 
-  <div style="flex-grow: 1; height: 100%;">
-    <app-map></app-map>
+<div *ngIf="accessAllowed">
+  <div style="display: flex; height: 100vh;">
+    <div style="width: 500px; padding: 20px; box-sizing: border-box;">
+      <ride-form></ride-form>
+    </div>
+
+    <div style="flex-grow: 1; height: 100%;">
+      <app-map></app-map>
+    </div>
   </div>
+</div>
+
+<div *ngIf="!accessAllowed">
+  access denied
 </div>
