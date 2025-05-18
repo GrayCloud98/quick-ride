@@ -17,6 +17,30 @@
   color: #4285F3;
 }
 
-.pinlocation-btn {
+.toggle-btn {
   color: red;
+}
+
+.coordinate-fields {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.coordinate-fields .example-full-width {
+  flex: 1;
+  min-width: 150px;
+}
+
+.actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.manual-mode-box {
+  background-color: #E0E2EC;
+  padding: 16px;
+  border-radius: 8px;
 }
