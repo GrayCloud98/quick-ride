@@ -24,7 +24,7 @@ import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
 import {LocationCardComponent} from './components/location-card/location-card.component';
 
 import {GoogleMap, GoogleMapsModule} from '@angular/google-maps';
-import { MapComponent } from './components/map/map.component'
+import { MapComponent } from '../map/map.component'
 
 @NgModule({
   declarations: [
