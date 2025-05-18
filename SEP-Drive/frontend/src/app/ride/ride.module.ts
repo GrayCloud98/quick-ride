@@ -7,7 +7,7 @@ import {PlacesService} from './services/places.service';
 import {RideRequestService} from './services/ride-request.service';
 
 import {RideFormComponent} from './components/ride-form/ride-form.component';
-import {RidePageComponent} from './pages/ride-page/ride-page.component';
+import {RequestRidePageComponent} from './pages/request-ride/request-ride-page.component';
 
 import {BrowserModule} from '@angular/platform-browser';
 import {ReactiveFormsModule, FormsModule} from '@angular/forms';
@@ -30,7 +30,7 @@ import { MapComponent } from '../map/map.component'
   declarations: [
     RideFormComponent,
     LocationAutocompleteComponent,
-    RidePageComponent,
+    RequestRidePageComponent,
     ActiveRidePageComponent,
     LocationCardComponent,
     MapComponent
