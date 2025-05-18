@@ -7,7 +7,7 @@ import {PlacesService} from './services/places.service';
 import {RideRequestService} from './services/ride-request.service';
 
 import {RideFormComponent} from './components/ride-form/ride-form.component';
-import {RidePageComponent} from './components/ride-page/ride-page.component';
+import {RidePageComponent} from './pages/ride-page/ride-page.component';
 
 import {BrowserModule} from '@angular/platform-browser';
 import {ReactiveFormsModule, FormsModule} from '@angular/forms';
@@ -19,7 +19,7 @@ import {MatIcon} from '@angular/material/icon';
 import {MatTooltip} from '@angular/material/tooltip';
 import {LocationAutocompleteComponent} from './components/location-autocomplete/location-autocomplete.component';
 import {MatRadioModule} from '@angular/material/radio';
-import {ActiveRidePageComponent} from './components/active-ride-page/active-ride-page.component';
+import {ActiveRidePageComponent} from './pages/active-ride-page/active-ride-page.component';
 import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
 import {LocationCardComponent} from './components/location-card/location-card.component';
 
