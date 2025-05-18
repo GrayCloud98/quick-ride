@@ -4,7 +4,7 @@
     [placeholder]="'Restaurant'"
     [control]="pickupControl"
     (locationSelected)="onLocationSelected($event, updateType.pickup)"
-    (pinClicked)="pinLocation(updateType.pickup)">
+    >
 
     <button mat-icon-button matSuffix (click)="myLocation()" type="button" class="mylocation-btn"
             matTooltip="Use current location"
@@ -18,7 +18,7 @@
     [placeholder]="'Cinema'"
     [control]="dropoffControl"
     (locationSelected)="onLocationSelected($event, updateType.dropoff)"
-    (pinClicked)="pinLocation(updateType.dropoff)">
+    >
   </app-location-autocomplete>
 
   <div class="form-label">Select a vehicle class:</div>

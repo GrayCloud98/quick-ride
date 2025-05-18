@@ -16,7 +16,6 @@ export class LocationAutocompleteComponent implements OnInit {
   @Input() placeholder: string = '';
   @Input() control!: FormControl;
   @Output() locationSelected = new EventEmitter<Location>();
-  @Output() pinClicked = new EventEmitter<void>();
 
   manualMode = false;
   latitude = new FormControl<number | null>(null, [
