@@ -17,7 +17,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatButton, MatFabButton, MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {MatTooltip} from '@angular/material/tooltip';
-import {LocationAutocompleteComponent} from './components/location-autocomplete/location-autocomplete.component';
+import {SelectLocationComponent} from './components/location-autocomplete/select-location.component';
 import {MatRadioModule} from '@angular/material/radio';
 import {ActiveRidePageComponent} from './pages/active-ride-page/active-ride-page.component';
 import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
@@ -29,7 +29,7 @@ import { MapComponent } from '../map/map.component'
 @NgModule({
   declarations: [
     RideFormComponent,
-    LocationAutocompleteComponent,
+    SelectLocationComponent,
     RequestRidePageComponent,
     ActiveRidePageComponent,
     LocationCardComponent,

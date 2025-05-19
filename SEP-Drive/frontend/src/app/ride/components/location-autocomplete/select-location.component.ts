@@ -6,12 +6,12 @@ import {PlacesService} from '../../services/places.service';
 import {Location} from '../../models/location.model';
 
 @Component({
-  selector: 'app-location-autocomplete',
+  selector: 'select-location',
   standalone: false,
-  templateUrl: './location-autocomplete.component.html',
-  styleUrls: ['./location-autocomplete.component.scss']
+  templateUrl: './select-location.component.html',
+  styleUrls: ['./select-location.component.scss']
 })
-export class LocationAutocompleteComponent implements OnInit {
+export class SelectLocationComponent implements OnInit {
   @Input() label: string = '';
   @Input() placeholder: string = '';
   @Input() control!: FormControl;

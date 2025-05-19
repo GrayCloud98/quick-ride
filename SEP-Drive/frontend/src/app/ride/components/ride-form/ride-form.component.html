@@ -1,5 +1,5 @@
 <form>
-  <app-location-autocomplete
+  <select-location
     [label]="'Pickup Location'"
     [placeholder]="'Restaurant'"
     [control]="pickupControl"
@@ -11,15 +11,15 @@
             matTooltipPosition="right">
       <mat-icon>my_location</mat-icon>
     </button>
-  </app-location-autocomplete>
+  </select-location>
 
-  <app-location-autocomplete
+  <select-location
     [label]="'Drop-off Location'"
     [placeholder]="'Cinema'"
     [control]="dropoffControl"
     (locationSelected)="onLocationSelected($event, updateType.dropoff)"
     >
-  </app-location-autocomplete>
+  </select-location>
 
   <div class="form-label">Select a vehicle class:</div>
   <mat-radio-group [(ngModel)]="ride.vehicleClass" name="vehicleClass">
