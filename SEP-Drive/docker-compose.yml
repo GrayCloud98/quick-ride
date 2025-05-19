@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "4200:80"
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./h2data:/data
+      - ./uploads:/app/uploads
+
+    environment:
+      SUPER_CODE: super1
+      JWT_SECRET: superdupersecretkey324chasdasfwerqwre
