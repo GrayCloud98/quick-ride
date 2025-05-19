@@ -12,6 +12,7 @@ import { AuthService } from '../auth/auth.service';
 
 export class ProfilePageComponent implements OnInit {
   profileData: any = {};
+  public isOwnProfile: any;
 
     constructor(
         private profileService: ProfileService,
@@ -27,13 +28,15 @@ export class ProfilePageComponent implements OnInit {
         this.profileService.getAllProfiles().subscribe({
           next: (data: any[]) => {
             this.profileData = data.find(user => user.username === username);
+
             if (this.profileData) {
               if (this.profileData.profilePicture && !this.profileData.profilePicture.startsWith('http')) {
                 this.profileData.profilePicture = `http://localhost:8080${this.profileData.profilePicture}`;
-                this.authService.updatePhotoUrl(this.profileData.profilePicture);
               }
-            }
-            else {
+              // Check if this is the currently logged-in user's profile
+              const loggedInUser = this.authService.currentUserValue;
+              this.isOwnProfile = loggedInUser && loggedInUser.username === username;
+            } else {
               console.warn('User not found!');
             }
           },
@@ -48,11 +51,12 @@ export class ProfilePageComponent implements OnInit {
     });
   }
 
+
   logout() {
     if (this.authService.clearUserData) {
       this.authService.clearUserData();
     } else {
-      console.error("❌ clearUserData not found in AuthService!");
+      console.error("clearUserData not found in AuthService!");
     }
   }
 
