@@ -13,12 +13,12 @@
   font-style: italic;
 }
 
-.mylocation-btn {
-  color: #4285F3;
-}
-
 .toggle-btn {
   color: red;
+  &:hover {
+    color: white;
+    background-color: #F08784;
+  }
 }
 
 .coordinate-fields {
@@ -43,4 +43,13 @@
   background-color: #E0E2EC;
   padding: 16px;
   border-radius: 8px;
+}
+
+.btn {
+  background-color: #CED7E8 ;
+
+  &:hover {
+    color: white;
+    background-color: #2563eb;
+  }
 }

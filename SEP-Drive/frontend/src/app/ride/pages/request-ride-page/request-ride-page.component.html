@@ -1,0 +1,13 @@
+<div *ngIf="accessAllowed" class="main-container">
+  <div class="ride-form-container">
+    <ride-form/>
+  </div>
+
+  <div class="map-container">
+    <app-map/>
+  </div>
+</div>
+
+<div *ngIf="!accessAllowed" class="centered-box alert error" style="width: 500px">
+  Please log in as a Customer first.
+</div>
