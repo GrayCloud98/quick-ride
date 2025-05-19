@@ -30,7 +30,6 @@ export class ProfilePageComponent implements OnInit {
             if (this.profileData) {
               if (this.profileData.profilePicture && !this.profileData.profilePicture.startsWith('http')) {
                 this.profileData.profilePicture = `http://localhost:8080${this.profileData.profilePicture}`;
-                this.authService.updatePhotoUrl(this.profileData.profilePicture);
               }
             }
             else {
