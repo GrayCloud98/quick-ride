@@ -121,4 +121,8 @@ export class AuthService {
     return this.http.get<boolean>(`http://localhost:8080/api/ride-requests/${username}/is-customer`);
   }
 
+  get currentUserValue(): any {
+    return this.currentUserSubject.value;
+  }
+
 }
