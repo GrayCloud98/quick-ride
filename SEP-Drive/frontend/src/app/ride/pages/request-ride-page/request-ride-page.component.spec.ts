@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RidePageComponent } from './ride-page.component';
+import { RequestRidePageComponent } from './request-ride-page.component';
 
 describe('RidePageComponent', () => {
-  let component: RidePageComponent;
-  let fixture: ComponentFixture<RidePageComponent>;
+  let component: RequestRidePageComponent;
+  let fixture: ComponentFixture<RequestRidePageComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [RidePageComponent]
+      declarations: [RequestRidePageComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(RidePageComponent);
+    fixture = TestBed.createComponent(RequestRidePageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

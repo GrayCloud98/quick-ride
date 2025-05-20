@@ -2,12 +2,12 @@ import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../../../auth/auth.service';
 
 @Component({
-  selector: 'app-ride-page',
+  selector: 'app-request-ride-page',
   standalone: false,
-  templateUrl: './ride-page.component.html',
-  styleUrl: './ride-page.component.scss'
+  templateUrl: './request-ride-page.component.html',
+  styleUrl: './request-ride-page.component.scss'
 })
-export class RidePageComponent implements OnInit {
+export class RequestRidePageComponent implements OnInit {
   username: string = '';
   accessAllowed: boolean = false;
 

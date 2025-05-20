@@ -1,0 +1,55 @@
+.example-form {
+  min-width: 150px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.example-full-width {
+  width: 100%;
+}
+
+.address-text {
+  color: grey;
+  font-style: italic;
+}
+
+.toggle-btn {
+  color: red;
+  &:hover {
+    color: white;
+    background-color: #F08784;
+  }
+}
+
+.coordinate-fields {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.coordinate-fields .example-full-width {
+  flex: 1;
+  min-width: 150px;
+}
+
+.actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.manual-mode-box {
+  background-color: #E0E2EC;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.btn {
+  background-color: #CED7E8 ;
+
+  &:hover {
+    color: white;
+    background-color: #2563eb;
+  }
+}

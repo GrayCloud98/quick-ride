@@ -104,29 +104,6 @@ export class RideFormComponent implements OnInit {
     })
   }
 
-  //TODO: Update with map visualization API
-  pinLocation(type: updateType | number) {
-    const mockupLocation: Location = {
-      latitude: 50,
-      longitude: 50,
-      name: 'Pin Location',
-      address: 'This is a mockup address'
-    };
-
-    switch (type) {
-      case updateType.pickup:
-        this.pickupControl.setValue(mockupLocation);
-        this.onLocationSelected(mockupLocation, updateType.pickup);
-
-        break;
-
-      case updateType.dropoff:
-        this.dropoffControl.setValue(mockupLocation);
-        this.onLocationSelected(mockupLocation, updateType.dropoff);
-        break;
-    }
-  }
-
   get isFormInvalid(): boolean {
     return (
       this.ride.active ||
@@ -152,8 +129,6 @@ export class RideFormComponent implements OnInit {
       startAddress: `${this.ride.pickup.address}`,
       destinationAddress: `${this.ride.dropoff.address}`
     };
-
-    console.log("this is the file to send to database:", rideDataJson)
 
     this.rideService.submitRide(rideDataJson).subscribe({
       next: () => {

@@ -19,14 +19,19 @@
       <p><strong>Total Rides:</strong> {{ profileData?.totalRides }}</p>
       <p><strong>Rating:</strong> ⭐⭐⭐⭐✰</p>
 
-      <!-- 🔍 Vehicle Class only for Driver -->
+      <!-- Vehicle Class only for Driver -->
       <p *ngIf="profileData?.role === 'Driver'">
         <strong>Vehicle Class:</strong> {{ profileData?.vehicleClass ? profileData.vehicleClass : 'Not specified' }}
       </p>
     </div>
   </div>
 
-  <button mat-raised-button color="warn" (click)="logout()" class="logout-button">
+  <button
+    *ngIf="isOwnProfile"
+    mat-raised-button
+    color="warn"
+    (click)="logout()"
+    class="logout-button">
     Logout
   </button>
 

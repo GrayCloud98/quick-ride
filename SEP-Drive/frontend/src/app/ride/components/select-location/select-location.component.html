@@ -1,0 +1,80 @@
+<ng-container *ngIf="!manualMode">
+  <mat-form-field class="example-full-width">
+    <mat-label>{{ label }}</mat-label>
+    <input type="text"
+           matInput
+           [placeholder]="placeholder"
+           [formControl]="control"
+           [matAutocomplete]="auto"
+           [attr.aria-label]="label">
+
+    <span matSuffix>
+      <ng-container *ngTemplateOutlet="suffixContainer"></ng-container>
+    </span>
+
+    <button mat-icon-button matSuffix type="button" (click)="toggleManualMode()"
+            class="toggle-btn"
+            matTooltip="Switch to manual coordinate entry"
+            matTooltipPosition="right">
+      <mat-icon>location_on</mat-icon>
+    </button>
+
+    <mat-error *ngIf="control.hasError('required')">
+      This field is required.
+    </mat-error>
+
+    <mat-autocomplete #auto="matAutocomplete"
+                      [displayWith]="displayFn"
+                      (optionSelected)="onLocationSelected($event.option.value)">
+      <mat-option *ngFor="let loc of filteredLocations | async" [value]="loc">
+        {{ loc.name }}
+        <br>
+        <span class="address-text">{{ loc.address }}</span>
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+</ng-container>
+
+<ng-container *ngIf="manualMode">
+  <div class="manual-mode-box">
+
+    <mat-label>{{ label }}</mat-label>
+    <br>
+
+    <div class="coordinate-fields">
+      <mat-form-field appearance="fill" class="example-full-width">
+        <mat-label>Latitude</mat-label>
+        <input matInput type="number" [formControl]="latitude">
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="example-full-width">
+        <mat-label>Longitude</mat-label>
+        <input matInput type="number" [formControl]="longitude">
+      </mat-form-field>
+    </div>
+
+    <div class="actions centered-box">
+      <button class="btn" mat-button type="button" (click)="useManualCoordinates()">Set Location</button>
+      <button mat-icon-button type="button" (click)="toggleManualMode()"
+            class="toggle-btn"
+            matTooltip="Switch to address search"
+            matTooltipPosition="right">
+      <mat-icon>search</mat-icon>
+    </button>
+    </div>
+
+    <div class="alert error" *ngIf="latitude.hasError('min') || latitude.hasError('max')">
+      Latitude must be between -90 and 90.
+    </div>
+
+    <div class="alert error" *ngIf="longitude.hasError('min') || longitude.hasError('max')">
+      Longitude must be between -180 and 180.
+    </div>
+
+  </div>
+  <br>
+</ng-container>
+
+<ng-template #suffixContainer>
+  <ng-content select="[matSuffix]"></ng-content>
+</ng-template>

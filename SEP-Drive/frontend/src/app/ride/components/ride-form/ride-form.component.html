@@ -1,25 +1,25 @@
 <form>
-  <app-location-autocomplete
+  <select-location
     [label]="'Pickup Location'"
     [placeholder]="'Restaurant'"
     [control]="pickupControl"
     (locationSelected)="onLocationSelected($event, updateType.pickup)"
-    (pinClicked)="pinLocation(updateType.pickup)">
+    >
 
     <button mat-icon-button matSuffix (click)="myLocation()" type="button" class="mylocation-btn"
             matTooltip="Use current location"
             matTooltipPosition="right">
       <mat-icon>my_location</mat-icon>
     </button>
-  </app-location-autocomplete>
+  </select-location>
 
-  <app-location-autocomplete
+  <select-location
     [label]="'Drop-off Location'"
     [placeholder]="'Cinema'"
     [control]="dropoffControl"
     (locationSelected)="onLocationSelected($event, updateType.dropoff)"
-    (pinClicked)="pinLocation(updateType.dropoff)">
-  </app-location-autocomplete>
+    >
+  </select-location>
 
   <div class="form-label">Select a vehicle class:</div>
   <mat-radio-group [(ngModel)]="ride.vehicleClass" name="vehicleClass">
