@@ -34,6 +34,14 @@ public class RideRequest {
     private Double destinationLatitude;
     private Double destinationLongitude;
 
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
 
     @Column
     @Enumerated(EnumType.STRING)
@@ -63,6 +71,13 @@ public class RideRequest {
     }
 
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
     public String getStartLocationName() {
         return startLocationName;

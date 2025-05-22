@@ -1,5 +1,6 @@
 package com.example.sep_drive_backend.services;
 
+import com.example.sep_drive_backend.dto.RidesForDriversDTO;
 import com.example.sep_drive_backend.models.Customer;
 import com.example.sep_drive_backend.models.RideRequest;
 import com.example.sep_drive_backend.repository.CustomerRepository;
@@ -7,8 +8,11 @@ import com.example.sep_drive_backend.repository.RideRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.sep_drive_backend.dto.RideRequestDTO;
+
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class RideRequestService {
@@ -74,6 +78,19 @@ public class RideRequestService {
     }
     public boolean isCustomer(String username) {
         return customerRepository.findByUsername(username).isPresent();
+    }
+
+    public List<RidesForDriversDTO> getAllRideRequests(double latDriver) {
+        return repository.findAll().stream()
+                .map(r -> {
+                    double distance = calculateDistance(latDriver, r.getStartLatitude());
+                    return new RidesForDriversDTO(r, distance);
+                })
+                .collect(Collectors.toList());
+    }
+
+    private double calculateDistance(double latDriver, double latCustomer) {
+        return latDriver - latCustomer;
     }
 
 }
