@@ -63,9 +63,9 @@ public class RideRequestController {
 //        return ResponseEntity.ok(rideRequests);
 //    }
     @GetMapping("/all-active-rides")
-    public ResponseEntity<List<RidesForDriversDTO>> getAllRideRequests(@RequestParam double driverLat) {
+    public ResponseEntity<List<RidesForDriversDTO>> getAllRideRequests(@RequestParam double driverLat, @RequestParam double driverLon) {
 
-        List<RidesForDriversDTO> rideRequests = rideRequestService.getAllRideRequests(driverLat);
+        List<RidesForDriversDTO> rideRequests = rideRequestService.getAllRideRequests(driverLat, driverLon);
         return ResponseEntity.ok(rideRequests);
     }
 
