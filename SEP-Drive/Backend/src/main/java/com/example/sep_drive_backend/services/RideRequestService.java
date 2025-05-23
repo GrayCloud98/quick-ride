@@ -104,7 +104,7 @@ public class RideRequestService {
 //        return driverPoint.distance(customerPoint).to(Length.Unit.KILOMETER);
 //    }
 
-private static final double EARTH_RADIUS_KM = 6371.0;
+    private static final double EARTH_RADIUS_KM = 6371.0;
 
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
         double latDistance = Math.toRadians(lat2 - lat1);

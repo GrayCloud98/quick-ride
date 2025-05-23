@@ -1,5 +1,6 @@
 package com.example.sep_drive_backend.controller;
 
+import com.example.sep_drive_backend.dto.DriverLocationDTO;
 import com.example.sep_drive_backend.dto.RideRequestDTO;
 import com.example.sep_drive_backend.dto.RidesForDriversDTO;
 import com.example.sep_drive_backend.models.RideRequest;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 
@@ -62,12 +64,23 @@ public class RideRequestController {
 //        List<RidesForDriversDTO> rideRequests = rideRequestService.getAllRideRequests();
 //        return ResponseEntity.ok(rideRequests);
 //    }
-    @GetMapping("/all-active-rides")
-    public ResponseEntity<List<RidesForDriversDTO>> getAllRideRequests(@RequestParam double driverLat, @RequestParam double driverLon) {
+
+
+    @PostMapping("/all-active-rides")
+    public ResponseEntity<List<RidesForDriversDTO>> getAllRideRequests(
+            @RequestBody DriverLocationDTO location,
+            Principal principal) {
+
+        String username = principal.getName();
+        System.out.println("Authenticated user: " + username);
+
+        double driverLat = location.getDriverLat();
+        double driverLon = location.getDriverLon();
 
         List<RidesForDriversDTO> rideRequests = rideRequestService.getAllRideRequests(driverLat, driverLon);
         return ResponseEntity.ok(rideRequests);
     }
+
 
 
 
