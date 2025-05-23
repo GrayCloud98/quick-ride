@@ -10,7 +10,6 @@ import {AuthService} from '../../../auth/auth.service';
 export class RequestRidePageComponent implements OnInit {
   username: string = '';
   accessAllowed: boolean = false;
-
   constructor(private authService: AuthService) {}
 
   ngOnInit() {

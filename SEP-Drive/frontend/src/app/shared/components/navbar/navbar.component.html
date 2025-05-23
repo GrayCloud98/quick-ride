@@ -6,8 +6,8 @@
     mat-raised-button
     color="accent"
     class="nav-btn"
-    (click)="activeRide ? routeToActiveRide() : routeToRideRequest()">
-    {{ activeRide ? 'Active Request' : 'Request Ride' }}
+    (click)="userHasActiveRide ? routeToActiveRide() : routeToRideRequest()">
+    {{ userHasActiveRide ? 'Active Request' : 'Request Ride' }}
   </button>
 
 

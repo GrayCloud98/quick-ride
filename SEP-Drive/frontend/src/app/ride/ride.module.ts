@@ -1,61 +1,41 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
+import {BrowserModule} from '@angular/platform-browser';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import { GoogleMap, GoogleMapsModule } from '@angular/google-maps';
+
 import {RideRoutingModule} from './ride-routing.module';
+
+import {RequestRidePageComponent} from './pages/request-ride-page/request-ride-page.component';
+import {RideFormComponent} from './components/ride-form/ride-form.component';
+import {SelectLocationComponent} from './components/select-location/select-location.component';
+import {MapComponent} from '../map/map.component';
+import {ActiveRidePageComponent} from './pages/active-ride-page/active-ride-page.component';
+import {LocationCardComponent} from './components/location-card/location-card.component';
+
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatInputModule} from '@angular/material/input';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatRadioModule} from '@angular/material/radio';
+import {MatButton, MatFabButton, MatIconButton} from '@angular/material/button';
+import {MatIcon} from '@angular/material/icon';
+import {MatTooltip} from '@angular/material/tooltip';
+import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
 
 import {GeolocationService} from './services/geolocation.service';
 import {PlacesService} from './services/places.service';
 import {RideRequestService} from './services/ride-request.service';
 
-import {RideFormComponent} from './components/ride-form/ride-form.component';
-import {RequestRidePageComponent} from './pages/request-ride-page/request-ride-page.component';
-
-import {BrowserModule} from '@angular/platform-browser';
-import {ReactiveFormsModule, FormsModule} from '@angular/forms';
-import {MatAutocompleteModule} from '@angular/material/autocomplete';
-import {MatInputModule} from '@angular/material/input';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatButton, MatFabButton, MatIconButton} from '@angular/material/button';
-import {MatIcon} from '@angular/material/icon';
-import {MatTooltip} from '@angular/material/tooltip';
-import {SelectLocationComponent} from './components/select-location/select-location.component';
-import {MatRadioModule} from '@angular/material/radio';
-import {ActiveRidePageComponent} from './pages/active-ride-page/active-ride-page.component';
-import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
-import {LocationCardComponent} from './components/location-card/location-card.component';
-
-import {GoogleMap, GoogleMapsModule} from '@angular/google-maps';
-import { MapComponent } from '../map/map.component'
-
 @NgModule({
   declarations: [
-    RideFormComponent,
-    SelectLocationComponent,
-    RequestRidePageComponent,
-    ActiveRidePageComponent,
-    LocationCardComponent,
-    MapComponent
+    RequestRidePageComponent, RideFormComponent, SelectLocationComponent, MapComponent,
+    ActiveRidePageComponent, LocationCardComponent
   ],
   imports: [
-    CommonModule,
-    RideRoutingModule,
-
-    BrowserModule,
-    ReactiveFormsModule,
-    FormsModule,
-    MatAutocompleteModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatIconButton,
-    MatIcon,
-    MatTooltip,
-    MatButton,
-    MatFabButton,
-    MatRadioModule,
-    MatCard,
-    MatCardContent,
-    MatCardTitle,
-    GoogleMap,
-    GoogleMapsModule
+    CommonModule, BrowserModule, FormsModule, ReactiveFormsModule, RideRoutingModule,
+    GoogleMapsModule, GoogleMap,
+    MatAutocompleteModule, MatInputModule, MatFormFieldModule, MatRadioModule,
+    MatButton, MatFabButton, MatIconButton, MatIcon, MatTooltip, MatCard, MatCardContent, MatCardTitle
   ],
   providers: [
     GeolocationService,

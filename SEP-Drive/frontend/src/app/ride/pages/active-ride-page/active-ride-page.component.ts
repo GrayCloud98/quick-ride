@@ -1,10 +1,12 @@
 import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {filter, switchMap, tap} from 'rxjs';
+
 import {Ride, VehicleClass} from '../../models/ride.model';
 import {Location} from '../../models/location.model'
-import {Router} from '@angular/router';
+
 import {RideRequestService} from '../../services/ride-request.service';
 import {AuthService} from '../../../auth/auth.service';
-import {filter, switchMap, tap} from 'rxjs';
 
 @Component({
   selector: 'app-active-ride-page',
@@ -19,13 +21,11 @@ export class ActiveRidePageComponent implements OnInit {
   accessAllowed: boolean = false;
   userHasActiveRide: boolean = true;
   activeRide!: Ride;
-
   constructor(
     private rideService: RideRequestService,
     private authService: AuthService,
     private router: Router) {
   }
-
 
   deactivateRide() {
     this.rideService.deactivateRide(this.username).subscribe({
@@ -46,7 +46,7 @@ export class ActiveRidePageComponent implements OnInit {
       switchMap(() => this.authService.isCustomer(this.username)),
       tap(isCustomer => this.accessAllowed = isCustomer),
       filter(isCustomer => isCustomer),
-      switchMap(() => this.rideService.userHasActiveRide(this.username)),
+      switchMap(() => this.rideService.activeRideStatus$),
       tap(hasActive => this.userHasActiveRide = hasActive),
       filter(hasActive => hasActive),
       switchMap(() => this.rideService.getRide(this.username)),
@@ -57,7 +57,6 @@ export class ActiveRidePageComponent implements OnInit {
   }
 
   private mapToRide(raw: any): Ride {
-
     const pickup: Location = {
       name: raw.startLocationName || undefined,
       latitude: Number(raw.startLatitude),
@@ -72,13 +71,11 @@ export class ActiveRidePageComponent implements OnInit {
       address: raw.destinationAddress || undefined,
     };
 
-    const ride: Ride = {
+    return {
       pickup,
       dropoff,
       vehicleClass: raw.vehicleClass as VehicleClass,
       active: true
     };
-
-    return ride;
   }
 }
