@@ -19,8 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LoginService {
 
 
-    @Value("${SUPER_CODE}")
-    private String superCode;
+    //@Value("${SUPER_CODE}")
+    private String superCode = "super1";
 
     private final DriverRepository driverRepository;
     private final CustomerRepository customerRepository;

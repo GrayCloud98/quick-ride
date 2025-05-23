@@ -17,8 +17,8 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${JWT_SECRET}")
-    private String secretKeyString;
+    //@Value("${JWT_SECRET}")
+    private String secretKeyString = "superdupersecretkey324chasdasfwerqwre";
 
     private SecretKey secretKey;
 
