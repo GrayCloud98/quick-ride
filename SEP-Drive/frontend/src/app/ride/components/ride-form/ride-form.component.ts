@@ -5,7 +5,6 @@ import {Router} from '@angular/router';
 import {Location} from '../../models/location.model'
 import {Ride, VehicleClass} from '../../models/ride.model';
 
-import {GeolocationService} from '../../services/geolocation.service';
 import {RideRequestService} from '../../services/ride-request.service';
 import {AuthService} from '../../../auth/auth.service';
 
@@ -22,14 +21,16 @@ enum updateType {
 })
 export class RideFormComponent implements OnInit {
   username!: string
+  vehicles = Object.values(VehicleClass);
+
   pickupPicked: boolean = false;
   dropoffPicked: boolean = false;
+
   protected readonly updateType = updateType;
 
   pickupControl = new FormControl<Location | string>('', [Validators.required]);
   dropoffControl = new FormControl<Location | string>('', [Validators.required]);
 
-  vehicles = Object.values(VehicleClass);
   ride: Ride = {
     pickup: {latitude: 0, longitude: 0},
     dropoff: {latitude: 0, longitude: 0},
@@ -37,20 +38,19 @@ export class RideFormComponent implements OnInit {
     active: false
   };
 
+  constructor(
+    private rideService: RideRequestService,
+    private authService: AuthService,
+    private router: Router,
+  ) {
+  }
+
   get isFormInvalid(): boolean {
     return (
       this.ride.active ||
       !this.pickupPicked ||
       !this.dropoffPicked
     );
-  }
-
-  constructor(
-    private geolocationService: GeolocationService,
-    private rideService: RideRequestService,
-    private authService: AuthService,
-    private router: Router,
-  ) {
   }
 
   ngOnInit() {
@@ -83,14 +83,6 @@ export class RideFormComponent implements OnInit {
         break;
     }
   }
-
-  myLocation() {
-    this.geolocationService.getLocation().subscribe({
-      next: (myLocation: Location) => this.onLocationSelected(myLocation, updateType.pickup),
-      error: err => console.log(err)
-    })
-  }
-
 
   submit() {
     const rideDataJson: any = {

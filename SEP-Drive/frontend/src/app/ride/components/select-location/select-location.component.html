@@ -9,9 +9,12 @@
            [attr.aria-label]="label"
     >
 
-    <span matSuffix>
-      <ng-container *ngTemplateOutlet="suffixContainer"></ng-container>
-    </span>
+    <button mat-icon-button matSuffix *ngIf="geoLocationButton"
+            (click)="myLocation()" type="button" class="mylocation-btn"
+            matTooltip="Use current location"
+            matTooltipPosition="right">
+      <mat-icon>my_location</mat-icon>
+    </button>
 
     <button mat-icon-button matSuffix type="button" (click)="toggleManualMode()"
             class="toggle-btn"
@@ -83,7 +86,3 @@
   </div>
   <br>
 </ng-container>
-
-<ng-template #suffixContainer>
-  <ng-content select="[matSuffix]"></ng-content>
-</ng-template>
