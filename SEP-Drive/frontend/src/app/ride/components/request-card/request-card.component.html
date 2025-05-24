@@ -1,0 +1,52 @@
+<mat-card>
+  <mat-card-content>
+
+    <div class="header">
+      <mat-icon>route</mat-icon>
+      <span class="label">Distance to Pickup:</span>
+      <span >{{ request.driverToStartDistance }} km</span>
+    </div>
+
+    <div class="header">
+      <mat-icon>directions_car</mat-icon>
+      <span class="label">Requested Vehicle Type:</span>
+      <span >{{ request.desiredVehicleClass }} </span>
+    </div>
+
+    <div class="header">
+      <mat-icon>hail</mat-icon>
+      <span class="label">Customer Name:</span>
+      <span >{{ request.customerName }} </span>
+    </div>
+
+    <div class="header">
+      <mat-icon>star</mat-icon>
+      <span class="label">Customer Rating:</span>
+      <span >{{ request.customerRating }} </span>
+    </div>
+
+    <div class="header">
+      <mat-icon>hourglass_full</mat-icon>
+      <span class="label">Requested at:</span>
+      <span >{{ request.createdAt }}</span>
+    </div>
+
+    <div class="header">
+      <mat-icon>sell</mat-icon>
+      <span class="label">Request ID:</span>
+      <span >{{ request.requestID }}</span>
+    </div>
+
+    <div class="location-cards-container">
+      <app-location-card label="Pickup at" [location]="request.pickup"></app-location-card>
+      <app-location-card label="Drop off at" [location]="request.dropoff"></app-location-card>
+    </div>
+
+    <div class="padding">
+      <button class="btn" mat-fab extended (click)="accept()">
+        Accept Request
+      </button>
+    </div>
+
+  </mat-card-content>
+</mat-card>
