@@ -28,6 +28,32 @@ export class RequestsListPageComponent {
   acceptRequest() {
     console.log("accepted")
   }
+
+  sortRequests(attr: keyof Request, direction: 'asc' | 'desc') {
+    const compare = (a: Request, b: Request) => {
+      let valA = a[attr];
+      let valB = b[attr];
+
+      if (attr === 'createdAt') {
+        valA = new Date(valA as string).getTime();
+        valB = new Date(valB as string).getTime();
+      }
+
+      if (valA == null) return -1;
+      if (valB == null) return 1;
+
+      if (valA < valB) return direction === 'asc' ? -1 : 1;
+      if (valA > valB) return direction === 'asc' ? 1 : -1;
+      return 0;
+    };
+
+    this.activeRequests.sort(compare);
+  }
+
+  // TODO add buttons for dynamic sorting (sorting in ngOnInit is only for testing)
+  ngOnInit() {
+    this.sortRequests('createdAt', 'desc');
+  }
 }
 
 
