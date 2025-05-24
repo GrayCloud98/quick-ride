@@ -1,28 +1,45 @@
-<div class="driver-location">
-  <select-location
-    [label]="'My Position'"
-    [placeholder]="'Train Station'"
-    [control]="currentPositionControl"
-    [geoLocationButton]="true"
-    (locationSelected)="onLocationSelected($event)"
-  >
-  </select-location>
+<div class="main-container">
+  <div class="left-container">
+    <select-location
+      [label]="'My Position'"
+      [placeholder]="'Train Station'"
+      [control]="currentPositionControl"
+      [geoLocationButton]="true"
+      (locationSelected)="onLocationSelected($event)"
+    >
+    </select-location>
 
-<!--TODO Fix styling-->
-  <h1>Sort with</h1>
-  <mat-radio-group aria-label="Select an option">
-    <div *ngFor="let option of sortOptions">
-      {{ option.label }}
-      <mat-radio-button (click)="sortRequests(option.key, 'asc')"></mat-radio-button>
-      <mat-radio-button (click)="sortRequests(option.key, 'desc')"></mat-radio-button>
-    </div>
-  </mat-radio-group>
+    <h1 class="sort-header">Sort by</h1>
+    <mat-radio-group  class="sort-group">
 
-</div>
+      <div *ngFor="let option of sortOptions" class="sort-option">
+        <span class="sort-label">{{ option.label }}</span>
+        <div class="radio-buttons">
+          <mat-radio-button
+            (click)="sortRequests(option.key, 'asc')"
+            [value]="option.key + '-asc'"
+          >
+            <mat-icon>arrow_upward</mat-icon>
+          </mat-radio-button>
+          <mat-radio-button
+            (click)="sortRequests(option.key, 'desc')"
+            [value]="option.key + '-desc'"
+          >
+            <mat-icon>arrow_downward</mat-icon>
+          </mat-radio-button>
+        </div>
+      </div>
 
-<div class="centered-box" style="width: 1000px" >
-  <div *ngFor="let request of activeRequests">
+    </mat-radio-group>
+
+
+
+  </div>
+
+  <div class="right-container">
+    <div class="centered-box" style="width: 50%;" *ngFor="let request of activeRequests">
       <request-card [request]="request" (onAccept)="acceptRequest()"></request-card>
-    <br><br><br>
+      <br><br><br>
+    </div>
   </div>
 </div>

@@ -1,5 +1,61 @@
-.driver-location {
-  width: 500px;
-  padding: 20px;
-  box-sizing: border-box;
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
 }
+
+.main-container {
+  display: flex;
+  height: calc(100vh - 64px);
+  overflow: hidden;
+}
+
+.left-container {
+  padding: 20px;
+  width: 500px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.right-container {
+  background-color: rgba(215, 227, 255, 0.31);
+  padding: 20px;
+  flex-grow: 1;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.sort-header {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.sort-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sort-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #E0E2EC;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.sort-label {
+  font-weight: 500;
+  flex: 1;
+}
+
+.radio-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
