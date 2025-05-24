@@ -2,7 +2,7 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {BrowserModule} from '@angular/platform-browser';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import { GoogleMap, GoogleMapsModule } from '@angular/google-maps';
+import {GoogleMap, GoogleMapsModule} from '@angular/google-maps';
 
 import {RideRoutingModule} from './ride-routing.module';
 
@@ -25,11 +25,17 @@ import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
 import {GeolocationService} from './services/geolocation.service';
 import {PlacesService} from './services/places.service';
 import {RideRequestService} from './services/ride-request.service';
+// ***
+import { RequestsListPageComponent } from './pages/requests-list-page/requests-list-page.component';
+import { RequestCardComponent } from './components/request-card/request-card.component';
 
 @NgModule({
   declarations: [
     RequestRidePageComponent, RideFormComponent, SelectLocationComponent, MapComponent,
-    ActiveRidePageComponent, LocationCardComponent
+    ActiveRidePageComponent, LocationCardComponent,
+    //***
+    RequestsListPageComponent,
+    RequestCardComponent
   ],
   imports: [
     CommonModule, BrowserModule, FormsModule, ReactiveFormsModule, RideRoutingModule,

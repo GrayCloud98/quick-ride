@@ -1,0 +1,18 @@
+<div class="driver-location">
+  <select-location
+    [label]="'My Position'"
+    [placeholder]="'Train Station'"
+    [control]="currentPositionControl"
+    [geoLocationButton]="true"
+    (locationSelected)="onLocationSelected($event)"
+  >
+  </select-location>
+</div>
+
+
+<div class="centered-box" style="width: 1000px" >
+  <div *ngFor="let request of activeRequests">
+      <request-card [request]="request" (onAccept)="acceptRequest()"></request-card>
+    <br><br><br>
+  </div>
+</div>

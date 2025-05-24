@@ -3,10 +3,14 @@ import {RouterModule, Routes} from '@angular/router';
 
 import {RequestRidePageComponent} from './pages/request-ride-page/request-ride-page.component';
 import {ActiveRidePageComponent} from './pages/active-ride-page/active-ride-page.component';
+//***
+import {RequestsListPageComponent} from './pages/requests-list-page/requests-list-page.component';
 
 const routes: Routes = [
   {path: "request", component: RequestRidePageComponent},
   {path: "active", component: ActiveRidePageComponent},
+  //***
+  {path: "requests-list", component: RequestsListPageComponent},
 ];
 
 @NgModule({
