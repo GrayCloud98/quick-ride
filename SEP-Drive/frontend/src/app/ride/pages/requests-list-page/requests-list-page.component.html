@@ -7,8 +7,18 @@
     (locationSelected)="onLocationSelected($event)"
   >
   </select-location>
-</div>
 
+<!--TODO Fix styling-->
+  <h1>Sort with</h1>
+  <mat-radio-group aria-label="Select an option">
+    <div *ngFor="let option of sortOptions">
+      {{ option.label }}
+      <mat-radio-button (click)="sortRequests(option.key, 'asc')"></mat-radio-button>
+      <mat-radio-button (click)="sortRequests(option.key, 'desc')"></mat-radio-button>
+    </div>
+  </mat-radio-group>
+
+</div>
 
 <div class="centered-box" style="width: 1000px" >
   <div *ngFor="let request of activeRequests">
