@@ -31,15 +31,22 @@
       </div>
 
     </mat-radio-group>
-
-
-
   </div>
 
   <div class="right-container">
-    <div class="centered-box" style="width: 50%;" *ngFor="let request of allActiveRequests">
-      <request-card [request]="request" (onAccept)="acceptRequest()"></request-card>
-      <br>
-    </div>
+
+      <div class="centered-box half-box alert error" *ngIf="!positionSet">
+        Please enter your position first.
+      </div>
+
+      <div class="centered-box half-box alert error" *ngIf="positionSet && allActiveRequests?.length === 0">
+        No active requests at the moment.
+      </div>
+
+      <div class="centered-box half-box" *ngFor="let request of allActiveRequests">
+        <request-card [request]="request" (onAccept)="acceptRequest()"></request-card>
+        <br>
+      </div>
+
   </div>
 </div>
