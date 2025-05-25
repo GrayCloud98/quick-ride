@@ -37,9 +37,9 @@
   </div>
 
   <div class="right-container">
-    <div class="centered-box" style="width: 50%;" *ngFor="let request of activeRequests">
+    <div class="centered-box" style="width: 50%;" *ngFor="let request of allActiveRequests">
       <request-card [request]="request" (onAccept)="acceptRequest()"></request-card>
-      <br><br><br>
+      <br>
     </div>
   </div>
 </div>
