@@ -6,6 +6,7 @@ import com.example.sep_drive_backend.models.Driver;
 import com.example.sep_drive_backend.models.JwtTokenProvider;
 import com.example.sep_drive_backend.repository.CustomerRepository;
 import com.example.sep_drive_backend.repository.DriverRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LoginService {
 
 
-    //    @Value("${SUPER_CODE}") later for yml (use as environment variable)
-    private static final String SUPER_CODE = "super1";
+    //@Value("${SUPER_CODE}")
+    private String superCode = "super1";
 
     private final DriverRepository driverRepository;
     private final CustomerRepository customerRepository;
@@ -74,7 +75,7 @@ public class LoginService {
 
         String storedCode = verificationCodes.get(username);
         // super code logic
-        if (code.equals(SUPER_CODE)) {
+        if (code.equals(superCode)) {
             verificationCodes.remove(username);
             return jwtTokenProvider.createToken(username);
         }
