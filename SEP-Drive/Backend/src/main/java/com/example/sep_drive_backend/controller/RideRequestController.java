@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 
 
@@ -66,13 +65,10 @@ public class RideRequestController {
 //    }
 
 
-    @PostMapping("/all-active-rides")
+    @GetMapping("/all-active-rides")
     public ResponseEntity<List<RidesForDriversDTO>> getAllRideRequests(
-            @RequestBody DriverLocationDTO location,
-            Principal principal) {
+            @RequestBody DriverLocationDTO location) {
 
-        String username = principal.getName();
-        System.out.println("Authenticated user: " + username);
 
         double driverLat = location.getDriverLat();
         double driverLon = location.getDriverLon();
