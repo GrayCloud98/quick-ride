@@ -24,11 +24,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/home", "/h2-console/**", "/api/auth/**", "/api/users/**", "/uploads/**", "/api/ride-requests/**").permitAll()
+                        .requestMatchers("/", "/home", "/h2-console/**", "/api/auth/**", "/api/users/**", "/uploads/**", "/api/ride-requests/**", "/api/wallet/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/h2-console/**", "/api/auth/**", "/api/ride-requests/**")
+                        .ignoringRequestMatchers("/h2-console/**", "/api/auth/**", "/api/ride-requests/**", "/api/wallet/**")
                 )
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
                 .formLogin(form -> form.disable())
