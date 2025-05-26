@@ -4,9 +4,11 @@ import com.example.sep_drive_backend.dto.RideOfferDTO;
 import com.example.sep_drive_backend.dto.RidesForDriversDTO;
 import com.example.sep_drive_backend.models.Customer;
 import com.example.sep_drive_backend.models.Driver;
+import com.example.sep_drive_backend.models.RideOffer;
 import com.example.sep_drive_backend.models.RideRequest;
 import com.example.sep_drive_backend.repository.CustomerRepository;
 import com.example.sep_drive_backend.repository.DriverRepository;
+import com.example.sep_drive_backend.repository.RideOfferRepository;
 import com.example.sep_drive_backend.repository.RideRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,10 +34,16 @@ public class RideRequestService {
     @Autowired
     private final DriverRepository driverRepository;
 
-    public RideRequestService(RideRequestRepository repository, CustomerRepository customerRepository, DriverRepository driverRepository) {
+    @Autowired
+    private RideOfferRepository RideOfferRepository;
+    @Autowired
+    private RideOfferRepository rideOfferRepository;
+
+    public RideRequestService(RideRequestRepository repository, CustomerRepository customerRepository, DriverRepository driverRepository, RideOfferRepository RideOfferRepository) {
         this.repository = repository;
         this.customerRepository = customerRepository;
         this.driverRepository = driverRepository;
+        this.RideOfferRepository = RideOfferRepository;
     }
 
 
@@ -102,14 +110,17 @@ public class RideRequestService {
                 })
                 .collect(Collectors.toList());
     }
-    public RideOfferDTO createRideOffer(Long rideRequestId, String driverUsername) {
+    public RideOffer createRideOffer(Long rideRequestId, String driverUsername) {
 
         Optional<RideRequest> rideRequestOptional = repository.findById(rideRequestId);
         RideRequest rideRequest = rideRequestOptional.orElseThrow(() -> new NoSuchElementException("Ride request with id " + rideRequestId + " not found"));
         Customer customer = rideRequest.getCustomer();
         Optional<Driver> driverOptional = driverRepository.findByUsername(driverUsername);
         Driver driver = driverOptional.orElseThrow(() -> new NoSuchElementException("Driver with username " + driverUsername + " not found"));
-        return new RideOfferDTO(driver.getTotalRides(), driver.getRating(), driver.getUsername(), customer.getUsername());
+        RideOffer rideOffer = new RideOffer();
+        rideOffer.setDriver(driver);
+        rideOffer.setRideRequest(rideRequest);
+        return rideOfferRepository.save(rideOffer);
     }
 
     public RideOfferDTO acceptRideOffer(Long rideRequestId, String driverUsername) {

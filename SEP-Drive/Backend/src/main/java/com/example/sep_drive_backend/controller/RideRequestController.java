@@ -4,6 +4,7 @@ import com.example.sep_drive_backend.dto.DriverLocationDTO;
 import com.example.sep_drive_backend.dto.RideOfferDTO;
 import com.example.sep_drive_backend.dto.RideRequestDTO;
 import com.example.sep_drive_backend.dto.RidesForDriversDTO;
+import com.example.sep_drive_backend.models.RideOffer;
 import com.example.sep_drive_backend.models.RideRequest;
 import com.example.sep_drive_backend.services.RideRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,9 +80,9 @@ public class RideRequestController {
     }
 
     @PostMapping("/offer-ride")
-    public ResponseEntity<RideOfferDTO> offerRide(@RequestBody Long rideRequestId, @RequestBody String username) {
+    public ResponseEntity<RideOffer> offerRide(@RequestBody Long rideRequestId, @RequestBody String username) {
 
-        RideOfferDTO offer = rideRequestService.createRideOffer(rideRequestId, username);
+        RideOffer offer = rideRequestService.createRideOffer(rideRequestId, username);
         return ResponseEntity.ok(offer);
     }
 
