@@ -65,7 +65,7 @@ public class RideRequestController {
 //    }
 
 
-    @GetMapping("/all-active-rides")
+    @PostMapping("/all-active-rides")
     public ResponseEntity<List<RidesForDriversDTO>> getAllRideRequests(
             @RequestBody DriverLocationDTO location) {
 
