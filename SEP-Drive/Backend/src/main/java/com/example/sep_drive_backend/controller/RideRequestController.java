@@ -1,6 +1,7 @@
 package com.example.sep_drive_backend.controller;
 
 import com.example.sep_drive_backend.dto.DriverLocationDTO;
+import com.example.sep_drive_backend.dto.RideOfferDTO;
 import com.example.sep_drive_backend.dto.RideRequestDTO;
 import com.example.sep_drive_backend.dto.RidesForDriversDTO;
 import com.example.sep_drive_backend.models.RideRequest;
@@ -75,6 +76,13 @@ public class RideRequestController {
 
         List<RidesForDriversDTO> rideRequests = rideRequestService.getAllRideRequests(driverLat, driverLon);
         return ResponseEntity.ok(rideRequests);
+    }
+
+    @PostMapping("/offer-ride")
+    public ResponseEntity<RideOfferDTO> offerRide(@RequestBody Long rideRequestId, @RequestBody String username) {
+
+        RideOfferDTO offer = rideRequestService.createRideOffer(rideRequestId, username);
+        return ResponseEntity.ok(offer);
     }
 
 
