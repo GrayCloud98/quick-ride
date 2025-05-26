@@ -111,4 +111,9 @@ export class NavbarComponent implements OnInit {
   routeToActiveRide() {
     void this.router.navigate([`/ride/active`]);
   }
+
+  routeToRequestsList() {
+    void this.router.navigate([`/ride/requests-list`]);
+  }
+
 }

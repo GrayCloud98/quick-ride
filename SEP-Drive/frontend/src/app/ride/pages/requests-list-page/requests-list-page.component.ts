@@ -1,8 +1,10 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 import {RideRequestService} from '../../services/ride-request.service';
 import {Location} from '../../models/location.model';
 import {Request} from '../../models/request.model';
+import {filter, switchMap, tap} from 'rxjs';
+import {AuthService} from '../../../auth/auth.service';
 
 interface SortOption {
   key: keyof Request,
@@ -14,9 +16,11 @@ interface SortOption {
   templateUrl: './requests-list-page.component.html',
   styleUrl: './requests-list-page.component.scss'
 })
-export class RequestsListPageComponent {
+export class RequestsListPageComponent implements OnInit {
+  accessAllowed: boolean = false;
+  username: string = '';
 
-  allActiveRequests!: Request[];
+  allActiveRequests: Request[] = [];
   currentPositionControl = new FormControl<Location | string>('', [Validators.required]);
   currentPosition!: Location;
   positionSet = false;
@@ -28,7 +32,8 @@ export class RequestsListPageComponent {
     { key: 'createdAt', label: 'Request Time' },
     { key: 'requestID', label: 'Request ID' },
   ];
-  constructor(private rideService: RideRequestService) {
+  constructor(private rideService: RideRequestService,
+              private authService: AuthService) {
   }
 
   onLocationSelected(pos: Location) {
@@ -64,5 +69,14 @@ export class RequestsListPageComponent {
       return 0;
     };
     this.allActiveRequests.sort(compare);
+  }
+
+  ngOnInit() {
+    this.authService.currentUser.pipe(
+      filter(user => !!user?.username),
+      tap(user => this.username = user!.username!),
+      switchMap(() => this.authService.isCustomer(this.username)),
+      tap(isCustomer => this.accessAllowed = !isCustomer)
+    )
   }
 }
