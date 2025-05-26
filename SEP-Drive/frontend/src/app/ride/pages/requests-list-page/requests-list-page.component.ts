@@ -77,6 +77,6 @@ export class RequestsListPageComponent implements OnInit {
       tap(user => this.username = user!.username!),
       switchMap(() => this.authService.isCustomer(this.username)),
       tap(isCustomer => this.accessAllowed = !isCustomer)
-    )
+    ).subscribe()
   }
 }
