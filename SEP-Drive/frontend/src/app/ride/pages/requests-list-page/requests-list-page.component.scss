@@ -13,7 +13,9 @@ html, body {
 
 .left-container {
   padding: 20px;
-  width: 500px;
+  width: 30%;
+  min-width: 280px;
+  max-width: 500px;
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -59,7 +61,9 @@ html, body {
   gap: 1rem;
 }
 
-.half-box{
-  width: 50%;
+.req-card-container{
+  min-width: 500px;
+  max-width: 1000px;
+  width: 100%;
 }
 
