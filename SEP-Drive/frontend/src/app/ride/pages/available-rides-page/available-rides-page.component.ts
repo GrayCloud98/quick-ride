@@ -13,10 +13,10 @@ interface SortOption {
 @Component({
   selector: 'requests-list',
   standalone: false,
-  templateUrl: './requests-list-page.component.html',
-  styleUrl: './requests-list-page.component.scss'
+  templateUrl: './available-rides-page.component.html',
+  styleUrl: './available-rides-page.component.scss'
 })
-export class RequestsListPageComponent implements OnInit {
+export class AvailableRidesPageComponent implements OnInit {
   accessAllowed: boolean = false;
   username: string = '';
 

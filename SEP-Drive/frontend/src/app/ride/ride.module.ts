@@ -26,7 +26,7 @@ import {GeolocationService} from './services/geolocation.service';
 import {PlacesService} from './services/places.service';
 import {RideRequestService} from './services/ride-request.service';
 // ***
-import { RequestsListPageComponent } from './pages/requests-list-page/requests-list-page.component';
+import { AvailableRidesPageComponent } from './pages/available-rides-page/available-rides-page.component';
 import { RequestCardComponent } from './components/request-card/request-card.component';
 
 @NgModule({
@@ -34,7 +34,7 @@ import { RequestCardComponent } from './components/request-card/request-card.com
     RequestRidePageComponent, RideFormComponent, SelectLocationComponent, MapComponent,
     ActiveRidePageComponent, LocationCardComponent,
     //***
-    RequestsListPageComponent,
+    AvailableRidesPageComponent,
     RequestCardComponent
   ],
   imports: [

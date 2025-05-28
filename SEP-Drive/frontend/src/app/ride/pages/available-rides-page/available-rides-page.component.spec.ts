@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RequestsListPageComponent } from './requests-list-page.component';
+import { AvailableRidesPageComponent } from './available-rides-page.component';
 
 describe('RequestsListComponent', () => {
-  let component: RequestsListPageComponent;
-  let fixture: ComponentFixture<RequestsListPageComponent>;
+  let component: AvailableRidesPageComponent;
+  let fixture: ComponentFixture<AvailableRidesPageComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [RequestsListPageComponent]
+      declarations: [AvailableRidesPageComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(RequestsListPageComponent);
+    fixture = TestBed.createComponent(AvailableRidesPageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
