@@ -4,7 +4,7 @@
     <div class="header">
       <mat-icon>route</mat-icon>
       <span class="label">Distance to Pickup:</span>
-      <span >{{ request.driverToStartDistance }} km</span>
+      <span >{{ request.driverToStartDistance | number:'1.2-2' }} km</span>
     </div>
 
     <div class="header">
@@ -28,7 +28,7 @@
     <div class="header">
       <mat-icon>hourglass_full</mat-icon>
       <span class="label">Requested at:</span>
-      <span >{{ request.createdAt }}</span>
+      <span>{{ request.createdAt | date:"EEEE, dd.MM.yyyy — 'at' hh:mm a" }}</span>
     </div>
 
     <div class="header">
