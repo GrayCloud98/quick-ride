@@ -15,12 +15,10 @@ import {RideRequestService} from '../../../ride/services/ride-request.service';
 })
 export class NavbarComponent implements OnInit {
 
-  activeRide: boolean = false;
   isLoggedIn: boolean = false;
   username: string = '';
   photoUrl: string = '';
   usernameControl = new FormControl();
-  isCustomer: boolean = false;
   options: string[] = [];
   filteredOptions!: Observable<string[]>;
 
@@ -57,17 +55,7 @@ export class NavbarComponent implements OnInit {
       this.photoUrl = newUrl;
     });
 
-    this.authService.isCustomer(this.username).subscribe({
-      next: isCustomer => this.isCustomer = isCustomer,
-      error: err => console.log(err)
-    })
-
-    this.rideService.updateActiveRideStatus(this.username);
-    this.rideService.activeRideStatus$.subscribe({
-      next: (status: boolean) => {
-        this.activeRide = status;
-      }
-    });
+    this.applyRideRequestButtonDisplayLogic();
   }
 
   openLoginDialog() {
@@ -99,11 +87,33 @@ export class NavbarComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
+  // Logic for Ride Request Button
+  userHasActiveRide: boolean = false;
+  isCustomer: boolean = false;
+
+  private applyRideRequestButtonDisplayLogic(){
+    this.authService.isCustomer(this.username).subscribe({
+      next: isCustomer => this.isCustomer = isCustomer,
+      error: err => console.log(err)
+    })
+
+    this.rideService.updateActiveRideStatus(this.username);
+    this.rideService.activeRideStatus$.subscribe({
+      next: (status: boolean) => this.userHasActiveRide = status,
+      error: err => console.log(err)
+    });
+  }
+
   routeToRideRequest() {
-    this.router.navigate([`/ride/request`]);
+    void this.router.navigate([`/ride/request`]);
   }
 
   routeToActiveRide() {
-    this.router.navigate([`/ride/active`]);
+    void this.router.navigate([`/ride/active`]);
   }
+
+  routeToAvailableRides() {
+    void this.router.navigate([`/ride/available`]);
+  }
+
 }
