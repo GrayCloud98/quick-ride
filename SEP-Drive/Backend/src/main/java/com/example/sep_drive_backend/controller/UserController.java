@@ -36,7 +36,7 @@ public class UserController {
     private JwtTokenProvider jwtTokenProvider;
 
     // Get the token's holder's profile (authentication required)
-    @GetMapping("/{username}")
+    @GetMapping("/me")
     public ResponseEntity<?> getUserProfile(HttpServletRequest request) {
 
         String token = jwtTokenProvider.resolveToken(request);
@@ -85,7 +85,7 @@ public class UserController {
     }
 
     // Get user profiles (No authentication required)
-    @GetMapping("/")
+    @GetMapping("/user")
     public ResponseEntity<List<?>> getAllUserProfiles() {
         List<User> allUsers = userRepository.findAll();  // Fetch all User
         List<Object> userProfiles = allUsers.stream()
