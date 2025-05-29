@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {Request} from '../models/request.model';
 import {map} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
+import {Offer} from '../models/offer.model';
 
 @Injectable({
   providedIn: 'root'
@@ -41,5 +42,23 @@ export class OfferService {
         })
       ))
     );
+  }
+
+  private offers = new BehaviorSubject<Offer[]>([]);
+  public offers$ = this.offers.asObservable();
+
+
+  // TODO BIND WITH BACKEND
+  public getOffers(requestID: number): Observable<Offer[]> {
+    return this.offers$.pipe(
+      map(offers => offers.filter(o => o.requestID === requestID))
+    );
+  }
+
+  // TODO BIND WITH BACKEND
+  public postOffer(requestID: number, offer: Offer): void {
+    const current = this.offers.getValue();
+    const updated = [...current, { ...offer, requestID }];
+    this.offers.next(updated);
   }
 }
