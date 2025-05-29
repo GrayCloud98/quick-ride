@@ -5,12 +5,14 @@ import {RequestRidePageComponent} from './pages/request-ride-page/request-ride-p
 import {ActiveRidePageComponent} from './pages/active-ride-page/active-ride-page.component';
 //***
 import {AvailableRidesPageComponent} from './pages/available-rides-page/available-rides-page.component';
+import {RideOffersPageComponent} from './pages/ride-offers-page/ride-offers-page.component';
 
 const routes: Routes = [
   {path: "request", component: RequestRidePageComponent},
   {path: "active", component: ActiveRidePageComponent},
   //***
   {path: "available", component: AvailableRidesPageComponent},
+  {path: "offer", component: RideOffersPageComponent},
 ];
 
 @NgModule({

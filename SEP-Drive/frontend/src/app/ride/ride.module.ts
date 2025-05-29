@@ -28,14 +28,16 @@ import {RideRequestService} from './services/ride-request.service';
 // ***
 import { AvailableRidesPageComponent } from './pages/available-rides-page/available-rides-page.component';
 import { RequestCardComponent } from './components/request-card/request-card.component';
+import { RideOffersPageComponent } from './pages/ride-offers-page/ride-offers-page.component';
+import { OfferCardComponent } from './components/offer-card/offer-card.component';
 
 @NgModule({
   declarations: [
     RequestRidePageComponent, RideFormComponent, SelectLocationComponent, MapComponent,
     ActiveRidePageComponent, LocationCardComponent,
     //***
-    AvailableRidesPageComponent,
-    RequestCardComponent
+    AvailableRidesPageComponent, RequestCardComponent,
+    RideOffersPageComponent, OfferCardComponent
   ],
   imports: [
     CommonModule, BrowserModule, FormsModule, ReactiveFormsModule, RideRoutingModule,
