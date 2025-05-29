@@ -30,6 +30,7 @@ import { AvailableRidesPageComponent } from './pages/available-rides-page/availa
 import { RequestCardComponent } from './components/request-card/request-card.component';
 import { RideOffersPageComponent } from './pages/ride-offers-page/ride-offers-page.component';
 import { OfferCardComponent } from './components/offer-card/offer-card.component';
+import {OfferService} from './services/offer.service';
 
 @NgModule({
   declarations: [
@@ -48,7 +49,8 @@ import { OfferCardComponent } from './components/offer-card/offer-card.component
   providers: [
     GeolocationService,
     PlacesService,
-    RideRequestService
+    RideRequestService,
+    OfferService
   ]
 })
 export class RideModule {
