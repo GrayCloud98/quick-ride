@@ -28,11 +28,12 @@ public class WalletController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/withdraw")
-    public ResponseEntity<Void> withdraw(
-            @RequestHeader("X-User-Id") Long userId,
+    @PostMapping("transfer")
+    public ResponseEntity<Void> transfer(
+            @RequestHeader("X-User-Id") Long fromUserId,
+            @RequestParam Long toUserId,
             @RequestParam long amountCents) {
-        walletService.withdraw(userId, amountCents);
+        walletService.transfer(fromUserId, toUserId, amountCents);
         return ResponseEntity.ok().build();
     }
 }

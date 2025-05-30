@@ -3,6 +3,6 @@ package com.example.sep_drive_backend.constants;
 
 public enum TransactionType {
     DEPOSIT,
-    PAYMENT,
-    REFUND
+    PAYMENT_IN,
+    PAYMENT_OUT
 }
