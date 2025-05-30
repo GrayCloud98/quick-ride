@@ -37,4 +37,6 @@ typings/
 # === System files ===
 .DS_Store
 Thumbs.db
-**/target/
+/target/
+*.class
+*.lst
