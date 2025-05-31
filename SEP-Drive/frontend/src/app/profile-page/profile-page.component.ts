@@ -24,27 +24,34 @@ export class ProfilePageComponent implements OnInit {
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       const username = params.get('username');
-      if (username) {
-        this.profileService.getAllProfiles().subscribe({
-          next: (data: any[]) => {
-            this.profileData = data.find(user => user.username === username);
+      const loggedInUser = this.authService.currentUserValue;
 
-            if (this.profileData) {
-              if (this.profileData.profilePicture && !this.profileData.profilePicture.startsWith('http')) {
-                this.profileData.profilePicture = `http://localhost:8080${this.profileData.profilePicture}`;
-              }
-              // Check if this is the currently logged-in user's profile
-              const loggedInUser = this.authService.currentUserValue;
-              this.isOwnProfile = loggedInUser && loggedInUser.username === username;
-            } else {
-              console.warn('User not found!');
+      if (username && loggedInUser && username === loggedInUser.username) {
+        // Viewing own profile
+        this.profileService.getCurrentUserProfile().subscribe({
+          next: (data) => {
+            this.profileData = data;
+            this.isOwnProfile = true;
+            if (this.profileData.profilePicture && !this.profileData.profilePicture.startsWith('http')) {
+              this.profileData.profilePicture = `http://localhost:8080${this.profileData.profilePicture}`;
             }
           },
           error: (err) => {
-            console.error('Error fetching profile data:', err);
+            console.error('Error fetching own profile data:', err);
+          }
+        });
+      } else if (username) {
+        // Viewing someone else's profile
+        this.profileService.getUserByUsername(username).subscribe({
+          next: (data) => {
+            this.profileData = data;
+            this.isOwnProfile = false;
+            if (this.profileData.profilePicture && !this.profileData.profilePicture.startsWith('http')) {
+              this.profileData.profilePicture = `http://localhost:8080${this.profileData.profilePicture}`;
+            }
           },
-          complete: () => {
-            console.log('Data fetch complete');
+          error: (err) => {
+            console.error('Error fetching user profile:', err);
           }
         });
       }
