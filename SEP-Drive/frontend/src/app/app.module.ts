@@ -30,6 +30,7 @@ import {MatSelect} from '@angular/material/select';
 import { ProfilePageComponent } from './profile-page/profile-page.component';
 import {MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
 import {MatCard, MatCardActions, MatCardContent, MatCardHeader} from '@angular/material/card';
+import { WalletPageComponent } from './profile-page/wallet-page/wallet-page.component';
 
 
 @NgModule({
@@ -38,7 +39,8 @@ import {MatCard, MatCardActions, MatCardContent, MatCardHeader} from '@angular/m
     ProfilePageComponent,
     AppComponent,
     RegisterComponent,
-    TwoFaComponent
+    TwoFaComponent,
+    WalletPageComponent
   ],
   imports: [
     MatCardModule,

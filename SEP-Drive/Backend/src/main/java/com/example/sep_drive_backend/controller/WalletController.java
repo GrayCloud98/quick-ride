@@ -28,7 +28,7 @@ public class WalletController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("transfer")
+    @PostMapping("/transfer")
     public ResponseEntity<Void> transfer(
             @RequestHeader("X-User-Id") Long fromUserId,
             @RequestParam Long toUserId,

@@ -4,10 +4,13 @@ import { RouterModule, Routes } from '@angular/router';
 import { ProfilePageComponent } from './profile-page/profile-page.component';
 import { RideRoutingModule } from './ride/ride-routing.module';
 import {RegisterComponent} from './auth/register/register.component';
+import { WalletPageComponent } from './profile-page/wallet-page/wallet-page.component';
+
 const routes: Routes = [
   { path: 'ride', loadChildren: () => RideRoutingModule },
   { path: 'register', component: RegisterComponent },
   { path: 'two-factor', component: TwoFaComponent },
+  { path: 'wallet', component: WalletPageComponent },
   { path: ':username', component: ProfilePageComponent },
 ];
 
