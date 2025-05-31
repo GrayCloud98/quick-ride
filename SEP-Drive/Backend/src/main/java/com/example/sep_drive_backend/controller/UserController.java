@@ -129,13 +129,14 @@ public class UserController {
     public ResponseEntity<?> getUserProfileByUsername(
             @PathVariable String username,
             HttpServletRequest request) {
-
+        System.out.println("requested user : " + username);
         String token = jwtTokenProvider.resolveToken(request);
         if (token == null || !jwtTokenProvider.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         Optional<User> userOpt = userRepository.findByUsername(username);
+        System.out.println("user found : " + userOpt.isPresent());
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

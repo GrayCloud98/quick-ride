@@ -18,13 +18,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { ReactiveFormsModule } from '@angular/forms';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
+import { UserNotFoundComponent } from './components/user-not-found/user-not-found.component';
 
 @NgModule({
   declarations: [
     ButtonComponent,
     InputComponent,
     NavbarComponent,
-    LoginDialogComponent
+    LoginDialogComponent,
+    UserNotFoundComponent
   ],
   imports: [
     CommonModule,
@@ -59,7 +61,8 @@ import {HTTP_INTERCEPTORS} from '@angular/common/http';
     ButtonComponent,
     InputComponent,
     NavbarComponent,
-    NgOptimizedImage
+    NgOptimizedImage,
+    UserNotFoundComponent
   ],
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }]
 })

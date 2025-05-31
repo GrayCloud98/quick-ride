@@ -51,13 +51,16 @@ export class ProfilePageComponent implements OnInit {
             }
           },
           error: (err) => {
-            console.error('Error fetching user profile:', err);
+            if (err.status === 404) {
+              // Redirect to user-not-found page
+              this.router.navigate(['/user-not-found']);
+            }
+            console.error('Error fetching profile data:', err);
           }
         });
       }
     });
   }
-
 
   logout() {
     if (this.authService.clearUserData) {
