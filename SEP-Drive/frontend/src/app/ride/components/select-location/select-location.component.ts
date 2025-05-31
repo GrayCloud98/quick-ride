@@ -1,8 +1,12 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
+
 import {Observable, of} from 'rxjs';
 import {debounceTime, distinctUntilChanged, map, switchMap, catchError} from 'rxjs/operators';
+
+import {GeolocationService} from '../../services/geolocation.service';
 import {PlacesService} from '../../services/places.service';
+
 import {Location} from '../../models/location.model';
 
 @Component({
@@ -15,6 +19,7 @@ export class SelectLocationComponent implements OnInit {
   @Input() label: string = '';
   @Input() placeholder: string = '';
   @Input() control!: FormControl;
+  @Input() geoLocationButton: boolean = false;
   @Output() locationSelected = new EventEmitter<Location>();
 
   manualMode = false;
@@ -23,16 +28,16 @@ export class SelectLocationComponent implements OnInit {
     Validators.min(-90),
     Validators.max(90)
   ]);
-
   longitude = new FormControl<number | null>(null, [
     Validators.required,
     Validators.min(-180),
     Validators.max(180)
   ]);
-
   filteredLocations!: Observable<Location[]>;
-
-  constructor(private placesService: PlacesService) {
+  constructor(
+    private geolocationService: GeolocationService,
+    private placesService: PlacesService
+  ) {
   }
 
   ngOnInit(): void {
@@ -60,6 +65,13 @@ export class SelectLocationComponent implements OnInit {
     this.locationSelected.emit(location);
   }
 
+  myLocation() {
+    this.geolocationService.getLocation().subscribe({
+      next: (myLocation: Location) => this.onLocationSelected(myLocation),
+      error: err => console.log(err)
+    })
+  }
+
   toggleManualMode(): void {
     this.manualMode = !this.manualMode;
   }
@@ -71,7 +83,6 @@ export class SelectLocationComponent implements OnInit {
         longitude: this.longitude.value!,
         name: 'Manual Location',
       };
-      this.control.setValue(loc);
       this.locationSelected.emit(loc);
       this.manualMode = false;
     }

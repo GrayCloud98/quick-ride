@@ -3,14 +3,9 @@
     [label]="'Pickup Location'"
     [placeholder]="'Restaurant'"
     [control]="pickupControl"
+    [geoLocationButton]="true"
     (locationSelected)="onLocationSelected($event, updateType.pickup)"
     >
-
-    <button mat-icon-button matSuffix (click)="myLocation()" type="button" class="mylocation-btn"
-            matTooltip="Use current location"
-            matTooltipPosition="right">
-      <mat-icon>my_location</mat-icon>
-    </button>
   </select-location>
 
   <select-location
@@ -29,7 +24,7 @@
   </mat-radio-group>
 
   <div class="padding">
-    <button mat-fab extended class="wide-btn" (click)="submit()" [disabled]="isFormInvalid">
+    <button mat-fab extended class="full-width" (click)="submit()" [disabled]="isFormInvalid">
       Submit Ride Request
     </button>
   </div>

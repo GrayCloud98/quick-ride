@@ -1,32 +1,16 @@
-.example-form {
+.request-form {
   min-width: 150px;
   max-width: 500px;
   width: 100%;
 }
 
-.example-full-width {
+.full-width {
   width: 100%;
 }
 
 .address-text {
   color: grey;
   font-style: italic;
-}
-
-.mylocation-btn {
-  color: #4285F3;
-  &:hover {
-    color: white;
-    background-color: #4285F3 !important;
-  }
-}
-
-.delete-btn {
-  color: black;
-}
-
-.wide-btn {
-  width: 100%;
 }
 
 .mat-mdc-radio-button ~ .mat-mdc-radio-button {
