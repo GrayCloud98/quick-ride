@@ -28,9 +28,9 @@ export class ActiveRidePageComponent implements OnInit {
 
 
   deactivateRide() {
-    this.rideService.deactivateRide(this.username).subscribe({
+    this.rideService.deactivateRide().subscribe({
       next: () => {
-        this.rideService.updateActiveRideStatus(this.username);
+        this.rideService.updateActiveRideStatus();
         this.router.navigate(['/ride/request']);
       },
       error: (err) => {
@@ -43,13 +43,13 @@ export class ActiveRidePageComponent implements OnInit {
     this.authService.currentUser.pipe(
       filter(user => !!user?.username),
       tap(user => this.username = user!.username!),
-      switchMap(() => this.authService.isCustomer(this.username)),
+      switchMap(() => this.authService.isCustomer()),
       tap(isCustomer => this.accessAllowed = isCustomer),
       filter(isCustomer => isCustomer),
-      switchMap(() => this.rideService.userHasActiveRide(this.username)),
+      switchMap(() => this.rideService.userHasActiveRide()),
       tap(hasActive => this.userHasActiveRide = hasActive),
       filter(hasActive => hasActive),
-      switchMap(() => this.rideService.getRide(this.username)),
+      switchMap(() => this.rideService.getRide()),
     ).subscribe({
       next: ride => this.activeRide = this.mapToRide(ride),
       error: err => console.log(err)

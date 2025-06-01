@@ -55,7 +55,7 @@ export class RideFormComponent implements OnInit {
     const user = JSON.parse(<string>localStorage.getItem('currentUser'));
     const username = user?.username;
 
-    this.rideService.userHasActiveRide(username).subscribe({
+    this.rideService.userHasActiveRide().subscribe({
       next: response => this.ride.active = response,
       error: err => console.log(err)
     })
@@ -132,7 +132,7 @@ export class RideFormComponent implements OnInit {
 
     this.rideService.submitRide(rideDataJson).subscribe({
       next: () => {
-        this.rideService.updateActiveRideStatus(username);
+        this.rideService.updateActiveRideStatus();
         this.router.navigate(['/ride/active']);
       },
       error: error => {

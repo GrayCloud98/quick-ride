@@ -120,8 +120,8 @@ export class AuthService {
     this.photoUrlSubject.next(newUrl ?? 'assets/placeholder.png');
   }
 
-  public isCustomer(username: string): Observable<boolean>{
-    return this.http.get<boolean>(`http://localhost:8080/api/ride-requests/${username}/is-customer`);
+  public isCustomer(): Observable<boolean>{
+    return this.http.get<boolean>(`http://localhost:8080/api/ride-requests/is-customer`);
   }
 
   get currentUserValue(): any {
