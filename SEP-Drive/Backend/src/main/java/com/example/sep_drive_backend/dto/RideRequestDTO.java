@@ -1,39 +1,45 @@
 package com.example.sep_drive_backend.dto;
 
 import com.example.sep_drive_backend.constants.VehicleClassEnum;
+import com.example.sep_drive_backend.models.Customer;
 import com.example.sep_drive_backend.models.RideRequest;
+import jakarta.persistence.Column;
 
 public class RideRequestDTO {
 
-    private String startLocationName;
-    private String destinationLocationName;
-
-    private String startAddress;
-    private Double startLatitude;
-    private Double startLongitude;
-
-    private String destinationAddress;
-    private Double destinationLatitude;
-    private Double destinationLongitude;
-
-    private VehicleClassEnum vehicleClass;
-
-    public RideRequestDTO() {}
-
-    // Create DTO from entity (no username included here)
+    public RideRequestDTO() {
+    }
     public RideRequestDTO(RideRequest request) {
+        this.userName = request.getCustomer().getUsername();
         this.startAddress = request.getStartAddress();
         this.destinationAddress = request.getDestinationAddress();
+        this.vehicleClass = request.getVehicleClass();
         this.startLatitude = request.getStartLatitude();
         this.startLongitude = request.getStartLongitude();
         this.destinationLatitude = request.getDestinationLatitude();
         this.destinationLongitude = request.getDestinationLongitude();
-        this.vehicleClass = request.getVehicleClass();
         this.startLocationName = request.getStartLocationName();
-        this.destinationLocationName = request.getDestinationLocationName();
+        this.DestinationLocationName = request.getDestinationLocationName();
     }
 
-    // Getters and setters
+
+    private String userName;
+
+    private String startLocationName;
+    private String DestinationLocationName;
+
+    private String startAddress;
+
+    private Double startLatitude;
+    private Double startLongitude;
+
+    private String destinationAddress;
+
+    private Double destinationLatitude;
+    private Double destinationLongitude;
+
+
+    private VehicleClassEnum vehicleClass;
 
     public String getStartLocationName() {
         return startLocationName;
@@ -44,19 +50,11 @@ public class RideRequestDTO {
     }
 
     public String getDestinationLocationName() {
-        return destinationLocationName;
+        return DestinationLocationName;
     }
 
     public void setDestinationLocationName(String destinationLocationName) {
-        this.destinationLocationName = destinationLocationName;
-    }
-
-    public String getStartAddress() {
-        return startAddress;
-    }
-
-    public void setStartAddress(String startAddress) {
-        this.startAddress = startAddress;
+        DestinationLocationName = destinationLocationName;
     }
 
     public Double getStartLatitude() {
@@ -75,14 +73,6 @@ public class RideRequestDTO {
         this.startLongitude = startLongitude;
     }
 
-    public String getDestinationAddress() {
-        return destinationAddress;
-    }
-
-    public void setDestinationAddress(String destinationAddress) {
-        this.destinationAddress = destinationAddress;
-    }
-
     public Double getDestinationLatitude() {
         return destinationLatitude;
     }
@@ -99,11 +89,39 @@ public class RideRequestDTO {
         this.destinationLongitude = destinationLongitude;
     }
 
+
+
+    public String getUserName() {
+        return this.userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getStartAddress() {
+        return this.startAddress;
+    }
+
+    public void setStartAddress(String startAddress) {
+        this.startAddress = startAddress;
+    }
+
+    public String getDestinationAddress() {
+        return this.destinationAddress;
+    }
+
+    public void setDestinationAddress(String destinationAddress) {
+        this.destinationAddress = destinationAddress;
+    }
+
     public VehicleClassEnum getVehicleClass() {
-        return vehicleClass;
+        return this.vehicleClass;
     }
 
     public void setVehicleClass(VehicleClassEnum vehicleClass) {
         this.vehicleClass = vehicleClass;
     }
+
+
 }
