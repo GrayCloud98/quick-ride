@@ -6,6 +6,17 @@ public class RideOfferNotification {
     private int totalRides;
     private double totalDistance;
     private String message;
+    private Long rideOfferId;
+
+    public RideOfferNotification() {}
+
+    public Long getRideOfferId() {
+        return rideOfferId;
+    }
+
+    public void setRideOfferId(Long rideOfferId) {
+        this.rideOfferId = rideOfferId;
+    }
 
     public String getDriverUsername() {
         return driverUsername;
