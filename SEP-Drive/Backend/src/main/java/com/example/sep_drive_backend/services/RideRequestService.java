@@ -1,16 +1,14 @@
 package com.example.sep_drive_backend.services;
 
+import com.example.sep_drive_backend.constants.VehicleClassEnum;
 import com.example.sep_drive_backend.dto.RidesForDriversDTO;
+import com.example.sep_drive_backend.dto.RideRequestDTO;
 import com.example.sep_drive_backend.models.Customer;
 import com.example.sep_drive_backend.models.RideRequest;
 import com.example.sep_drive_backend.repository.CustomerRepository;
 import com.example.sep_drive_backend.repository.RideRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.example.sep_drive_backend.dto.RideRequestDTO;
-
-
-
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -20,104 +18,94 @@ import java.util.stream.Collectors;
 @Service
 public class RideRequestService {
 
-    @Autowired
-    private final RideRequestRepository repository;
-
-    @Autowired
+    private final RideRequestRepository rideRequestRepository;
     private final CustomerRepository customerRepository;
 
-
-    public RideRequestService(RideRequestRepository repository, CustomerRepository customerRepository) {
-        this.repository = repository;
+    @Autowired
+    public RideRequestService(RideRequestRepository rideRequestRepository, CustomerRepository customerRepository) {
+        this.rideRequestRepository = rideRequestRepository;
         this.customerRepository = customerRepository;
     }
 
+    public RideRequest createRideRequest(RideRequestDTO dto, String username) {
+        Optional<Customer> customerOpt = customerRepository.findByUsername(username);
 
-    public RideRequest createRideRequest(RideRequestDTO dto) {
-        Optional<Customer> customerOptional = customerRepository.findByUsername(dto.getUserName());
-
-        if (!customerOptional.isPresent()) {
-            throw new IllegalArgumentException("Customer with username " + dto.getUserName() + " not found");
+        if (!customerOpt.isPresent()) {
+            throw new IllegalArgumentException("Customer not found");
         }
 
-        Customer customer = customerOptional.get();
+        Customer customer = customerOpt.get();
+
         if (customer.isActive()) {
-            throw new IllegalStateException("Customer already has an active ride request.");
+            throw new IllegalStateException("Customer already has an active ride");
         }
 
-        RideRequest request = new RideRequest();
-        request.setCustomer(customer);
-        request.setStartAddress(dto.getStartAddress());
-        request.setStartLatitude(dto.getStartLatitude());
-        request.setStartLongitude(dto.getStartLongitude());
-        request.setDestinationAddress(dto.getDestinationAddress());
-        request.setDestinationLatitude(dto.getDestinationLatitude());
-        request.setDestinationLongitude(dto.getDestinationLongitude());
-        request.setVehicleClass(dto.getVehicleClass()); // now uses enum
-        request.setStartLocationName(dto.getStartLocationName());
-        request.setDestinationLocationName(dto.getDestinationLocationName());
+        RideRequest rideRequest = new RideRequest();
+        rideRequest.setCustomer(customer);
+        rideRequest.setStartAddress(dto.getStartAddress());
+        rideRequest.setStartLatitude(dto.getStartLatitude());
+        rideRequest.setStartLongitude(dto.getStartLongitude());
+        rideRequest.setDestinationAddress(dto.getDestinationAddress());
+        rideRequest.setDestinationLatitude(dto.getDestinationLatitude());
+        rideRequest.setDestinationLongitude(dto.getDestinationLongitude());
+        rideRequest.setVehicleClass(dto.getVehicleClass());
+        rideRequest.setStartLocationName(dto.getStartLocationName());
+        rideRequest.setDestinationLocationName(dto.getDestinationLocationName());
+
         customer.setActive(true);
         customerRepository.save(customer);
-        return repository.save(request);
+
+        return rideRequestRepository.save(rideRequest);
     }
 
     public RideRequest getActiveRideRequestForCustomer(String username) {
-        return repository.findByCustomerUsernameAndCustomerActiveTrue(username)
-                .orElseThrow(() -> new NoSuchElementException("No active ride request found for user: " + username));
+        return rideRequestRepository.findByCustomerUsernameAndCustomerActiveTrue(username)
+                .orElseThrow(() -> new NoSuchElementException("No active ride request for user: " + username));
     }
 
     public void deleteActiveRideRequest(String username) {
-        RideRequest request = repository.findByCustomerUsernameAndCustomerActiveTrue(username)
-                .orElseThrow(() -> new NoSuchElementException("No active ride request to delete"));
+        RideRequest rideRequest = rideRequestRepository.findByCustomerUsernameAndCustomerActiveTrue(username)
+                .orElseThrow(() -> new NoSuchElementException("No active ride request to delete for user: " + username));
 
-        Customer customer = request.getCustomer();
+        Customer customer = rideRequest.getCustomer();
         customer.setActive(false);
         customerRepository.save(customer);
-        repository.delete(request);
+
+        rideRequestRepository.delete(rideRequest);
     }
 
     public boolean hasActiveRideRequest(String username) {
-        return repository.findByCustomerUsernameAndCustomerActiveTrue(username).isPresent();
+        return rideRequestRepository.findByCustomerUsernameAndCustomerActiveTrue(username).isPresent();
     }
+
     public boolean isCustomer(String username) {
         return customerRepository.findByUsername(username).isPresent();
     }
 
     public List<RidesForDriversDTO> getAllRideRequests(double driverLat, double driverLon) {
-        return repository.findAll().stream()
-                .map(r -> {
-                    double distance = calculateDistance(
-                            driverLat,
-                            driverLon,
-                            r.getStartLatitude(),
-                            r.getStartLongitude()
-                    );
-                    return new RidesForDriversDTO(r, distance);
-                })
-                .collect(Collectors.toList());
+        return rideRequestRepository.findAll()
+                .stream()
+                .map(ride -> {
+                    double distance = calculateDistance(driverLat, driverLon,
+                            ride.getStartLatitude(), ride.getStartLongitude());
+                    return new RidesForDriversDTO(ride, distance);
+                }).collect(Collectors.toList());
     }
 
-//    private double calculateDistance(double latDriver, double lonDriver, double latCustomer, double lonCustomer) {
-//        WayPoint driverPoint = WayPoint.of(Latitude.ofDegrees(latDriver), Longitude.ofDegrees(lonDriver));
-//        WayPoint customerPoint = WayPoint.of(Latitude.ofDegrees(latCustomer), Longitude.ofDegrees(lonCustomer));
-//
-//        return driverPoint.distance(customerPoint).to(Length.Unit.KILOMETER);
-//    }
-
+    // Haversine formula to calculate distance in KM between two points
     private static final double EARTH_RADIUS_KM = 6371.0;
 
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
-        double latDistance = Math.toRadians(lat2 - lat1);
-        double lonDistance = Math.toRadians(lon2 - lon1);
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
 
-        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) *
+                        Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLon / 2) *
+                        Math.sin(dLon / 2);
 
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
         return EARTH_RADIUS_KM * c;
     }
-
-
 }
