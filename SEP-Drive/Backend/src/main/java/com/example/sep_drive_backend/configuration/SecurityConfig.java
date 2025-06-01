@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth
                             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                            .requestMatchers("/", "/home", "/h2-console/**", "/api/auth/**", "/uploads/**", "/api/ride-requests/**").permitAll()
+                            .requestMatchers("/", "/home", "/h2-console/**", "/api/auth/**", "/uploads/**").permitAll()
                             .anyRequest().authenticated();
                 })
                 .csrf(csrf -> csrf
