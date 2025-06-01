@@ -52,8 +52,8 @@ export class RideFormComponent implements OnInit {
   }
 
   ngOnInit() {
-    //const user = JSON.parse(<string>localStorage.getItem('currentUser'));
-    //const username = user?.username;
+    const user = JSON.parse(<string>localStorage.getItem('currentUser'));
+    const username = user?.username;
 
     this.rideService.userHasActiveRide().subscribe({
       next: response => this.ride.active = response,
@@ -114,10 +114,11 @@ export class RideFormComponent implements OnInit {
 
   submit() {
 
-    //const user = JSON.parse(<string>localStorage.getItem('currentUser'));
-    //const username = user?.username;
+    const user = JSON.parse(<string>localStorage.getItem('currentUser'));
+    const username = user?.username;
 
     const rideDataJson: any = {
+      userName: username,
       vehicleClass: this.ride.vehicleClass,
       startLatitude: `${this.ride.pickup.latitude}`,
       startLongitude: `${this.ride.pickup.longitude}`,
