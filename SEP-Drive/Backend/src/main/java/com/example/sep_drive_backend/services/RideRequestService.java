@@ -1,6 +1,7 @@
 package com.example.sep_drive_backend.services;
 
 import com.example.sep_drive_backend.dto.RideOfferDTO;
+import com.example.sep_drive_backend.dto.RideOfferNotification;
 import com.example.sep_drive_backend.dto.RidesForDriversDTO;
 import com.example.sep_drive_backend.models.Customer;
 import com.example.sep_drive_backend.models.Driver;
@@ -11,6 +12,7 @@ import com.example.sep_drive_backend.repository.DriverRepository;
 import com.example.sep_drive_backend.repository.RideOfferRepository;
 import com.example.sep_drive_backend.repository.RideRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import com.example.sep_drive_backend.dto.RideRequestDTO;
 
@@ -24,6 +26,10 @@ import java.util.stream.Collectors;
 
 @Service
 public class RideRequestService {
+
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     private final RideRequestRepository repository;
@@ -120,7 +126,23 @@ public class RideRequestService {
         RideOffer rideOffer = new RideOffer();
         rideOffer.setDriver(driver);
         rideOffer.setRideRequest(rideRequest);
-        return rideOfferRepository.save(rideOffer);
+
+        RideOffer savedOffer = rideOfferRepository.save(rideOffer);
+
+        RideOfferNotification notification = new RideOfferNotification();
+        notification.setMessage("A driver wants to take your ride!");
+        notification.setDriverUsername(driver.getUsername());
+        notification.setDriverRating(driver.getRating());
+        notification.setTotalRides(driver.getTotalRides());
+
+        String customerUsername = rideRequest.getCustomer().getUsername();
+
+        messagingTemplate.convertAndSend("/topic/customer/" + customerUsername, notification);
+        System.out.println("Notification sent to customer " + customerUsername);
+
+        return savedOffer;
+
+
     }
 
     public RideOfferDTO acceptRideOffer(Long rideRequestId, String driverUsername) {

@@ -4,9 +4,11 @@ import com.example.sep_drive_backend.dto.DriverLocationDTO;
 import com.example.sep_drive_backend.dto.RideOfferDTO;
 import com.example.sep_drive_backend.dto.RideRequestDTO;
 import com.example.sep_drive_backend.dto.RidesForDriversDTO;
+import com.example.sep_drive_backend.models.JwtTokenProvider;
 import com.example.sep_drive_backend.models.RideOffer;
 import com.example.sep_drive_backend.models.RideRequest;
 import com.example.sep_drive_backend.services.RideRequestService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,10 @@ public class RideRequestController {
 
 
     private RideRequestService rideRequestService;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
 
     @Autowired
     public RideRequestController(RideRequestService rideRequestService) {
@@ -80,7 +86,9 @@ public class RideRequestController {
     }
 
     @PostMapping("/offer-ride")
-    public ResponseEntity<RideOffer> offerRide(@RequestBody Long rideRequestId, @RequestBody String username) {
+    public ResponseEntity<RideOffer> offerRide(@RequestParam Long rideRequestId, HttpServletRequest request) {
+        String token = jwtTokenProvider.resolveToken(request);
+        String username = jwtTokenProvider.getUsername(token);
 
         RideOffer offer = rideRequestService.createRideOffer(rideRequestId, username);
         return ResponseEntity.ok(offer);
