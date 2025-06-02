@@ -58,7 +58,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     ButtonComponent,
     InputComponent,
     NavbarComponent,
-    NgOptimizedImage
+    NgOptimizedImage,
   ]
 })
 export class SharedModule { }

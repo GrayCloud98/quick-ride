@@ -30,6 +30,8 @@ import {MatSelect} from '@angular/material/select';
 import { ProfilePageComponent } from './profile-page/profile-page.component';
 import {MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
 import {MatCard, MatCardActions, MatCardContent, MatCardHeader} from '@angular/material/card';
+import { GoogleMapsModule } from '@angular/google-maps';
+import { RideSimulationComponent } from './ride-simulation/ride-simulation.component';
 
 
 @NgModule({
@@ -38,7 +40,8 @@ import {MatCard, MatCardActions, MatCardContent, MatCardHeader} from '@angular/m
     ProfilePageComponent,
     AppComponent,
     RegisterComponent,
-    TwoFaComponent
+    TwoFaComponent,
+    RideSimulationComponent
   ],
   imports: [
     MatCardModule,
@@ -83,7 +86,8 @@ import {MatCard, MatCardActions, MatCardContent, MatCardHeader} from '@angular/m
     MatCard,
     MatCardHeader,
     MatCardContent,
-    MatCardActions
+    MatCardActions,
+    GoogleMapsModule,
   ],
 
   providers: [
