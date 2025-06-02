@@ -1,5 +1,6 @@
 package com.example.sep_drive_backend.services;
 
+import com.example.sep_drive_backend.constants.VehicleClassEnum;
 import com.example.sep_drive_backend.dto.RidesForDriversDTO;
 import com.example.sep_drive_backend.models.Customer;
 import com.example.sep_drive_backend.models.RideRequest;
@@ -56,6 +57,17 @@ public class RideRequestService {
         request.setVehicleClass(dto.getVehicleClass()); // now uses enum
         request.setStartLocationName(dto.getStartLocationName());
         request.setDestinationLocationName(dto.getDestinationLocationName());
+        double distance = calculateDistance(
+                dto.getStartLatitude(), dto.getStartLongitude(),
+                dto.getDestinationLatitude(), dto.getDestinationLongitude());
+
+        double duration = estimateDuration(distance);
+        double price = calculatePrice(distance, dto.getVehicleClass());
+
+        request.setDistance(distance);
+        request.setDuration(duration);
+        request.setEstimatedPrice(price);
+
         customer.setActive(true);
         customerRepository.save(customer);
         return repository.save(request);
@@ -96,14 +108,6 @@ public class RideRequestService {
                 })
                 .collect(Collectors.toList());
     }
-
-//    private double calculateDistance(double latDriver, double lonDriver, double latCustomer, double lonCustomer) {
-//        WayPoint driverPoint = WayPoint.of(Latitude.ofDegrees(latDriver), Longitude.ofDegrees(lonDriver));
-//        WayPoint customerPoint = WayPoint.of(Latitude.ofDegrees(latCustomer), Longitude.ofDegrees(lonCustomer));
-//
-//        return driverPoint.distance(customerPoint).to(Length.Unit.KILOMETER);
-//    }
-
     private static final double EARTH_RADIUS_KM = 6371.0;
 
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
@@ -118,6 +122,15 @@ public class RideRequestService {
 
         return EARTH_RADIUS_KM * c;
     }
-
-
+    private double estimateDuration(double distanceKm) {
+        return (distanceKm / 40.0) * 60;
+    }
+    private double calculatePrice(double distanceKm, VehicleClassEnum vehicleClass) {
+        double factor = switch (vehicleClass) {
+            case Small -> 1.0;
+            case Medium -> 2.0;
+            case Large -> 10.0;
+        };
+        return distanceKm * factor;
+    }
 }
