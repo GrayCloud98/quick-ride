@@ -10,14 +10,23 @@ import {Request} from '../models/request.model';
 })
 export class RideRequestService {
 
-  private baseUrl: string;
+  private baseUrl= 'http://localhost:8080/api/ride-requests';
+  constructor(private http: HttpClient) {}
 
-  constructor(private http: HttpClient) {
-    this.baseUrl = 'http://localhost:8080/api/ride-requests';
-  }
+  public submitRide(ride: Ride) {
+    const rideJson: any = {
+      vehicleClass: ride.vehicleClass,
+      startLatitude: ride.pickup.latitude,
+      startLongitude: ride.pickup.longitude,
+      destinationLatitude: ride.dropoff.latitude,
+      destinationLongitude: ride.dropoff.longitude,
+      startLocationName: ride.pickup.name,
+      destinationLocationName: ride.dropoff.name,
+      startAddress: ride.pickup.address,
+      destinationAddress: ride.dropoff.address
+    };
 
-  public submitRide(ride: any) {
-    return this.http.post<Ride>(this.baseUrl, ride)
+    return this.http.post<Ride>(this.baseUrl, rideJson);
   }
 
   public getRide(): Observable<Ride> {
