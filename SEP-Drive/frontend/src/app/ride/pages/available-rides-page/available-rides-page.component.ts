@@ -75,7 +75,7 @@ export class AvailableRidesPageComponent implements OnInit {
     this.authService.currentUser.pipe(
       filter(user => !!user?.username),
       tap(user => this.username = user!.username!),
-      switchMap(() => this.authService.isCustomer(this.username)),
+      switchMap(() => this.authService.isCustomer()),
       tap(isCustomer => this.accessAllowed = !isCustomer)
     ).subscribe({
       error: err => console.log(err)
