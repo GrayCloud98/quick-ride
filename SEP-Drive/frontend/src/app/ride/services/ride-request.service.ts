@@ -10,15 +10,18 @@ import {Request} from '../models/request.model';
 })
 export class RideRequestService {
 
-  baseUrl = 'http://localhost:8080/api/ride-requests';
-  constructor(private http: HttpClient) {}
+  private baseUrl: string;
+
+  constructor(private http: HttpClient) {
+    this.baseUrl = 'http://localhost:8080/api/ride-requests';
+  }
 
   public submitRide(ride: any) {
     return this.http.post<Ride>(this.baseUrl, ride)
   }
 
-  public getRide(username: string): Observable<Ride> {
-    return this.http.get<any>(`${this.baseUrl}/${username}`).pipe(
+  public getRide(): Observable<Ride> {
+    return this.http.get<Ride>(this.baseUrl).pipe(
       map((ride: any) => ({
         pickup: {
           latitude: Number(ride.startLatitude),
@@ -38,16 +41,21 @@ export class RideRequestService {
     );
   }
 
-  public deactivateRide(username: string) {
-    return this.http.delete<Ride>(this.baseUrl + '/' + username)
+  public deactivateRide() {
+    return this.http.delete<Ride>(this.baseUrl)
+  }
+
+  public userHasActiveRide(): Observable<boolean> {
+    return this.http.get<boolean>(`${this.baseUrl}/has-active`);
   }
 
   private activeRideStatus = new BehaviorSubject<boolean>(false);
   public activeRideStatus$ = this.activeRideStatus.asObservable();
 
-  public updateActiveRideStatus(username: string) {
-    this.http.get<boolean>(`${this.baseUrl}/${username}/has-active`).subscribe({
-      next: activeRideStatus => this.activeRideStatus.next(activeRideStatus),
-    })
+  updateActiveRideStatus(): void {
+    this.userHasActiveRide().subscribe({
+      next: status => this.activeRideStatus.next(status),
+      error: err => console.error(err)
+    });
   }
 }

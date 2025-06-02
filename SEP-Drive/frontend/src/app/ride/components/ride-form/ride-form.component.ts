@@ -86,7 +86,6 @@ export class RideFormComponent implements OnInit {
 
   submit() {
     const rideDataJson: any = {
-      userName: `${this.username}`,
       vehicleClass: `${this.ride.vehicleClass}`,
       startLatitude: `${this.ride.pickup.latitude}`,
       startLongitude: `${this.ride.pickup.longitude}`,
@@ -100,8 +99,8 @@ export class RideFormComponent implements OnInit {
 
     this.rideService.submitRide(rideDataJson).subscribe({
       next: () => {
-        this.rideService.updateActiveRideStatus(this.username);
-        void this.router.navigate(['/ride/active']);
+        this.rideService.updateActiveRideStatus();
+        this.router.navigate(['/ride/active']);
       },
       error: error => {
         console.error('Error:', error);

@@ -92,12 +92,12 @@ export class NavbarComponent implements OnInit {
   isCustomer: boolean = false;
 
   private applyRideRequestButtonDisplayLogic(){
-    this.authService.isCustomer(this.username).subscribe({
+    this.authService.isCustomer().subscribe({
       next: isCustomer => this.isCustomer = isCustomer,
       error: err => console.log(err)
     })
 
-    this.rideService.updateActiveRideStatus(this.username);
+    this.rideService.updateActiveRideStatus();
     this.rideService.activeRideStatus$.subscribe({
       next: (status: boolean) => this.userHasActiveRide = status,
       error: err => console.log(err)
