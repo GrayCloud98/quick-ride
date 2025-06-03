@@ -7,11 +7,19 @@ import { Observable } from 'rxjs';
 })
 export class ProfileService {
 
-  private apiUrl = 'http://localhost:8080/api/users/'; // This is the endpoint you mentioned
+  private apiUrl = 'http://localhost:8080/api/users/';
 
   constructor(private http: HttpClient) {}
 
   getAllProfiles(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+    return this.http.get<any[]>(this.apiUrl + 'user');
+  }
+
+  getCurrentUserProfile(): Observable<any> {
+    return this.http.get<any>(this.apiUrl + 'me');
+  }
+
+  getUserByUsername(username: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}${username}`);
   }
 }

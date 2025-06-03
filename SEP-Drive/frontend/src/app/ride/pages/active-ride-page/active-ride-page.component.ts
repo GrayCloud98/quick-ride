@@ -1,10 +1,11 @@
 import {Component, OnInit} from '@angular/core';
-import {Ride, VehicleClass} from '../../models/ride.model';
-import {Location} from '../../models/location.model'
 import {Router} from '@angular/router';
+import {filter, switchMap, tap} from 'rxjs';
+
+import {Ride} from '../../models/ride.model';
+
 import {RideRequestService} from '../../services/ride-request.service';
 import {AuthService} from '../../../auth/auth.service';
-import {filter, switchMap, tap} from 'rxjs';
 
 @Component({
   selector: 'app-active-ride-page',
@@ -19,23 +20,19 @@ export class ActiveRidePageComponent implements OnInit {
   accessAllowed: boolean = false;
   userHasActiveRide: boolean = true;
   activeRide!: Ride;
-
   constructor(
     private rideService: RideRequestService,
     private authService: AuthService,
     private router: Router) {
   }
 
-
   deactivateRide() {
-    this.rideService.deactivateRide(this.username).subscribe({
+    this.rideService.deactivateRide().subscribe({
       next: () => {
-        this.rideService.updateActiveRideStatus(this.username);
-        this.router.navigate(['/ride/request']);
+        this.rideService.updateActiveRideStatus();
+        void this.router.navigate(['/ride/request']);
       },
-      error: (err) => {
-        console.log(err)
-      }
+      error: (err) => console.log(err)
     })
   }
 
@@ -43,42 +40,16 @@ export class ActiveRidePageComponent implements OnInit {
     this.authService.currentUser.pipe(
       filter(user => !!user?.username),
       tap(user => this.username = user!.username!),
-      switchMap(() => this.authService.isCustomer(this.username)),
+      switchMap(() => this.authService.isCustomer()),
       tap(isCustomer => this.accessAllowed = isCustomer),
       filter(isCustomer => isCustomer),
-      switchMap(() => this.rideService.userHasActiveRide(this.username)),
+      switchMap(() => this.rideService.activeRideStatus$),
       tap(hasActive => this.userHasActiveRide = hasActive),
       filter(hasActive => hasActive),
-      switchMap(() => this.rideService.getRide(this.username)),
+      switchMap(() => this.rideService.getRide()),
+      tap(ride => this.activeRide = ride),
     ).subscribe({
-      next: ride => this.activeRide = this.mapToRide(ride),
       error: err => console.log(err)
-    })
-  }
-
-  private mapToRide(raw: any): Ride {
-
-    const pickup: Location = {
-      name: raw.startLocationName || undefined,
-      latitude: Number(raw.startLatitude),
-      longitude: Number(raw.startLongitude),
-      address: raw.startAddress || undefined,
-    };
-
-    const dropoff: Location = {
-      name: raw.destinationLocationName || undefined,
-      latitude: Number(raw.destinationLatitude),
-      longitude: Number(raw.destinationLongitude),
-      address: raw.destinationAddress || undefined,
-    };
-
-    const ride: Ride = {
-      pickup,
-      dropoff,
-      vehicleClass: raw.vehicleClass as VehicleClass,
-      active: true
-    };
-
-    return ride;
+    });
   }
 }
