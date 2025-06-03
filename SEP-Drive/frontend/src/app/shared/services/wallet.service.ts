@@ -1,11 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+export interface Transaction {
+  id: number;
+  amountCents: number;
+  date: string; // z. B. '2024-06-02T14:03:21'
+}
 @Injectable({
   providedIn: 'root'
 })
 export class WalletService {
+
   private apiUrl = 'http://localhost:8080/api/wallet';
 
   constructor(private http: HttpClient) { }
@@ -32,4 +37,10 @@ export class WalletService {
       }
     });
   }
+  getTransactions(userId: number): Observable<Transaction[]> {
+    return this.http.get<Transaction[]>(`${this.apiUrl}/transactions`, {
+      headers: { 'X-User-Id': userId.toString() }
+    });
+  }
+
 }
