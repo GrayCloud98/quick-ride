@@ -37,34 +37,52 @@ public class RideRequestController {
     }
 
     @PostMapping
-    public ResponseEntity<RideRequest> createRideRequest(@RequestBody RideRequestDTO dto) {
+    public ResponseEntity<RideRequest> createRideRequest(
+            @RequestBody RideRequestDTO dto, HttpServletRequest request) {
         try {
+            String token = jwtTokenProvider.resolveToken(request);
+            String username = jwtTokenProvider.getUsername(token);
+            dto.setUserName(username); // Inject username from token, not from client
+
             RideRequest rideRequest = rideRequestService.createRideRequest(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(rideRequest);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
-    @GetMapping("/{username}/has-active")
-    public ResponseEntity<Boolean> hasActiveRideRequest(@PathVariable String username) {
+    @GetMapping("/has-active")
+    public ResponseEntity<Boolean> hasActiveRideRequest(HttpServletRequest request) {
+
+        String token = jwtTokenProvider.resolveToken(request);
+        String username = jwtTokenProvider.getUsername(token);
         boolean hasActive = rideRequestService.hasActiveRideRequest(username);
         return ResponseEntity.ok(hasActive);
     }
-    @GetMapping("/{username}/is-customer")
-    public ResponseEntity<Boolean> isCustomer (@PathVariable String username) {
+    @GetMapping("/is-customer")
+    public ResponseEntity<Boolean> isCustomer (HttpServletRequest request) {
+
+        String token = jwtTokenProvider.resolveToken(request);
+        String username = jwtTokenProvider.getUsername(token);
+
         boolean isCustomer = rideRequestService.isCustomer(username);
         return ResponseEntity.ok(isCustomer);
     }
 
 
-    @GetMapping("/{username}")
-    public ResponseEntity<RideRequestDTO> getActiveRideRequest(@PathVariable String username) {
-        RideRequest request = rideRequestService.getActiveRideRequestForCustomer(username);
-        return ResponseEntity.ok(new RideRequestDTO(request));
+    @GetMapping
+    public ResponseEntity<RideRequestDTO> getActiveRideRequest(HttpServletRequest request) {
+
+        String token = jwtTokenProvider.resolveToken(request);
+        String username = jwtTokenProvider.getUsername(token);
+        RideRequest RideRequest = rideRequestService.getActiveRideRequestForCustomer(username);
+        return ResponseEntity.ok(new RideRequestDTO(RideRequest));
     }
 
-    @DeleteMapping("/{username}")
-    public ResponseEntity<Void> deleteActiveRideRequest(@PathVariable String username) {
+    @DeleteMapping
+    public ResponseEntity<Void> deleteActiveRideRequest(HttpServletRequest request) {
+
+        String token = jwtTokenProvider.resolveToken(request);
+        String username = jwtTokenProvider.getUsername(token);
         rideRequestService.deleteActiveRideRequest(username);
         return ResponseEntity.noContent().build();
     }
