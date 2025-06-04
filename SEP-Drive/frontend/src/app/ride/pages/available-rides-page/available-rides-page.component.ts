@@ -60,6 +60,10 @@ export class AvailableRidesPageComponent implements OnInit {
   }
 
   withdrawOffer() {
+    this.offerService.driverWithdrawOffer().subscribe({
+      next: response => console.log(response),
+      error: err => console.log(err)
+    })
     this.offerState = OfferState.NONE;
   }
 

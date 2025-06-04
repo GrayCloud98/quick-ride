@@ -65,4 +65,8 @@ export class OfferService {
     const params = {rideRequestId: requestID};
     return this.http.post(this.baseUrl + '/offer-ride', null, {params});
   }
+
+  public driverWithdrawOffer(){
+    return this.http.delete(this.baseUrl + '/cancel-offer');
+  }
 }
