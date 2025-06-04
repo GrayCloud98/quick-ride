@@ -1,9 +1,9 @@
 import {VehicleClass} from './ride.model';
 
-export enum OfferStatus {
-  PENDING = 'Pending',
-  ACCEPTED = 'Accepted',
-  REJECTED = 'Rejected'
+export enum OfferState {
+  NONE = 'none',
+  OFFERED = 'offered',
+  ACCEPTED = 'accepted'
 }
 
 export interface Offer {
@@ -15,5 +15,5 @@ export interface Offer {
   driverVehicle: VehicleClass;
   ridesCount: number;
   travelledDistance: number;
-  status: OfferStatus;
+  status: OfferState;
 }

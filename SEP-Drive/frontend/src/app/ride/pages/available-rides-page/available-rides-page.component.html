@@ -45,8 +45,13 @@
       </div>
 
       <div class="centered-box req-card-container" *ngFor="let request of allActiveRequests">
-        <request-card [request]="request" (onAccept)="acceptRequest(request.requestID)"></request-card>
-        <br>
+        <request-card
+          [request]="request"
+          [offerState]="offerState"
+          [RequestIdOfOffer]="requestIdOfOffer"
+          (onAccept)="acceptRequest(request.requestID)"
+          (onWithdraw)="withdrawOffer()"
+        />
       </div>
 
   </div>

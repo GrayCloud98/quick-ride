@@ -43,10 +43,42 @@
     </div>
 
     <div class="padding">
-      <button class="btn" mat-fab extended (click)="accept()">
+      <button
+        *ngIf="offerState === OfferState.NONE"
+        class="btn" mat-fab extended (click)="accept()"
+      >
         Accept Request
       </button>
+
+      <button
+        *ngIf="offerState === OfferState.OFFERED && request.requestID === RequestIdOfOffer"
+        class="btn withdraw" mat-fab extended (click)="withdraw()"
+      >
+        Withdraw Offer
+      </button>
+
+      <button
+        *ngIf="offerState === OfferState.OFFERED && request.requestID !== RequestIdOfOffer"
+        class="btn" mat-fab extended disabled
+      >
+        Please withdraw your active offer first
+      </button>
+
+      <button
+        *ngIf="offerState === OfferState.ACCEPTED && request.requestID === RequestIdOfOffer"
+        class="btn" mat-fab extended disabled
+      >
+        Offer Accepted
+      </button>
+
+<!--      <button-->
+<!--        *ngIf="offerState === OfferState.ACCEPTED && request.requestID !== RequestIdOfOffer"-->
+<!--        class="btn" mat-fab extended disabled-->
+<!--      >-->
+<!--        An Offer was accepted-->
+<!--      </button>-->
     </div>
 
   </mat-card-content>
 </mat-card>
+<br>

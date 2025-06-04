@@ -5,6 +5,7 @@ import {Location} from '../../models/location.model';
 import {Request} from '../../models/request.model';
 import {filter, switchMap, tap} from 'rxjs';
 import {AuthService} from '../../../auth/auth.service';
+import {OfferState} from '../../models/offer.model';
 
 interface SortOption {
   key: keyof Request,
@@ -19,7 +20,6 @@ interface SortOption {
 export class AvailableRidesPageComponent implements OnInit {
   accessAllowed: boolean = false;
   username: string = '';
-
   allActiveRequests: Request[] = [];
   currentPositionControl = new FormControl<Location | string>('', [Validators.required]);
   currentPosition!: Location;
@@ -46,12 +46,21 @@ export class AvailableRidesPageComponent implements OnInit {
     this.positionSet = true;
   }
 
-  //TODO implement accepting logic
+  //TODO continue accepting logic
+  offerState: OfferState = OfferState.NONE;
+  requestIdOfOffer: number | null = null;
   acceptRequest(requestID: number) {
     this.offerService.driverAcceptRequest(requestID).subscribe({
-      next: response => console.log(response),
+      next: (response: any) => {
+        this.requestIdOfOffer = response.rideRequest.id;
+      },
       error: err => console.log(err)
     })
+    this.offerState = OfferState.OFFERED;
+  }
+
+  withdrawOffer() {
+    this.offerState = OfferState.NONE;
   }
 
   sortRequests(attr: keyof Request, direction: 'asc' | 'desc') {
