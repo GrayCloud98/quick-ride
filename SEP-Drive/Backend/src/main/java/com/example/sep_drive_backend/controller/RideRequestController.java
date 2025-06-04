@@ -159,6 +159,14 @@ public class RideRequestController {
 
     }
 
+    @GetMapping("/is-driver-active")
+    public ResponseEntity<Boolean> isDriverActive (HttpServletRequest request) {
 
+        String token = jwtTokenProvider.resolveToken(request);
+        String username = jwtTokenProvider.getUsername(token);
+
+        boolean isDriverActive = rideRequestService.isDriverActive(username);
+        return ResponseEntity.ok(isDriverActive);
+    }
 
 }
