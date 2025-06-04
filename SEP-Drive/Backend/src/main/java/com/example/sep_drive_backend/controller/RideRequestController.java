@@ -129,6 +129,15 @@ public class RideRequestController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("offer-request-id")
+    public ResponseEntity<Long> getDriverOfferRideRequestId(HttpServletRequest request) {
+        String token = jwtTokenProvider.resolveToken(request);
+        String username = jwtTokenProvider.getUsername(token);
+
+        Long rideRequestId = rideRequestService.getRideRequestIdIfDriverOffer(username);
+        return ResponseEntity.ok(rideRequestId);
+    }
+
     @GetMapping("/offers")
     public ResponseEntity<List<RideOfferNotification>> getOffersForCustomer(HttpServletRequest request) {
         String token = jwtTokenProvider.resolveToken(request);

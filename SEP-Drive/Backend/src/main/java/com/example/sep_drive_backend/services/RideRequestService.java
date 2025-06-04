@@ -153,6 +153,17 @@ public class RideRequestService {
                 .orElse(false);
     }
 
+    public Long getRideRequestIdIfDriverOffer(String username) {
+        Optional<Driver> driverOpt = driverRepository.findByUsername(username);
+        if (driverOpt.isPresent() && driverOpt.get().getActive()) {
+            Optional<RideOffer> offerOpt = rideOfferRepository.findByDriver(driverOpt.get());
+            if (offerOpt.isPresent() && offerOpt.get().getRideRequest() != null) {
+                return offerOpt.get().getRideRequest().getId();
+            }
+        }
+        return null;
+    }
+
 
 
     public void rejectOffer(Long rideRequestId) {
