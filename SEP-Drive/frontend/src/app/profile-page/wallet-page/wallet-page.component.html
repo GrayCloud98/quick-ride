@@ -5,7 +5,7 @@
   <div class="wallet-title">My Wallet</div>
   <div class="wallet-balance">{{ balance | number:'1.2-2' }} €</div>
 
-  <div class="amount-section">
+  <div *ngIf="accessAllowed" class="amount-section">
     <label>Amount:</label>
     <mat-radio-group [(ngModel)]="selectedAmount" class="amount-radio-group">
       <mat-radio-button [value]="10">10 €</mat-radio-button>
@@ -14,7 +14,7 @@
     </mat-radio-group>
   </div>
 
-  <button mat-raised-button color="primary" (click)="topUp()" [disabled]="!selectedAmount">
+  <button *ngIf="accessAllowed" mat-raised-button color="primary" (click)="topUp()" [disabled]="!selectedAmount">
     Top-Up
   </button>
   <div *ngIf="success" style="color: green; text-align: center; margin: 8px 0;">
@@ -24,12 +24,12 @@
     {{ error }}
   </div>
 
-  <div class="transaction-history" (click)="toggleHistory()" style="cursor:pointer;">
+  <div *ngIf="accessAllowed" class="transaction-history" (click)="toggleHistory()" style="cursor:pointer;">
     Transaction History
     <mat-icon>{{ showHistory ? 'expand_less' : 'history' }}</mat-icon>
   </div>
 
-  <div *ngIf="showHistory">
+  <div  *ngIf="showHistory">
     <table style="width:100%; margin-top: 10px;">
       <tr>
         <th>Datum</th>
@@ -44,4 +44,7 @@
       Keine Transaktionen gefunden.
     </div>
   </div>
+  <div *ngIf="!accessAllowed" style="text-align:center; color:#666; margin:16px 0;">
+    Drivers cannot top up their credit themselves.
+</div>
 </mat-card>

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { WalletService, Transaction } from '../../shared/services/wallet.service';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-wallet-page',
@@ -15,14 +16,20 @@ export class WalletPageComponent implements OnInit {
   success: string = '';
   transactions: Transaction[] = [];
   showHistory = false;
+  accessAllowed: boolean = false;
 
   constructor(
     private router: Router,
     private walletService: WalletService,
+    private authService: AuthService
   ) { }
 
   ngOnInit() {
     this.loadBalance();
+    this.authService.isCustomer().subscribe({
+      next: isCustomer => this.accessAllowed = isCustomer,
+      error: err => console.log(err),
+    });
   }
 
   loadTransactions() {
