@@ -55,10 +55,8 @@ export class OfferService {
     );
   }
 
-  // TODO BIND WITH BACKEND
-  public postOffer(requestID: number, offer: Offer): void {
-    const current = this.offers.getValue();
-    const updated = [...current, { ...offer, requestID }];
-    this.offers.next(updated);
+  public driverAcceptRequest(requestID: number) {
+    const params = {rideRequestId: requestID};
+    return this.http.post(this.baseUrl + '/offer-ride', null, {params});
   }
 }

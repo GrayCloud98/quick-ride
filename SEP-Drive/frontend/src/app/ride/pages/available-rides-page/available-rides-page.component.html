@@ -45,7 +45,7 @@
       </div>
 
       <div class="centered-box req-card-container" *ngFor="let request of allActiveRequests">
-        <request-card [request]="request" (onAccept)="acceptRequest()"></request-card>
+        <request-card [request]="request" (onAccept)="acceptRequest(request.requestID)"></request-card>
         <br>
       </div>
 

@@ -47,8 +47,11 @@ export class AvailableRidesPageComponent implements OnInit {
   }
 
   //TODO implement accepting logic
-  acceptRequest() {
-    console.log("accepted")
+  acceptRequest(requestID: number) {
+    this.offerService.driverAcceptRequest(requestID).subscribe({
+      next: response => console.log(response),
+      error: err => console.log(err)
+    })
   }
 
   sortRequests(attr: keyof Request, direction: 'asc' | 'desc') {
