@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { WalletService,Transaction } from '../../shared/services/wallet.service';
-import {AuthService} from '../../auth/auth.service'
+import { WalletService, Transaction } from '../../shared/services/wallet.service';
 
 @Component({
   selector: 'app-wallet-page',
@@ -12,12 +11,10 @@ import {AuthService} from '../../auth/auth.service'
 export class WalletPageComponent implements OnInit {
   balance: number = 0;
   selectedAmount: number | null = null;
-  userId: number = 0;
   error: string = '';
   success: string = '';
   transactions: Transaction[] = [];
   showHistory = false;
-  role :string='';
 
   constructor(
     private router: Router,
@@ -27,8 +24,9 @@ export class WalletPageComponent implements OnInit {
   ngOnInit() {
     this.loadBalance();
   }
+
   loadTransactions() {
-    this.walletService.getTransactions(this.userId).subscribe({
+    this.walletService.getTransactions().subscribe({
       next: (data) => this.transactions = data,
       error: () => this.transactions = []
     });
@@ -40,27 +38,21 @@ export class WalletPageComponent implements OnInit {
       this.loadTransactions();
     }
   }
+
   loadBalance() {
-    if (this.userId) {
-      this.walletService.getBalance(this.userId).subscribe({
+    this.walletService.getBalance().subscribe({
       next: (balanceCents) => {
-        this.balance = balanceCents / 100; // Backend liefert Cents, wir zeigen Euro!
+        this.balance = balanceCents / 100;
       },
-        error: (err) => {
-          console.error('Error during operation:', err);
-          this.error = 'Balance could not be loaded!';
-        }
-    });} else {
-      this.error = 'User ID is invalid!';
-    }
+      error: () => {
+        this.error = 'Balance could not be loaded!';
+      }
+    });
   }
 
   topUp() {
-    if (this.role !== 'customer') {
-      return;
-    }
     if (this.selectedAmount && this.selectedAmount > 0) {
-      this.walletService.deposit(this.userId, this.selectedAmount * 100).subscribe({
+      this.walletService.deposit(this.selectedAmount * 100).subscribe({
         next: () => {
           this.success = `${this.selectedAmount} € were successfully charged!`;
           this.selectedAmount = null;
@@ -74,7 +66,6 @@ export class WalletPageComponent implements OnInit {
   }
 
   goToProfile() {
-    this.router.navigate(['/']); // Passe ggf. den Pfad an!
+    this.router.navigate(['/']);
   }
 }
-

@@ -25,19 +25,21 @@ public class WalletService {
         this.userRepo = userRepo;
     }
 
-    private Wallet getWalletForUser(Long userId) {
-        User user = userRepo.findById(userId).orElse(null);
-        return user != null ? user.getWallet() : null;
+    private Wallet getWalletForUsername(String username) {
+        return userRepo.findByUsername(username)
+                .map(User::getWallet)
+                .orElse(null);
     }
 
-    public long getBalance(Long userId) {
-        User user = userRepo.findById(userId).orElse(null);
-        if (user == null || user.getWallet() == null) return 0L;
-        return user.getWallet().getBalanceCents();
+    public long getBalance(String username) {
+        return userRepo.findByUsername(username)
+                .map(User::getWallet)
+                .map(Wallet::getBalanceCents)
+                .orElse(0L);
     }
 
     @Transactional
-    public void deposit(Long userId, long amountCents) {
+    public void deposit(String username, long amountCents) {
         if (amountCents <= 0) {
             throw new IllegalArgumentException("Deposit amount must be greater than zero.");
         }
@@ -45,33 +47,32 @@ public class WalletService {
             throw new IllegalArgumentException("Maximum deposit is 10,000 EUR.");
         }
 
-        Wallet wallet = getWalletForUser(userId);
+        Wallet wallet = getWalletForUsername(username);
         if (wallet == null) {
-            throw new IllegalArgumentException("Wallet not found for user: " + userId);
+            throw new IllegalArgumentException("Wallet not found for user: " + username);
         }
         wallet.setBalanceCents(wallet.getBalanceCents() + amountCents);
         walletRepo.save(wallet);
 
-        // Log the deposit as a transaction
         Transaction depositTransaction = new Transaction(
                 wallet,
                 TransactionType.DEPOSIT,
                 amountCents
-                );
+        );
         transactionRepo.save(depositTransaction);
     }
 
     @Transactional
-    public void transfer(Long fromUserId, long toUserId, long amountCents) {
+    public void transfer(String fromUsername, long toUserId, long amountCents) {
         if (amountCents <= 0) {
             throw new IllegalArgumentException("Transfer amount must be greater than zero.");
         }
 
-        Wallet fromWallet = getWalletForUser(fromUserId);
+        Wallet fromWallet = getWalletForUsername(fromUsername);
         Wallet toWallet = getWalletForUser(toUserId);
 
         if (fromWallet == null) {
-            throw new IllegalArgumentException("Sender wallet not found for user: " + fromUserId);
+            throw new IllegalArgumentException("Sender wallet not found for user: " + fromUsername);
         }
         if (toWallet == null) {
             throw new IllegalArgumentException("Receiver wallet not found for user: " + toUserId);
@@ -89,14 +90,19 @@ public class WalletService {
                 fromWallet,
                 TransactionType.PAYMENT_OUT,
                 -amountCents
-                );
+        );
         transactionRepo.save(outTx);
 
         Transaction inTx = new Transaction(
                 toWallet,
                 TransactionType.PAYMENT_IN,
                 amountCents
-                );
+        );
         transactionRepo.save(inTx);
+    }
+
+    private Wallet getWalletForUser(Long userId) {
+        User user = userRepo.findById(userId).orElse(null);
+        return user != null ? user.getWallet() : null;
     }
 }
