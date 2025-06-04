@@ -151,9 +151,11 @@ public class RideRequestController {
 
             RideOfferNotification notification = new RideOfferNotification();
             notification.setRideOfferId(offer.getId());
-            notification.setDriverUsername(driver.getUsername());
+            notification.setDriverName(driver.getFirstName() + " " + driver.getLastName());
             notification.setDriverRating(driver.getRating());
             notification.setTotalRides(driver.getTotalRides());
+            notification.setTotalTravelledDistance(0);
+            notification.setVehicleClass(driver.getVehicleClass());
             return notification;
         }).collect(Collectors.toList());
 
