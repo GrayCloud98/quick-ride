@@ -4,7 +4,6 @@ import {Request} from '../models/request.model';
 import {map} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
 import {Offer, OfferState} from '../models/offer.model';
-import {VehicleClass} from '../models/ride.model';
 
 @Injectable({
   providedIn: 'root'
@@ -50,11 +49,11 @@ export class OfferService {
       map((offers: any[]) => offers.map(
         (offer: any) => ({
           offerID: offer.rideOfferId,
-          driverName: offer.driverUsername,
+          driverName: offer.driverName,
           driverRating: offer.driverRating,
-          driverVehicle: VehicleClass.SMALL, // Backend not implemented
+          driverVehicle: offer.vehicleClass,
           ridesCount: offer.totalRides,
-          travelledDistance: 1313, // Backend not implemented
+          travelledDistance: offer.totalTravelledDistance,
           state: OfferState.OFFERED
         })
       ))
