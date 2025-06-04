@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
-import {RideRequestService} from '../../services/ride-request.service';
+import {OfferService} from '../../services/offer.service';
 import {Location} from '../../models/location.model';
 import {Request} from '../../models/request.model';
 import {filter, switchMap, tap} from 'rxjs';
@@ -32,14 +32,14 @@ export class AvailableRidesPageComponent implements OnInit {
     { key: 'createdAt', label: 'Request Time' },
     { key: 'requestID', label: 'Request ID' },
   ];
-  constructor(private rideService: RideRequestService,
+  constructor(private offerService: OfferService,
               private authService: AuthService) {
   }
 
   onLocationSelected(pos: Location) {
     this.currentPosition = pos;
     this.currentPositionControl.setValue(pos);
-    this.rideService.getAllActiveRequests(this.currentPosition.latitude,this.currentPosition.longitude).subscribe({
+    this.offerService.getAllActiveRequests(this.currentPosition.latitude,this.currentPosition.longitude).subscribe({
       next: result => this.allActiveRequests = result,
       error: err => console.log(err)
     })
@@ -75,7 +75,7 @@ export class AvailableRidesPageComponent implements OnInit {
     this.authService.currentUser.pipe(
       filter(user => !!user?.username),
       tap(user => this.username = user!.username!),
-      switchMap(() => this.authService.isCustomer(this.username)),
+      switchMap(() => this.authService.isCustomer()),
       tap(isCustomer => this.accessAllowed = !isCustomer)
     ).subscribe({
       error: err => console.log(err)

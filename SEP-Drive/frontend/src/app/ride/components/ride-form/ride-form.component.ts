@@ -85,27 +85,12 @@ export class RideFormComponent implements OnInit {
   }
 
   submit() {
-    const rideDataJson: any = {
-      userName: `${this.username}`,
-      vehicleClass: `${this.ride.vehicleClass}`,
-      startLatitude: `${this.ride.pickup.latitude}`,
-      startLongitude: `${this.ride.pickup.longitude}`,
-      destinationLatitude: `${this.ride.dropoff.latitude}`,
-      destinationLongitude: `${this.ride.dropoff.longitude}`,
-      startLocationName: `${this.ride.pickup.name}`,
-      destinationLocationName: `${this.ride.dropoff.name}`,
-      startAddress: `${this.ride.pickup.address}`,
-      destinationAddress: `${this.ride.dropoff.address}`
-    };
-
-    this.rideService.submitRide(rideDataJson).subscribe({
+    this.rideService.submitRide(this.ride).subscribe({
       next: () => {
-        this.rideService.updateActiveRideStatus(this.username);
+        this.rideService.updateActiveRideStatus();
         void this.router.navigate(['/ride/active']);
       },
-      error: error => {
-        console.error('Error:', error);
-      }
+      error: err => console.error(err)
     });
   }
 }
