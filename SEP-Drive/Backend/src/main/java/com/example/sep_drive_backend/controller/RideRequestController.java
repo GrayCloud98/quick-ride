@@ -129,6 +129,15 @@ public class RideRequestController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("offer-request-id")
+    public ResponseEntity<Long> getDriverOfferRideRequestId(HttpServletRequest request) {
+        String token = jwtTokenProvider.resolveToken(request);
+        String username = jwtTokenProvider.getUsername(token);
+
+        Long rideRequestId = rideRequestService.getRideRequestIdIfDriverOffer(username);
+        return ResponseEntity.ok(rideRequestId);
+    }
+
     @GetMapping("/offers")
     public ResponseEntity<List<RideOfferNotification>> getOffersForCustomer(HttpServletRequest request) {
         String token = jwtTokenProvider.resolveToken(request);
@@ -142,9 +151,11 @@ public class RideRequestController {
 
             RideOfferNotification notification = new RideOfferNotification();
             notification.setRideOfferId(offer.getId());
-            notification.setDriverUsername(driver.getUsername());
+            notification.setDriverName(driver.getFirstName() + " " + driver.getLastName());
             notification.setDriverRating(driver.getRating());
             notification.setTotalRides(driver.getTotalRides());
+            notification.setTotalTravelledDistance(0);
+            notification.setVehicleClass(driver.getVehicleClass());
             return notification;
         }).collect(Collectors.toList());
 
@@ -159,6 +170,14 @@ public class RideRequestController {
 
     }
 
+    @GetMapping("/is-driver-active")
+    public ResponseEntity<Boolean> isDriverActive (HttpServletRequest request) {
 
+        String token = jwtTokenProvider.resolveToken(request);
+        String username = jwtTokenProvider.getUsername(token);
+
+        boolean isDriverActive = rideRequestService.isDriverActive(username);
+        return ResponseEntity.ok(isDriverActive);
+    }
 
 }

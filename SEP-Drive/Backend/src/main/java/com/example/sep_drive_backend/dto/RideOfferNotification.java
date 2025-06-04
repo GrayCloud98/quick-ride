@@ -1,12 +1,23 @@
 package com.example.sep_drive_backend.dto;
 
+import com.example.sep_drive_backend.constants.VehicleClassEnum;
+
 public class RideOfferNotification {
-    private String driverUsername;
+    private String driverName;
     private double driverRating;
     private int totalRides;
-    private double totalDistance;
+    private double totalTravelledDistance;
     private String message;
     private Long rideOfferId;
+    private VehicleClassEnum vehicleClass;
+
+    public VehicleClassEnum getVehicleClass() {
+        return vehicleClass;
+    }
+
+    public void setVehicleClass(VehicleClassEnum vehicleClass) {
+        this.vehicleClass = vehicleClass;
+    }
 
     public RideOfferNotification() {}
 
@@ -18,12 +29,12 @@ public class RideOfferNotification {
         this.rideOfferId = rideOfferId;
     }
 
-    public String getDriverUsername() {
-        return driverUsername;
+    public String getDriverName() {
+        return driverName;
     }
 
-    public void setDriverUsername(String driverUsername) {
-        this.driverUsername = driverUsername;
+    public void setDriverName(String driverName) {
+        this.driverName = driverName;
     }
 
     public double getDriverRating() {
@@ -42,12 +53,12 @@ public class RideOfferNotification {
         this.totalRides = totalRides;
     }
 
-    public double getTotalDistance() {
-        return totalDistance;
+    public double getTotalTravelledDistance() {
+        return totalTravelledDistance;
     }
 
-    public void setTotalDistance(double totalDistance) {
-        this.totalDistance = totalDistance;
+    public void setTotalTravelledDistance(double totalTravelledDistance) {
+        this.totalTravelledDistance = totalTravelledDistance;
     }
 
     public String getMessage() {

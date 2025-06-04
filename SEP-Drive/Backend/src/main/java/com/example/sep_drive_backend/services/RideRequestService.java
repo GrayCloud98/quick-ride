@@ -122,28 +122,51 @@ public class RideRequestService {
         Customer customer = rideRequest.getCustomer();
         Optional<Driver> driverOptional = driverRepository.findByUsername(driverUsername);
         Driver driver = driverOptional.orElseThrow(() -> new NoSuchElementException("Driver with username " + driverUsername + " not found"));
-        RideOffer rideOffer = new RideOffer();
-        rideOffer.setDriver(driver);
-        rideOffer.setRideRequest(rideRequest);
-        driver.setActive(true);
-        driverRepository.save(driver);
-        RideOffer savedOffer = rideOfferRepository.save(rideOffer);
+        if (!driver.getActive()) {
+            RideOffer rideOffer = new RideOffer();
+            rideOffer.setDriver(driver);
+            rideOffer.setRideRequest(rideRequest);
+            driver.setActive(true);
+            driverRepository.save(driver);
+            RideOffer savedOffer = rideOfferRepository.save(rideOffer);
 
-        RideOfferNotification notification = new RideOfferNotification();
-        notification.setMessage("A driver wants to take your ride!");
-        notification.setDriverUsername(driver.getUsername());
-        notification.setDriverRating(driver.getRating());
-        notification.setTotalRides(driver.getTotalRides());
+            RideOfferNotification notification = new RideOfferNotification();
+            notification.setMessage("A driver wants to take your ride!");
+            notification.setDriverName(driver.getFirstName() + " " + driver.getLastName());
+            notification.setDriverRating(driver.getRating());
+            notification.setTotalRides(driver.getTotalRides());
+            notification.setTotalTravelledDistance(0);
+            notification.setVehicleClass(driver.getVehicleClass());
 
-        String customerUsername = rideRequest.getCustomer().getUsername();
+            String customerUsername = rideRequest.getCustomer().getUsername();
 
-        messagingTemplate.convertAndSend("/topic/customer/" + customerUsername, notification);
-        System.out.println("Notification sent to customer " + customerUsername);
-
-        return savedOffer;
-
-
+            messagingTemplate.convertAndSend("/topic/customer/" + customerUsername, notification);
+            System.out.println("Notification sent to customer " + customerUsername);
+            return savedOffer;
+        } else {
+            return null;
+        }
     }
+
+
+    public boolean isDriverActive(String username) {
+        return driverRepository.findByUsername(username)
+                .map(Driver::getActive)
+                .orElse(false);
+    }
+
+    public Long getRideRequestIdIfDriverOffer(String username) {
+        Optional<Driver> driverOpt = driverRepository.findByUsername(username);
+        if (driverOpt.isPresent() && driverOpt.get().getActive()) {
+            Optional<RideOffer> offerOpt = rideOfferRepository.findByDriver(driverOpt.get());
+            if (offerOpt.isPresent() && offerOpt.get().getRideRequest() != null) {
+                return offerOpt.get().getRideRequest().getId();
+            }
+        }
+        return null;
+    }
+
+
 
     public void rejectOffer(Long rideRequestId) {
         Optional<RideRequest> rideRequestOptional = rideRequestRepository.findById(rideRequestId);
