@@ -1,19 +1,17 @@
 import {VehicleClass} from './ride.model';
 
 export enum OfferState {
-  NONE = 'none',
-  OFFERED = 'offered',
-  ACCEPTED = 'accepted'
+  NONE,
+  OFFERED,
+  ACCEPTED
 }
 
 export interface Offer {
   offerID: number;
-  requestID: number;
-  driverID: number;
   driverName: string;
   driverRating: number;
-  driverVehicle: VehicleClass;
+  driverVehicle: VehicleClass; // Backend not implemented
   ridesCount: number;
-  travelledDistance: number;
+  travelledDistance: number; // Backend not implemented
   status: OfferState;
 }

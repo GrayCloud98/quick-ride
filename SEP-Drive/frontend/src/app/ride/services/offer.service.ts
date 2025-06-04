@@ -3,7 +3,8 @@ import {BehaviorSubject, Observable} from 'rxjs';
 import {Request} from '../models/request.model';
 import {map} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
-import {Offer} from '../models/offer.model';
+import {Offer, OfferState} from '../models/offer.model';
+import {VehicleClass} from '../models/ride.model';
 
 @Injectable({
   providedIn: 'root'
@@ -44,14 +45,19 @@ export class OfferService {
     );
   }
 
-  private offers = new BehaviorSubject<Offer[]>([]);
-  public offers$ = this.offers.asObservable();
-
-
-  // TODO BIND WITH BACKEND
-  public getOffers(requestID: number): Observable<Offer[]> {
-    return this.offers$.pipe(
-      map(offers => offers.filter(o => o.requestID === requestID))
+  public getOffers(): Observable<Offer[]> {
+    return this.http.get<any[]>(this.baseUrl + '/offers').pipe(
+      map((offers: any[]) => offers.map(
+        (offer: any) => ({
+          offerID: offer.rideOfferId,
+          driverName: offer.driverUsername,
+          driverRating: offer.driverRating,
+          driverVehicle: VehicleClass.SMALL, // Backend not implemented
+          ridesCount: offer.totalRides,
+          travelledDistance: 1313, // Backend not implemented
+          status: OfferState.OFFERED
+        })
+      ))
     );
   }
 
