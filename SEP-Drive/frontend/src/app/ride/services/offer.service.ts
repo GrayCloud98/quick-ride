@@ -55,7 +55,7 @@ export class OfferService {
           driverVehicle: VehicleClass.SMALL, // Backend not implemented
           ridesCount: offer.totalRides,
           travelledDistance: 1313, // Backend not implemented
-          status: OfferState.OFFERED
+          state: OfferState.OFFERED
         })
       ))
     );

@@ -1,3 +1,30 @@
-<div style="width: 1000px;" *ngFor="let offer of offers">
-  <offer-card [offer]="offer"></offer-card>
+<div class="main-container">
+  <div class="left-container">
+    <h1 class="sort-header">Sort by</h1>
+    <mat-radio-group class="sort-group">
+      <div *ngFor="let option of sortOptions" class="sort-option">
+        <span class="sort-label">{{ option.label }}</span>
+        <div class="radio-buttons">
+          <mat-radio-button
+            (click)="sortOffers(option.key, 'asc')"
+            [value]="option.key + '-asc'"
+          >
+            <mat-icon>arrow_upward</mat-icon>
+          </mat-radio-button>
+          <mat-radio-button
+            (click)="sortOffers(option.key, 'desc')"
+            [value]="option.key + '-desc'"
+          >
+            <mat-icon>arrow_downward</mat-icon>
+          </mat-radio-button>
+        </div>
+      </div>
+    </mat-radio-group>
+  </div>
+
+  <div class="right-container">
+    <div class="centered-box offer-card-container" *ngFor="let offer of offers">
+      <offer-card [offer]="offer"></offer-card>
+    </div>
+  </div>
 </div>

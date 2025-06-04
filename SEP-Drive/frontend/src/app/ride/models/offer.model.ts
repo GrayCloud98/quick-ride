@@ -13,5 +13,5 @@ export interface Offer {
   driverVehicle: VehicleClass; // Backend not implemented
   ridesCount: number;
   travelledDistance: number; // Backend not implemented
-  status: OfferState;
+  state: OfferState;
 }
