@@ -53,8 +53,8 @@ export class RideOffersPageComponent implements OnInit {
 
   rejectOffer(offerID: number) {
     this.offerService.customerRejectOffer(offerID).subscribe({
-      next: () => console.log("rejected", offerID),
-      error: err => console.log("customerRejectOffer", err)
+      next: () => this.offers = this.offers.filter(offer => offer.offerID !== offerID),
+      error: err => console.log(err)
     })
   }
 }
