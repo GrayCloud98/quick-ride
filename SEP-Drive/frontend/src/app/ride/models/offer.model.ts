@@ -10,8 +10,8 @@ export interface Offer {
   offerID: number;
   driverName: string;
   driverRating: number;
-  driverVehicle: VehicleClass; // Backend not implemented
+  driverVehicle: VehicleClass;
   ridesCount: number;
-  travelledDistance: number; // Backend not implemented
+  travelledDistance: number;
   state: OfferState;
 }

@@ -23,6 +23,12 @@
   </div>
 
   <div class="right-container">
+
+    <div class="centered-box offer-card-container alert error" *ngIf="offers.length === 0">
+      You have not received any offers yet. <br><br>
+      Please refresh later.
+    </div>
+
     <div class="centered-box offer-card-container" *ngFor="let offer of offers">
       <offer-card
         [offer]="offer"
