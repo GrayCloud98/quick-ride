@@ -24,7 +24,10 @@
 
   <div class="right-container">
     <div class="centered-box offer-card-container" *ngFor="let offer of offers">
-      <offer-card [offer]="offer"></offer-card>
+      <offer-card
+        [offer]="offer"
+        (onReject)="rejectOffer(offer.offerID)"
+      ></offer-card>
     </div>
   </div>
 </div>
