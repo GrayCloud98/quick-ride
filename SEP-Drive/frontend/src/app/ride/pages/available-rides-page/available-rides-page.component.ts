@@ -20,10 +20,12 @@ interface SortOption {
 export class AvailableRidesPageComponent implements OnInit {
   accessAllowed: boolean = false;
   username: string = '';
-  allActiveRequests: Request[] = [];
+
   currentPositionControl = new FormControl<Location | string>('', [Validators.required]);
   currentPosition!: Location;
   positionSet = false;
+
+  allActiveRequests: Request[] = [];
   sortOptions: SortOption[] = [
     { key: 'driverToStartDistance', label: 'Distance to Pickup' },
     { key: 'desiredVehicleClass', label: 'Requested Vehicle Type' },
@@ -32,6 +34,10 @@ export class AvailableRidesPageComponent implements OnInit {
     { key: 'createdAt', label: 'Request Time' },
     { key: 'requestID', label: 'Request ID' },
   ];
+
+  offerState = OfferState.NONE;
+  requestIdOfOffer: number | null = null;
+
   constructor(private offerService: OfferService,
               private authService: AuthService) {
   }
@@ -39,6 +45,16 @@ export class AvailableRidesPageComponent implements OnInit {
   onLocationSelected(pos: Location) {
     this.currentPosition = pos;
     this.currentPositionControl.setValue(pos);
+
+    this.offerService.driverHasActiveOffer().pipe(
+      filter(driverHasActiveOffer => driverHasActiveOffer),
+      tap(()=> this.offerState = OfferState.OFFERED),
+      switchMap(() => this.offerService.driverGetRequestIdOfOffer()),
+      tap(requestIdOfOffer => this.requestIdOfOffer = requestIdOfOffer),
+    ).subscribe({
+      error: err => console.log(err)
+    });
+
     this.offerService.getAllActiveRequests(this.currentPosition.latitude,this.currentPosition.longitude).subscribe({
       next: result => this.allActiveRequests = result,
       error: err => console.log(err)
@@ -47,13 +63,9 @@ export class AvailableRidesPageComponent implements OnInit {
   }
 
   //TODO continue accepting logic
-  offerState: OfferState = OfferState.NONE;
-  requestIdOfOffer: number | null = null;
   acceptRequest(requestID: number) {
     this.offerService.driverAcceptRequest(requestID).subscribe({
-      next: (response: any) => {
-        this.requestIdOfOffer = response.rideRequest.id;
-      },
+      next: (response: any) => this.requestIdOfOffer = response.rideRequest.id,
       error: err => console.log(err)
     })
     this.offerState = OfferState.OFFERED;
@@ -61,7 +73,6 @@ export class AvailableRidesPageComponent implements OnInit {
 
   withdrawOffer() {
     this.offerService.driverWithdrawOffer().subscribe({
-      next: response => console.log(response),
       error: err => console.log(err)
     })
     this.offerState = OfferState.NONE;

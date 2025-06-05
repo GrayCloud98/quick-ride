@@ -44,7 +44,7 @@ export class OfferService {
     );
   }
 
-  public getOffers(): Observable<Offer[]> {
+  public customerGetOffers(): Observable<Offer[]> {
     return this.http.get<any[]>(this.baseUrl + '/offers').pipe(
       map((offers: any[]) => offers.map(
         (offer: any) => ({
@@ -67,5 +67,13 @@ export class OfferService {
 
   public driverWithdrawOffer(){
     return this.http.delete(this.baseUrl + '/cancel-offer');
+  }
+
+  public driverHasActiveOffer(): Observable<boolean> {
+    return this.http.get<boolean>(this.baseUrl + '/is-driver-active');
+  }
+
+  public driverGetRequestIdOfOffer(): Observable<number>{
+    return this.http.get<number>(this.baseUrl + '/offer-request-id');
   }
 }

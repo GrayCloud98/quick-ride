@@ -27,7 +27,7 @@ export class RideOffersPageComponent implements OnInit {
   constructor(private offerService: OfferService) {}
 
   ngOnInit() {
-    this.offerService.getOffers().subscribe({
+    this.offerService.customerGetOffers().subscribe({
       next: (offers: Offer[]) => this.offers = offers,
       error: err => console.log(err)
     })
