@@ -166,26 +166,19 @@ public class RideRequestService {
         return null;
     }
 
+    public void rejectOffer(Long rideOfferId) {
+        Optional<RideOffer> rideOfferOptional = rideOfferRepository.findById(rideOfferId);
+        if (rideOfferOptional.isPresent()) {
+            RideOffer rideOffer = rideOfferOptional.get();
+            rideOfferRepository.delete(rideOffer);
 
-
-    public void rejectOffer(Long rideRequestId) {
-        Optional<RideRequest> rideRequestOptional = rideRequestRepository.findById(rideRequestId);
-        if (rideRequestOptional.isPresent()) {
-            RideRequest rideRequest = rideRequestOptional.get();
-            Optional<RideOffer> rideOfferOptional = rideOfferRepository.findByRideRequest(rideRequest);
-            if (rideOfferOptional.isPresent()) {
-                RideOffer rideOffer = rideOfferOptional.get();
-                rideOfferRepository.delete(rideOffer);
-                Driver driver = rideOffer.getDriver();
-                if (driver != null) {
-                    driver.setActive(false);
-                    driverRepository.save(driver);
-                }
-            } else {
-                System.out.println("No ride offer found for the given ride request.");
+            Driver driver = rideOffer.getDriver();
+            if (driver != null) {
+                driver.setActive(false);
+                driverRepository.save(driver);
             }
         } else {
-            System.out.println("Ride request not found.");
+            System.out.println("Ride offer not found.");
         }
     }
 
