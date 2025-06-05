@@ -51,6 +51,16 @@ export class RideOffersPageComponent implements OnInit {
     this.offers.sort(compare);
   }
 
+  acceptOffer(offerID: number) {
+    this.offerService.customerAcceptOffer(offerID).subscribe({
+      next: () => {
+        const otherOffers = this.offers.filter(o => o.offerID !== offerID);
+        otherOffers.forEach(o => this.rejectOffer(o.offerID));
+      },
+      error: err => console.error(err)
+    });
+  }
+
   rejectOffer(offerID: number) {
     this.offerService.customerRejectOffer(offerID).subscribe({
       next: () => this.offers = this.offers.filter(offer => offer.offerID !== offerID),
