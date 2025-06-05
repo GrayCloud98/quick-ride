@@ -76,4 +76,14 @@ export class OfferService {
   public driverGetRequestIdOfOffer(): Observable<number>{
     return this.http.get<number>(this.baseUrl + '/offer-request-id');
   }
+
+  public customerAcceptOffer(offerID: number) {
+    const params = {rideOfferId: offerID};
+    return this.http.post(this.baseUrl + '/accept-offer', null, {params});
+  }
+
+  public customerRejectOffer(offerID: number) {
+    const params = {rideOfferId: offerID};
+    return this.http.delete(this.baseUrl + '/reject-offer', {params});
+  }
 }
