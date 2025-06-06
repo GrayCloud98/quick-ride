@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>STOMP WebSocket Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        #status { font-weight: bold; margin-bottom: 10px; }
+        #messages { border: 1px solid #ccc; padding: 10px; min-height: 100px; max-width: 600px; }
+        p { margin: 5px 0; }
+    </style>
+</head>
+<body>
+<h2>WebSocket Test for Customer Notification</h2>
+<button onclick="connect()">Connect as 'sac'</button>
+<div id="status">Not connected</div>
+
+<h3>Messages:</h3>
+<div id="messages"></div>
+
+<script>
+    let stompClient = null;
+
+    function connect() {
+        const socket = new SockJS('http://localhost:8080/ws');
+        stompClient = Stomp.over(socket);
+
+        // Optional: disable debug logs
+        stompClient.debug = null;
+
+        stompClient.connect({}, function(frame) {
+            document.getElementById('status').innerText = 'Connected to WebSocket as ' + frame.user || 'sac';
+            const topic = '/topic/customer/sac';
+
+            stompClient.subscribe(topic, function(message) {
+                const notification = JSON.parse(message.body);
+
+                const content = `
+                        <p>
+                             <strong>${notification.driverName}</strong> wants to take your ride!<br>
+                            Rating: ${notification.driverRating} | Rides: ${notification.totalRides} | Vehicle: ${notification.vehicleClass}
+                        </p>
+                    `;
+
+                document.getElementById('messages').innerHTML += content;
+            });
+        }, function(error) {
+            document.getElementById('status').innerText = 'Failed to connect: ' + error;
+        });
+    }
+</script>
+</body>
+</html>
