@@ -1,6 +1,8 @@
 import {Component, OnInit} from '@angular/core';
+import {AuthService} from '../../../auth/auth.service';
 import {OfferService} from '../../services/offer.service';
 import {Offer} from '../../models/offer.model';
+import {filter, switchMap, tap} from 'rxjs';
 
 interface SortOption {
   key: keyof Offer,
@@ -13,6 +15,9 @@ interface SortOption {
   styleUrl: './ride-offers-page.component.scss'
 })
 export class RideOffersPageComponent implements OnInit {
+  accessAllowed: boolean = false;
+  username: string = '';
+
   offers: Offer[] = [];
   sortOptions: SortOption[] = [
     { key: 'offerID', label: 'Offer ID' },
@@ -22,11 +27,22 @@ export class RideOffersPageComponent implements OnInit {
     { key: 'ridesCount', label: 'Rides Count' },
     { key: 'travelledDistance', label: 'Travelled Distance' },
   ];
-  constructor(private offerService: OfferService) {}
+  constructor(private authService: AuthService,
+              private offerService: OfferService) {}
 
-  ngOnInit() {
-    this.offerService.customerGetOffers().subscribe({
-      next: (offers: Offer[]) => this.offers = offers,
+  acceptOffer(offerID: number) {
+    this.offerService.customerAcceptOffer(offerID).subscribe({
+      next: () => {
+        const otherOffers = this.offers.filter(offer => offer.offerID !== offerID);
+        otherOffers.forEach(offer => this.rejectOffer(offer.offerID));
+      },
+      error: err => console.error(err)
+    });
+  }
+
+  rejectOffer(offerID: number) {
+    this.offerService.customerRejectOffer(offerID).subscribe({
+      next: () => this.offers = this.offers.filter(offer => offer.offerID !== offerID),
       error: err => console.log(err)
     })
   }
@@ -46,19 +62,18 @@ export class RideOffersPageComponent implements OnInit {
     this.offers.sort(compare);
   }
 
-  acceptOffer(offerID: number) {
-    this.offerService.customerAcceptOffer(offerID).subscribe({
-      next: () => {
-        const otherOffers = this.offers.filter(offer => offer.offerID !== offerID);
-        otherOffers.forEach(offer => this.rejectOffer(offer.offerID));
-      },
-      error: err => console.error(err)
-    });
-  }
+  ngOnInit() {
+    this.authService.currentUser.pipe(
+      filter(user => !!user?.username),
+      tap(user => this.username = user!.username!),
+      switchMap(() => this.authService.isCustomer()),
+      tap(isCustomer => this.accessAllowed = isCustomer)
+    ).subscribe({
+      error: err => console.log(err)
+    })
 
-  rejectOffer(offerID: number) {
-    this.offerService.customerRejectOffer(offerID).subscribe({
-      next: () => this.offers = this.offers.filter(offer => offer.offerID !== offerID),
+    this.offerService.customerGetOffers().subscribe({
+      next: (offers: Offer[]) => this.offers = offers,
       error: err => console.log(err)
     })
   }
