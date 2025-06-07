@@ -18,10 +18,15 @@
       <mat-card-content><span class="vehicle-class">{{ activeRide.vehicleClass }}</span></mat-card-content>
     </mat-card>
 
+    <div class="button-container">
+      <button mat-fab extended class="btn" [routerLink]="['/ride/offer']">
+        View Ride Offers
+      </button>
 
-    <button mat-fab extended class="deactivation-btn" (click)="deactivateRide()">
-      Deactivate your ride
-    </button>
+      <button mat-fab extended class="btn deactivate" (click)="deactivateRide()">
+        Deactivate your ride
+      </button>
+    </div>
 
   </div>
 

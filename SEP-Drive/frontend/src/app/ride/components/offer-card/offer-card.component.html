@@ -31,14 +31,21 @@
       <span class="value">{{ offer.travelledDistance }} km</span>
     </div>
 
+    <div class="header">
+      <mat-icon>sell</mat-icon>
+      <span class="label">Offer ID:</span>
+      <span class="value">{{ offer.offerID }}</span>
+    </div>
+
     <div class="button-container">
-      <button class="btn" mat-fab extended>
-        Accept Request
+      <button class="btn" mat-fab extended (click)="accept()">
+        Accept Offer
       </button>
-      <button class="btn reject" mat-fab extended>
-        Reject Request
+      <button class="btn reject" mat-fab extended (click)="reject()">
+        Reject Offer
       </button>
     </div>
 
   </mat-card-content>
 </mat-card>
+<br>

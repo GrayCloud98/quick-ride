@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {Observable} from 'rxjs';
 import {Request} from '../models/request.model';
 import {map} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
-import {Offer} from '../models/offer.model';
+import {Offer, OfferState} from '../models/offer.model';
 
 @Injectable({
   providedIn: 'root'
@@ -44,21 +44,46 @@ export class OfferService {
     );
   }
 
-  private offers = new BehaviorSubject<Offer[]>([]);
-  public offers$ = this.offers.asObservable();
-
-
-  // TODO BIND WITH BACKEND
-  public getOffers(requestID: number): Observable<Offer[]> {
-    return this.offers$.pipe(
-      map(offers => offers.filter(o => o.requestID === requestID))
+  public customerGetOffers(): Observable<Offer[]> {
+    return this.http.get<any[]>(this.baseUrl + '/offers').pipe(
+      map((offers: any[]) => offers.map(
+        (offer: any) => ({
+          offerID: offer.rideOfferId,
+          driverName: offer.driverName,
+          driverRating: offer.driverRating,
+          driverVehicle: offer.vehicleClass,
+          ridesCount: offer.totalRides,
+          travelledDistance: offer.totalTravelledDistance,
+          state: OfferState.OFFERED
+        })
+      ))
     );
   }
 
-  // TODO BIND WITH BACKEND
-  public postOffer(requestID: number, offer: Offer): void {
-    const current = this.offers.getValue();
-    const updated = [...current, { ...offer, requestID }];
-    this.offers.next(updated);
+  public driverAcceptRequest(requestID: number) {
+    const params = {rideRequestId: requestID};
+    return this.http.post(this.baseUrl + '/offer-ride', null, {params});
+  }
+
+  public driverWithdrawOffer(){
+    return this.http.delete(this.baseUrl + '/cancel-offer');
+  }
+
+  public driverHasActiveOffer(): Observable<boolean> {
+    return this.http.get<boolean>(this.baseUrl + '/is-driver-active');
+  }
+
+  public driverGetRequestIdOfOffer(): Observable<number>{
+    return this.http.get<number>(this.baseUrl + '/offer-request-id');
+  }
+
+  public customerAcceptOffer(offerID: number) {
+    const params = {rideOfferId: offerID};
+    return this.http.post(this.baseUrl + '/accept-offer', null, {params});
+  }
+
+  public customerRejectOffer(offerID: number) {
+    const params = {rideOfferId: offerID};
+    return this.http.delete(this.baseUrl + '/reject-offer', {params});
   }
 }

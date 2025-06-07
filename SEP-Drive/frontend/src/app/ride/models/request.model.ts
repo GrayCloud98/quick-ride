@@ -3,7 +3,7 @@ import {Location} from './location.model';
 
 
 export interface Request {
-  requestID: string;
+  requestID: number;
   createdAt: string;
   customerName: string;
   customerRating: number;

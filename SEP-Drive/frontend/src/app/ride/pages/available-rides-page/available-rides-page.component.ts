@@ -1,10 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
+import {filter, switchMap, tap} from 'rxjs';
+import {AuthService} from '../../../auth/auth.service';
 import {OfferService} from '../../services/offer.service';
 import {Location} from '../../models/location.model';
 import {Request} from '../../models/request.model';
-import {filter, switchMap, tap} from 'rxjs';
-import {AuthService} from '../../../auth/auth.service';
+import {OfferState} from '../../models/offer.model';
 
 interface SortOption {
   key: keyof Request,
@@ -20,10 +21,11 @@ export class AvailableRidesPageComponent implements OnInit {
   accessAllowed: boolean = false;
   username: string = '';
 
-  allActiveRequests: Request[] = [];
   currentPositionControl = new FormControl<Location | string>('', [Validators.required]);
   currentPosition!: Location;
   positionSet = false;
+
+  allActiveRequests: Request[] = [];
   sortOptions: SortOption[] = [
     { key: 'driverToStartDistance', label: 'Distance to Pickup' },
     { key: 'desiredVehicleClass', label: 'Requested Vehicle Type' },
@@ -32,6 +34,10 @@ export class AvailableRidesPageComponent implements OnInit {
     { key: 'createdAt', label: 'Request Time' },
     { key: 'requestID', label: 'Request ID' },
   ];
+
+  offerState = OfferState.NONE;
+  requestIdOfOffer: number | null = null;
+
   constructor(private offerService: OfferService,
               private authService: AuthService) {
   }
@@ -39,6 +45,16 @@ export class AvailableRidesPageComponent implements OnInit {
   onLocationSelected(pos: Location) {
     this.currentPosition = pos;
     this.currentPositionControl.setValue(pos);
+
+    this.offerService.driverHasActiveOffer().pipe(
+      filter(driverHasActiveOffer => driverHasActiveOffer),
+      tap(()=> this.offerState = OfferState.OFFERED),
+      switchMap(() => this.offerService.driverGetRequestIdOfOffer()),
+      tap(requestIdOfOffer => this.requestIdOfOffer = requestIdOfOffer),
+    ).subscribe({
+      error: err => console.log(err)
+    });
+
     this.offerService.getAllActiveRequests(this.currentPosition.latitude,this.currentPosition.longitude).subscribe({
       next: result => this.allActiveRequests = result,
       error: err => console.log(err)
@@ -46,9 +62,19 @@ export class AvailableRidesPageComponent implements OnInit {
     this.positionSet = true;
   }
 
-  //TODO implement accepting logic
-  acceptRequest() {
-    console.log("accepted")
+  acceptRequest(requestID: number) {
+    this.offerService.driverAcceptRequest(requestID).subscribe({
+      next: (response: any) => this.requestIdOfOffer = response.rideRequest.id,
+      error: err => console.log(err)
+    })
+    this.offerState = OfferState.OFFERED;
+  }
+
+  withdrawOffer() {
+    this.offerService.driverWithdrawOffer().subscribe({
+      error: err => console.log(err)
+    })
+    this.offerState = OfferState.NONE;
   }
 
   sortRequests(attr: keyof Request, direction: 'asc' | 'desc') {

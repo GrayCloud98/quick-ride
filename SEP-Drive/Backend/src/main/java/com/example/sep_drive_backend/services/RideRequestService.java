@@ -1,11 +1,17 @@
 package com.example.sep_drive_backend.services;
 
+import com.example.sep_drive_backend.dto.RideOfferNotification;
 import com.example.sep_drive_backend.dto.RidesForDriversDTO;
 import com.example.sep_drive_backend.models.Customer;
+import com.example.sep_drive_backend.models.Driver;
+import com.example.sep_drive_backend.models.RideOffer;
 import com.example.sep_drive_backend.models.RideRequest;
 import com.example.sep_drive_backend.repository.CustomerRepository;
+import com.example.sep_drive_backend.repository.DriverRepository;
+import com.example.sep_drive_backend.repository.RideOfferRepository;
 import com.example.sep_drive_backend.repository.RideRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import com.example.sep_drive_backend.dto.RideRequestDTO;
 
@@ -20,16 +26,29 @@ import java.util.stream.Collectors;
 @Service
 public class RideRequestService {
 
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
     @Autowired
     private final RideRequestRepository repository;
 
     @Autowired
     private final CustomerRepository customerRepository;
 
+    @Autowired
+    private final DriverRepository driverRepository;
 
-    public RideRequestService(RideRequestRepository repository, CustomerRepository customerRepository) {
+    @Autowired
+    private RideOfferRepository rideOfferRepository;
+    @Autowired
+    private RideRequestRepository rideRequestRepository;
+
+    public RideRequestService(RideRequestRepository repository, CustomerRepository customerRepository, DriverRepository driverRepository, RideOfferRepository rideOfferRepository) {
         this.repository = repository;
         this.customerRepository = customerRepository;
+        this.driverRepository = driverRepository;
+        this.rideOfferRepository = rideOfferRepository;
     }
 
 
@@ -96,13 +115,103 @@ public class RideRequestService {
                 })
                 .collect(Collectors.toList());
     }
+    public RideOffer createRideOffer(Long rideRequestId, String driverUsername) {
 
-//    private double calculateDistance(double latDriver, double lonDriver, double latCustomer, double lonCustomer) {
-//        WayPoint driverPoint = WayPoint.of(Latitude.ofDegrees(latDriver), Longitude.ofDegrees(lonDriver));
-//        WayPoint customerPoint = WayPoint.of(Latitude.ofDegrees(latCustomer), Longitude.ofDegrees(lonCustomer));
-//
-//        return driverPoint.distance(customerPoint).to(Length.Unit.KILOMETER);
-//    }
+        Optional<RideRequest> rideRequestOptional = repository.findById(rideRequestId);
+        RideRequest rideRequest = rideRequestOptional.orElseThrow(() -> new NoSuchElementException("Ride request with id " + rideRequestId + " not found"));
+        Customer customer = rideRequest.getCustomer();
+        Optional<Driver> driverOptional = driverRepository.findByUsername(driverUsername);
+        Driver driver = driverOptional.orElseThrow(() -> new NoSuchElementException("Driver with username " + driverUsername + " not found"));
+        if (!driver.getActive()) {
+            RideOffer rideOffer = new RideOffer();
+            rideOffer.setDriver(driver);
+            rideOffer.setRideRequest(rideRequest);
+            driver.setActive(true);
+            driverRepository.save(driver);
+            RideOffer savedOffer = rideOfferRepository.save(rideOffer);
+
+            RideOfferNotification notification = new RideOfferNotification();
+            notification.setMessage("A driver wants to take your ride!");
+            notification.setDriverName(driver.getFirstName() + " " + driver.getLastName());
+            notification.setDriverRating(driver.getRating());
+            notification.setTotalRides(driver.getTotalRides());
+            notification.setTotalTravelledDistance(0);
+            notification.setVehicleClass(driver.getVehicleClass());
+
+            String customerUsername = rideRequest.getCustomer().getUsername();
+
+            messagingTemplate.convertAndSend("/topic/customer/" + customerUsername, notification);
+            System.out.println("Notification sent to customer " + customerUsername);
+            return savedOffer;
+        } else {
+            return null;
+        }
+    }
+
+
+    public boolean isDriverActive(String username) {
+        return driverRepository.findByUsername(username)
+                .map(Driver::getActive)
+                .orElse(false);
+    }
+
+    public Long getRideRequestIdIfDriverOffer(String username) {
+        Optional<Driver> driverOpt = driverRepository.findByUsername(username);
+        if (driverOpt.isPresent() && driverOpt.get().getActive()) {
+            Optional<RideOffer> offerOpt = rideOfferRepository.findByDriver(driverOpt.get());
+            if (offerOpt.isPresent() && offerOpt.get().getRideRequest() != null) {
+                return offerOpt.get().getRideRequest().getId();
+            }
+        }
+        return null;
+    }
+
+    public void rejectOffer(Long rideOfferId) {
+        Optional<RideOffer> rideOfferOptional = rideOfferRepository.findById(rideOfferId);
+        if (rideOfferOptional.isPresent()) {
+            RideOffer rideOffer = rideOfferOptional.get();
+            rideOfferRepository.delete(rideOffer);
+
+            Driver driver = rideOffer.getDriver();
+            if (driver != null) {
+                driver.setActive(false);
+                driverRepository.save(driver);
+            }
+        } else {
+            System.out.println("Ride offer not found.");
+        }
+    }
+
+    public void cancelOffer(String username) {
+        Optional<Driver> driverOptional = driverRepository.findByUsername(username);
+        Driver driver = driverOptional.get();
+        Optional<RideOffer> rideOfferOptional = rideOfferRepository.findByDriver(driver);
+        RideOffer rideOffer = rideOfferOptional.get();
+        rideOfferRepository.delete(rideOffer);
+        driver.setActive(false);
+        driverRepository.save(driver);
+    }
+
+    public void acceptRideOffer(Long rideOfferId, String customerUsername) {
+        RideOffer selectedOffer = rideOfferRepository.findById(rideOfferId)
+                .orElseThrow(() -> new RuntimeException("Offer not found"));
+
+        RideRequest rideRequest = selectedOffer.getRideRequest();
+        if (!rideRequest.getCustomer().getUsername().equals(customerUsername)) {
+            throw new RuntimeException("User not authorized to accept this offer");
+        }
+        List<RideOffer> allOffers = rideOfferRepository.findAllByRideRequest(rideRequest);
+        for (RideOffer offer : allOffers) {
+            if (!offer.getId().equals(rideOfferId)) {
+                rideOfferRepository.delete(offer);
+                Driver driver = offer.getDriver();
+                driver.setActive(false);
+                driverRepository.save(driver);
+            }
+        }
+        rideOfferRepository.save(selectedOffer);
+        rideRequestRepository.save(rideRequest);
+    }
 
     private static final double EARTH_RADIUS_KM = 6371.0;
 

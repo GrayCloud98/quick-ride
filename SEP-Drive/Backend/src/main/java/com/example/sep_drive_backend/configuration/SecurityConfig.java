@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth
                             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                            .requestMatchers("/", "/home", "/h2-console/**", "/api/auth/**", "/uploads/**").permitAll()
+                            .requestMatchers("/", "/home", "/h2-console/**", "/api/auth/**", "/uploads/**", "/ws/**").permitAll()
                             .anyRequest().authenticated();
                 })
                 .csrf(csrf -> csrf
