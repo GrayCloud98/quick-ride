@@ -1,5 +1,11 @@
 <mat-toolbar class="navbar">
-  <button mat-button class="navbar-title" (click)="goHome()">SEP-Drive</button>
+    <img
+      src="assets/Logo.png"
+      alt="SEP-Drive Logo"
+      class="navbar-logo"
+      (click)="goHome()"
+      style="height:250px; cursor:pointer; margin-right:90px;"
+    >
 
   <div *ngIf="isLoggedIn">
     <button *ngIf="isCustomer"
