@@ -2,30 +2,35 @@ import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {filter, switchMap, tap} from 'rxjs';
 
-import {Ride} from '../../models/ride.model';
-
+import {Ride, VehicleClass} from '../../models/ride.model';
 import {RideRequestService} from '../../services/ride-request.service';
 import {AuthService} from '../../../auth/auth.service';
 
 @Component({
   selector: 'app-active-ride-page',
-  standalone: false,
   templateUrl: './active-ride-page.component.html',
-  styleUrl: './active-ride-page.component.scss'
-
+  standalone: false,
+  styleUrls: ['./active-ride-page.component.scss']
 })
 export class ActiveRidePageComponent implements OnInit {
-
   username: string = '';
   accessAllowed: boolean = false;
-  userHasActiveRide: boolean = true;
-  activeRide!: Ride;
+  userHasActiveRide: boolean = false;
+  activeRide: Ride = {
+    pickup: { latitude: 0, longitude: 0 },
+    dropoff: { latitude: 0, longitude: 0 },
+    vehicleClass: VehicleClass.SMALL,
+    active: false,
+    distance: 0,
+    duration: 0,
+    estimatedPrice: 0
+  };
+
   constructor(
     private rideService: RideRequestService,
     private authService: AuthService,
-    private router: Router) {
-  }
-
+    private router: Router
+  ) {}
   deactivateRide() {
     this.rideService.deactivateRide(this.username).subscribe({
       next: () => {
@@ -33,7 +38,7 @@ export class ActiveRidePageComponent implements OnInit {
         void this.router.navigate(['/ride/request']);
       },
       error: (err) => console.log(err)
-    })
+    });
   }
 
   ngOnInit() {

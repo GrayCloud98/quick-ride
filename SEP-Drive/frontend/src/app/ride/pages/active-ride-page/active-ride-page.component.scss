@@ -1,44 +1,87 @@
-.deactivation-btn {
-  width: 100%;
-  padding: 12px 16px;
-  font-size: 1rem;
-  margin-top: 16px;
-  color: white;
-  border: none;
-  background-color: red ;
+.info-card {
+  margin: 16px 0;
+  padding: 16px;
 
-  &:hover {
-    color: white;
-    background-color: #AA0000;
+  .info-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+
+    mat-icon {
+      margin-right: 8px;
+      color: #3f51b5;
+    }
+
+    .info-label {
+      font-weight: 500;
+      font-size: 16px;
+    }
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 8px 0;
+
+    .info-title {
+      font-weight: 500;
+      color: #555;
+    }
+
+    .info-value {
+      font-weight: 600;
+      color: #333;
+    }
   }
 }
 
 .vehicle-card {
+  margin: 16px 0;
   padding: 16px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 
   .vehicle-header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 
-    .vehicle-label {
-      font-size: 1.2rem;
-      font-weight: 600;
+    mat-icon {
+      margin-right: 8px;
       color: #3f51b5;
     }
 
-    mat-icon {
-      color: #3f51b5;
+    .vehicle-label {
+      font-weight: 500;
+      font-size: 16px;
     }
   }
 
   .vehicle-class {
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: #222;
+    font-weight: 600;
+    text-transform: capitalize;
+    color: #333;
   }
 }
 
+.deactivation-btn {
+  margin-top: 24px;
+  background-color: #f44336;
+  color: white;
+  width: 100%;
+
+  mat-icon {
+    margin-right: 8px;
+  }
+}
+
+.centered-box {
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.alert.error {
+  background-color: #ffebee;
+  color: #d32f2f;
+  text-align: center;
+  padding: 16px;
+  border-radius: 4px;
+}

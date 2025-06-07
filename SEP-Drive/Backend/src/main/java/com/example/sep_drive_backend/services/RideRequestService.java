@@ -57,16 +57,9 @@ public class RideRequestService {
         request.setVehicleClass(dto.getVehicleClass()); // now uses enum
         request.setStartLocationName(dto.getStartLocationName());
         request.setDestinationLocationName(dto.getDestinationLocationName());
-        double distance = calculateDistance(
-                dto.getStartLatitude(), dto.getStartLongitude(),
-                dto.getDestinationLatitude(), dto.getDestinationLongitude());
-
-        double duration = estimateDuration(distance);
-        double price = calculatePrice(distance, dto.getVehicleClass());
-
-        request.setDistance(distance);
-        request.setDuration(duration);
-        request.setEstimatedPrice(price);
+        request.setDistance(dto.getDistance());
+        request.setDuration(dto.getDuration());
+        request.setEstimatedPrice(dto.getEstimatedPrice());
 
         customer.setActive(true);
         customerRepository.save(customer);
@@ -121,16 +114,5 @@ public class RideRequestService {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
         return EARTH_RADIUS_KM * c;
-    }
-    private double estimateDuration(double distanceKm) {
-        return (distanceKm / 40.0) * 60;
-    }
-    private double calculatePrice(double distanceKm, VehicleClassEnum vehicleClass) {
-        double factor = switch (vehicleClass) {
-            case Small -> 1.0;
-            case Medium -> 2.0;
-            case Large -> 10.0;
-        };
-        return distanceKm * factor;
     }
 }

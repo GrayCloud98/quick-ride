@@ -10,17 +10,40 @@
       [location]="activeRide.dropoff"
       label="Drop off at">
     </app-location-card>
+    <mat-card class="info-card" appearance="outlined">
+      <div class="info-header">
+        <mat-icon>directions_car</mat-icon>
+        <span class="info-label">Ride Information</span>
+      </div>
+      <mat-card-content>
+        <div class="info-row">
+          <span class="info-title">Distance:</span>
+          <span class="info-value">{{ activeRide.distance }} km</span>
+        </div>
+        <div class="info-row">
+          <span class="info-title">Estimated Duration:</span>
+          <span class="info-value">{{ activeRide.duration }} minutes</span>
+        </div>
+        <div class="info-row">
+          <span class="info-title">Estimated Price:</span>
+          <span class="info-value">{{ activeRide.estimatedPrice | number:'1.2-2' }} €</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
 
     <mat-card class="vehicle-card" appearance="outlined">
       <div class="vehicle-header">
         <mat-icon>local_taxi</mat-icon>
-        <span class="vehicle-label">Selected Vehicle Class</span></div>
-      <mat-card-content><span class="vehicle-class">{{ activeRide.vehicleClass }}</span></mat-card-content>
+        <span class="vehicle-label">Selected Vehicle Class</span>
+      </div>
+      <mat-card-content>
+        <span class="vehicle-class">{{ activeRide.vehicleClass }}</span>
+      </mat-card-content>
     </mat-card>
 
-
     <button mat-fab extended class="deactivation-btn" (click)="deactivateRide()">
-      Deactivate your ride
+      <mat-icon>cancel</mat-icon>
+      Deactivate your Ride
     </button>
 
   </div>
@@ -29,7 +52,6 @@
     Please submit a request first.
   </div>
 </div>
-
 
 <div *ngIf="!accessAllowed" class="centered-box alert error" style="width: 500px">
   Please log in as a Customer first.
