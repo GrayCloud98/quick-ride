@@ -6,6 +6,9 @@ import com.example.sep_drive_backend.models.Customer;
 import com.example.sep_drive_backend.models.Driver;
 import com.example.sep_drive_backend.repository.CustomerRepository;
 import com.example.sep_drive_backend.repository.DriverRepository;
+import com.example.sep_drive_backend.models.Wallet;
+import com.example.sep_drive_backend.repository.WalletRepository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,14 +25,17 @@ public class RegistrationService {
 
     private final DriverRepository driverRepository;
     private final CustomerRepository customerRepository;
+    private final WalletRepository walletRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public RegistrationService(DriverRepository driverRepository, CustomerRepository customerRepository, PasswordEncoder passwordEncoder) {
+    public RegistrationService(DriverRepository driverRepository, CustomerRepository customerRepository, PasswordEncoder passwordEncoder, WalletRepository walletRepository) {
         this.driverRepository = driverRepository;
         this.customerRepository = customerRepository;
+        this.walletRepository = walletRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     public Object registerUser(String username, String password, String email, String firstName, String lastName,
                                Date birthDate, RoleEnum role, MultipartFile profilePicture, VehicleClassEnum vehicleClass) {
         if (customerRepository.findByUsername(username).isPresent() || driverRepository.findByUsername(username).isPresent()) {
@@ -54,22 +60,25 @@ public class RegistrationService {
             }
         }
 
-        // If the role is Customer, save it and return the object
         if (role == RoleEnum.Customer) {
             Customer customer = new Customer(username, firstName, lastName, email, birthDate,
                     passwordEncoder.encode(password), role, fileName != null ? "/uploads/" + fileName : null);
 
-            return customerRepository.save(customer);  // Return the saved Customer
-        }
+            Wallet wallet = new Wallet();
+            customer.setWallet(wallet);
 
-        // If the role is Driver, save it and return the object
-        else if (role == RoleEnum.Driver) {
+            Customer saved = customerRepository.save(customer);
+            return saved;
+        } else if (role == RoleEnum.Driver) {
             Driver driver = new Driver(username, firstName, lastName, email, birthDate,
                     passwordEncoder.encode(password), role, fileName != null ? "/uploads/" + fileName : null, vehicleClass);
 
-            return driverRepository.save(driver);  // Return the saved Driver
+            Wallet wallet = new Wallet();
+            driver.setWallet(wallet);
+
+            Driver saved = driverRepository.save(driver); // Cascade saves wallet too!
+            return saved;
         }
-        // else return null
         return null;
     }
 

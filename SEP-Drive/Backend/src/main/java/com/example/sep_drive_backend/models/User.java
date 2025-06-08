@@ -47,6 +47,17 @@ public abstract class User {
         this.profilePicture = profilePicture;
     }
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "wallet_id", referencedColumnName = "id", unique = true)
+    private Wallet wallet;
+
+    public Wallet getWallet() {
+        return wallet;
+    }
+    public void setWallet(Wallet wallet) {
+        this.wallet = wallet;
+    }
+
     public int getTotalRides() {
         return totalRides;
     }

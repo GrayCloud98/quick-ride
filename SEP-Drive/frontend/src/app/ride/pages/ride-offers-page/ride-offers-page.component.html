@@ -1,4 +1,4 @@
-<div class="main-container">
+<div class="main-container" *ngIf="accessAllowed">
   <div class="left-container">
     <h1 class="sort-header">Sort by</h1>
     <mat-radio-group class="sort-group">
@@ -38,3 +38,8 @@
     </div>
   </div>
 </div>
+
+<div *ngIf="!accessAllowed" class="centered-box alert error" style="width: 500px">
+  Please log in as a Customer first.
+</div>
+

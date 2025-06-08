@@ -27,6 +27,7 @@ public class SecurityConfig {
         this.jwtAuthFilter = jwtAuthFilter;
     }
 
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -38,10 +39,10 @@ public class SecurityConfig {
                             .anyRequest().authenticated();
                 })
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/h2-console/**", "/api/auth/**", "/api/ride-requests/**")
+                        .ignoringRequestMatchers("/h2-console/**", "/api/auth/**", "/api/ride-requests/**", "/api/wallet/**")
                 )
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
-                .formLogin(AbstractHttpConfigurer::disable)
+                .formLogin(form -> form.disable())
                 .logout(logout -> logout.logoutUrl("/api/auth/logout"))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

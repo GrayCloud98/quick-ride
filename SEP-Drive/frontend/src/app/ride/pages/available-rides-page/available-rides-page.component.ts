@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
+import {filter, switchMap, tap} from 'rxjs';
+import {AuthService} from '../../../auth/auth.service';
 import {OfferService} from '../../services/offer.service';
 import {Location} from '../../models/location.model';
 import {Request} from '../../models/request.model';
-import {filter, switchMap, tap} from 'rxjs';
-import {AuthService} from '../../../auth/auth.service';
 import {OfferState} from '../../models/offer.model';
 
 interface SortOption {
@@ -62,7 +62,6 @@ export class AvailableRidesPageComponent implements OnInit {
     this.positionSet = true;
   }
 
-  //TODO continue accepting logic
   acceptRequest(requestID: number) {
     this.offerService.driverAcceptRequest(requestID).subscribe({
       next: (response: any) => this.requestIdOfOffer = response.rideRequest.id,
