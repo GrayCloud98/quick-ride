@@ -31,6 +31,9 @@ import { RequestCardComponent } from './components/request-card/request-card.com
 import { RideOffersPageComponent } from './pages/ride-offers-page/ride-offers-page.component';
 import { OfferCardComponent } from './components/offer-card/offer-card.component';
 import {OfferService} from './services/offer.service';
+import {NotificationComponent} from './components/notification/notification.component';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+
 
 @NgModule({
   declarations: [
@@ -38,19 +41,23 @@ import {OfferService} from './services/offer.service';
     ActiveRidePageComponent, LocationCardComponent,
     //***
     AvailableRidesPageComponent, RequestCardComponent,
-    RideOffersPageComponent, OfferCardComponent
+    RideOffersPageComponent, OfferCardComponent, NotificationComponent
   ],
   imports: [
     CommonModule, BrowserModule, FormsModule, ReactiveFormsModule, RideRoutingModule,
     GoogleMapsModule, GoogleMap,
     MatAutocompleteModule, MatInputModule, MatFormFieldModule, MatRadioModule,
-    MatButton, MatFabButton, MatIconButton, MatIcon, MatTooltip, MatCard, MatCardContent, MatCardTitle
+    MatButton, MatFabButton, MatIconButton, MatIcon, MatTooltip, MatCard, MatCardContent, MatCardTitle,
+    MatSnackBarModule
   ],
   providers: [
     GeolocationService,
     PlacesService,
     RideRequestService,
     OfferService
+  ],
+  exports: [
+    NotificationComponent
   ]
 })
 export class RideModule {
