@@ -15,22 +15,29 @@ export class NotificationService {
       debug: () => {},
     });
 
+    this.client.onConnect = () => {
+      this.client.subscribe('/topic/customer', (message: IMessage) => {
+        const parsed = JSON.parse(message.body);
+        this.customerCallback?.(parsed);
+      });
+
+      this.client.subscribe('/topic/driver', (message: IMessage) => {
+        const parsed = JSON.parse(message.body);
+        this.driverCallback?.(parsed);
+      });
+    };
+
     this.client.activate();
   }
 
-  onConnected(callback: () => void) {
-    this.client.onConnect = () => callback();
+  private customerCallback?: (msg: any) => void;
+  private driverCallback?: (msg: any) => void;
+
+  setCustomerCallback(callback: (msg: any) => void) {
+    this.customerCallback = callback;
   }
 
-  subscribeToCustomerTopic(callback: (msg: any) => void) {
-    this.client.subscribe('/topic/customer', (message: IMessage) => {
-      callback(JSON.parse(message.body));
-    });
-  }
-
-  subscribeToDriverTopic(callback: (msg: any) => void) {
-    this.client.subscribe('/topic/driver', (message: IMessage) => {
-      callback(JSON.parse(message.body));
-    });
+  setDriverCallback(callback: (msg: any) => void) {
+    this.driverCallback = callback;
   }
 }
