@@ -8,6 +8,7 @@ import {Ride, VehicleClass} from '../../models/ride.model';
 import {RideRequestService} from '../../services/ride-request.service';
 import {AuthService} from '../../../auth/auth.service';
 import { DistanceService } from '../../services/distance.service';
+import {RideStateService} from '../../services/ride-state.service';
 
 enum updateType {
   pickup,
@@ -49,6 +50,7 @@ export class RideFormComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private distanceService: DistanceService,
+    private rideStateService: RideStateService
   ) {
   }
 
@@ -81,12 +83,20 @@ export class RideFormComponent implements OnInit {
         this.pickupPicked = true;
         this.ride.pickup = location;
         this.pickupControl.setValue(location);
+        this.rideStateService.setPickupLocation({
+          lat: location.latitude,
+          lng: location.longitude
+        })
         break;
 
       case updateType.dropoff:
         this.dropoffPicked = true;
         this.ride.dropoff = location;
         this.dropoffControl.setValue(location);
+        this.rideStateService.setDropoffLocation({
+          lat: location.latitude,
+          lng: location.longitude
+        })
         break;
     }
     this.updateDistanceInfo();

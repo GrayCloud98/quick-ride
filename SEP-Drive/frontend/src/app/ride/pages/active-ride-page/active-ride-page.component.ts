@@ -5,6 +5,7 @@ import {filter, switchMap, tap} from 'rxjs';
 import {Ride, VehicleClass} from '../../models/ride.model';
 import {RideRequestService} from '../../services/ride-request.service';
 import {AuthService} from '../../../auth/auth.service';
+import {RideStateService} from '../../services/ride-state.service';
 
 @Component({
   selector: 'app-active-ride-page',
@@ -29,12 +30,14 @@ export class ActiveRidePageComponent implements OnInit {
   constructor(
     private rideService: RideRequestService,
     private authService: AuthService,
+    private rideStateService: RideStateService,
     private router: Router
   ) {}
   deactivateRide() {
     this.rideService.deactivateRide(this.username).subscribe({
       next: () => {
         this.rideService.updateActiveRideStatus(this.username);
+        this.rideStateService.resetLocations();
         void this.router.navigate(['/ride/request']);
       },
       error: (err) => console.log(err)
