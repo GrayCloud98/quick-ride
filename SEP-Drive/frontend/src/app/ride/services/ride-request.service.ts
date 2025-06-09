@@ -44,7 +44,10 @@ export class RideRequestService {
           name: ride.destinationLocationName || undefined
         },
         vehicleClass: ride.vehicleClass as VehicleClass,
-        active: true
+        active: true,
+        distance: Number(ride.distance) || 0,
+        duration: Number(ride.duration) || 0,
+        estimatedPrice: Number(ride.estimatedPrice) || 0
       }))
     );
   }
