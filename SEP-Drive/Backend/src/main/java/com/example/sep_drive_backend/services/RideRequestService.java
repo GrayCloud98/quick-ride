@@ -90,6 +90,18 @@ public class RideRequestService {
         RideRequest request = repository.findByCustomerUsernameAndCustomerActiveTrue(username)
                 .orElseThrow(() -> new NoSuchElementException("No active ride request to delete"));
 
+        List<RideOffer> offers = rideOfferRepository.findAllByRideRequest(request);
+        for (RideOffer offer : offers) {
+            Driver driver = offer.getDriver();
+            rideOfferRepository.delete(offer);
+
+            if (driver != null) {
+                driver.setActive(false);
+                driverRepository.save(driver);
+                sendRejectionNotification(driver.getUsername());
+            }
+        }
+
         Customer customer = request.getCustomer();
         customer.setActive(false);
         customerRepository.save(customer);
