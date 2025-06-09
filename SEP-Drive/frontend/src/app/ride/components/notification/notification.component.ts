@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationService } from '../../services/notification.service';
 import { Router } from '@angular/router';
+import {AuthService} from '../../../auth/auth.service';
 
 @Component({
   selector: 'app-notification',
@@ -12,11 +13,12 @@ export class NotificationComponent implements OnInit {
   constructor(
     private snackBar: MatSnackBar,
     private wsService: NotificationService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    const username = 'sac';
+    const username = this.authService.currentUserValue?.username;
 
     this.wsService.subscribe(username);
 
