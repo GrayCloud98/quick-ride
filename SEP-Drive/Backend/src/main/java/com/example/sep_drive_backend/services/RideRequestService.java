@@ -176,6 +176,7 @@ public class RideRequestService {
             if (driver != null) {
                 driver.setActive(false);
                 driverRepository.save(driver);
+                sendRejectionNotification(driver.getUsername());
             }
         } else {
             System.out.println("Ride offer not found.");
@@ -187,6 +188,7 @@ public class RideRequestService {
         Driver driver = driverOptional.get();
         Optional<RideOffer> rideOfferOptional = rideOfferRepository.findByDriver(driver);
         RideOffer rideOffer = rideOfferOptional.get();
+        sendCancelledNotification(rideOffer.getRideRequest().getCustomer().getUsername());
         rideOfferRepository.delete(rideOffer);
         driver.setActive(false);
         driverRepository.save(driver);
@@ -207,10 +209,23 @@ public class RideRequestService {
                 Driver driver = offer.getDriver();
                 driver.setActive(false);
                 driverRepository.save(driver);
+                sendRejectionNotification(driver.getUsername());
             }
         }
         rideOfferRepository.save(selectedOffer);
         rideRequestRepository.save(rideRequest);
+        sendRejectionNotification(selectedOffer.getDriver().getUsername());
+    }
+
+
+    private void sendRejectionNotification(String Username) {
+        messagingTemplate.convertAndSend("/topic/driver/" + Username, "Your Ride Offer was rejected, you can now create new Ride Offers");
+        System.out.println("notification sent to " + Username);
+    }
+    private void sendCancelledNotification(String Username) {
+        messagingTemplate.convertAndSend("/topic/customer/" + Username, "Offer for your RideRequest was cancelled");
+        System.out.println("notification sent to " + Username);
+
     }
 
     private static final double EARTH_RADIUS_KM = 6371.0;
