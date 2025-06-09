@@ -41,14 +41,14 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     ActiveRidePageComponent, LocationCardComponent,
     //***
     AvailableRidesPageComponent, RequestCardComponent,
-    RideOffersPageComponent, OfferCardComponent, NotificationComponent
+    RideOffersPageComponent, OfferCardComponent
   ],
   imports: [
     CommonModule, BrowserModule, FormsModule, ReactiveFormsModule, RideRoutingModule,
     GoogleMapsModule, GoogleMap,
     MatAutocompleteModule, MatInputModule, MatFormFieldModule, MatRadioModule,
     MatButton, MatFabButton, MatIconButton, MatIcon, MatTooltip, MatCard, MatCardContent, MatCardTitle,
-    MatSnackBarModule
+    MatSnackBarModule, NotificationComponent
   ],
   providers: [
     GeolocationService,

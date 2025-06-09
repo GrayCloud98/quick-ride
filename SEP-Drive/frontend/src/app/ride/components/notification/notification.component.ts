@@ -4,31 +4,30 @@ import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-notification',
-  standalone: false,
   templateUrl: './notification.component.html',
-  styleUrl: './notification.component.scss'
+  styleUrls: ['./notification.component.scss']
 })
 export class NotificationComponent implements OnInit {
   constructor(
     private snackBar: MatSnackBar,
-    private wsService: NotificationService
+    private wsService: NotificationService,
   ) {}
 
   ngOnInit(): void {
+    const username = 'sad';
+
+    this.wsService.subscribe(username);
+
     this.wsService.setCustomerCallback((message) => {
-      this.snackBar.open(
-        `${message.driverName} made you an offer!`,
-        'Close',
-        { duration: 5000 }
-      );
+      const text = message.message
+        ?? `${message.driverName ?? 'A driver'} made you an offer!`;
+      this.snackBar.open(text, 'Close', { duration: 5000 });
     });
 
     this.wsService.setDriverCallback((message) => {
-      this.snackBar.open(
-        `Your offer was ${message.status.toLowerCase()} by the customer.`,
-        'Close',
-        { duration: 5000 }
-      );
+      const text = message.message
+        ?? `Your offer was ${message.status?.toLowerCase() ?? 'updated'} by the customer.`;
+      this.snackBar.open(text, 'Close', { duration: 5000 });
     });
   }
 }

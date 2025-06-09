@@ -1,5 +1,6 @@
 package com.example.sep_drive_backend.services;
 
+import com.example.sep_drive_backend.dto.NotificationMessage;
 import com.example.sep_drive_backend.dto.RideOfferNotification;
 import com.example.sep_drive_backend.dto.RidesForDriversDTO;
 import com.example.sep_drive_backend.models.Customer;
@@ -218,15 +219,28 @@ public class RideRequestService {
     }
 
 
-    private void sendRejectionNotification(String Username) {
-        messagingTemplate.convertAndSend("/topic/driver/" + Username, "Your Ride Offer was rejected, you can now create new Ride Offers");
-        System.out.println("notification sent to " + Username);
+    private void sendRejectionNotification(String username) {
+        NotificationMessage message = new NotificationMessage(
+                "rejection",
+                "Your Ride Offer was rejected, you can now create new Ride Offers",
+                "REJECTED",
+                null
+        );
+        messagingTemplate.convertAndSend("/topic/driver/" + username, message);
+        System.out.println("Rejection notification sent to " + username);
     }
-    private void sendCancelledNotification(String Username) {
-        messagingTemplate.convertAndSend("/topic/customer/" + Username, "Offer for your RideRequest was cancelled");
-        System.out.println("notification sent to " + Username);
 
+    private void sendCancelledNotification(String username) {
+        NotificationMessage message = new NotificationMessage(
+                "cancellation",
+                "Offer for your RideRequest was cancelled",
+                null,
+                null
+        );
+        messagingTemplate.convertAndSend("/topic/customer/" + username, message);
+        System.out.println("Cancellation notification sent to " + username);
     }
+
 
     private static final double EARTH_RADIUS_KM = 6371.0;
 
