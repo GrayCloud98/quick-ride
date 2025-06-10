@@ -6,6 +6,7 @@ import { RideRoutingModule } from './ride/ride-routing.module';
 import { WalletPageComponent } from './profile-page/wallet-page/wallet-page.component';
 import { RegisterComponent } from './auth/register/register.component';
 import {UserNotFoundComponent} from './shared/components/user-not-found/user-not-found.component';
+import {RidehistoryComponent} from './shared/components/ridehistory/ridehistory.component';
 
 const routes: Routes = [
   { path: 'ride', loadChildren: () => RideRoutingModule },
@@ -13,6 +14,7 @@ const routes: Routes = [
   { path: 'two-factor', component: TwoFaComponent },
   { path: 'wallet', component: WalletPageComponent },
   { path: 'user-not-found', component: UserNotFoundComponent },
+  { path: 'history', component:RidehistoryComponent},
   { path: ':username', component: ProfilePageComponent }
 ];
 

@@ -27,6 +27,16 @@
     </button>
   </div>
 
+  <div *ngIf="isLoggedIn">
+    <button
+            mat-raised-button
+            color="accent"
+            class="nav-btn"
+            (click)="goToridehistory()"
+    >
+      RideHistory
+    </button>
+  </div>
 
   <span class="spacer"></span>
 
