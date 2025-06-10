@@ -55,7 +55,16 @@ export class ActiveRidePageComponent implements OnInit {
       tap(hasActive => this.userHasActiveRide = hasActive),
       filter(hasActive => hasActive),
       switchMap(() => this.rideService.getRide()),
-      tap(ride => this.activeRide = ride),
+      tap(ride => {
+        this.activeRide = ride;
+        this.rideStateService.setPickupLocation({
+          lat: ride.pickup.latitude,
+          lng: ride.pickup.longitude});
+        this.rideStateService.setDropoffLocation({
+          lat : ride.dropoff.latitude,
+          lng : ride.dropoff.longitude
+        });
+      }),
     ).subscribe({
       error: err => console.log(err)
     });
