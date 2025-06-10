@@ -32,6 +32,7 @@ import {MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/mater
 import {MatCard, MatCardActions, MatCardContent, MatCardHeader} from '@angular/material/card';
 import { GoogleMapsModule } from '@angular/google-maps';
 import { RideSimulationComponent } from './ride-simulation/ride-simulation.component';
+import { RideRatingDialogComponent } from './ride-rating-dialog/ride-rating-dialog.component';
 
 
 @NgModule({
@@ -41,7 +42,8 @@ import { RideSimulationComponent } from './ride-simulation/ride-simulation.compo
     AppComponent,
     RegisterComponent,
     TwoFaComponent,
-    RideSimulationComponent
+    RideSimulationComponent,
+    RideRatingDialogComponent
   ],
   imports: [
     MatCardModule,
