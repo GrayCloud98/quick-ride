@@ -3,7 +3,6 @@ import { TwoFaComponent } from  './shared/components/two-fa/two-fa.component';
 import { RouterModule, Routes } from '@angular/router';
 import { ProfilePageComponent } from './profile-page/profile-page.component';
 import { RideRoutingModule } from './ride/ride-routing.module';
-import {RegisterComponent} from './auth/register/register.component';
 import { RideSimulationComponent } from './ride-simulation/ride-simulation.component';
 import { WalletPageComponent } from './profile-page/wallet-page/wallet-page.component';
 import { RegisterComponent } from './auth/register/register.component';
@@ -14,7 +13,6 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'two-factor', component: TwoFaComponent },
   { path: 'simulation', component: RideSimulationComponent },
-  { path: ':username', component: ProfilePageComponent },
   { path: 'wallet', component: WalletPageComponent },
   { path: 'user-not-found', component: UserNotFoundComponent },
   { path: ':username', component: ProfilePageComponent }
