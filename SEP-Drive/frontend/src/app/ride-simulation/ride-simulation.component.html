@@ -1,0 +1,36 @@
+<h2>Ride Simulation</h2>
+<google-map
+  height="400px"
+  width="100%"
+  [center]="center"
+  [zoom]="zoom"
+>
+  <map-marker [position]="markerPosition" label="A"></map-marker>
+  <map-polyline [path]="route"></map-polyline>
+</google-map>
+
+<div class="controls">
+  <button (click)="startSimulation()">Start</button>
+  <button (click)="pauseSimulation()">Pause</button>
+  <button (click)="stopSimulation()">Reset</button>
+</div>
+
+<div class="status">
+  Status: {{ isRunning ? 'Running' : 'Paused' }} |
+  Step: {{ progress + 1 }} / {{ route.length }} |
+  Speed: {{ speed }}s total
+</div>
+
+<div *ngIf="isRunning">
+  Estimated Time to Arrival (ETA): {{ formattedEta }}
+</div>
+
+<label for="speed">Simulation Duration (3–30 sec):</label>
+<input
+  type="range"
+  id="speed"
+  min="3"
+  max="30"
+  [value]="speed"
+  (input)="handleSpeedInput($event)"
+>
