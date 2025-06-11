@@ -4,20 +4,18 @@
     [placeholder]="'Restaurant'"
     [control]="pickupControl"
     [geoLocationButton]="true"
-    (locationSelected)="onLocationSelected($event, updateType.pickup)"
-    >
+    (locationSelected)="onLocationSelected($event, updateType.pickup)">
   </select-location>
 
   <select-location
     [label]="'Drop-off Location'"
     [placeholder]="'Cinema'"
     [control]="dropoffControl"
-    (locationSelected)="onLocationSelected($event, updateType.dropoff)"
-    >
+    (locationSelected)="onLocationSelected($event, updateType.dropoff)">
   </select-location>
 
   <div class="form-label">Select a vehicle class:</div>
-  <mat-radio-group [(ngModel)]="ride.vehicleClass" name="vehicleClass">
+  <mat-radio-group [(ngModel)]="ride.vehicleClass" name="vehicleClass" (change)="updateDistanceInfo()">
     <mat-radio-button *ngFor="let car of vehicles" [value]="car">
       {{ car }}
     </mat-radio-button>
@@ -30,7 +28,12 @@
   </div>
 
   <div class="alert error" *ngIf="ride.active">
-    <mat-error>You can not request a ride while already having an active ride.</mat-error>
+    <mat-error>You cannot request a ride while already having an active ride.</mat-error>
   </div>
-
 </form>
+
+<div *ngIf="ride.distance != null && ride.duration != null && ride.estimatedPrice != null">
+  <p><strong>Distance:</strong> {{ ride.distance | number:'1.1-2' }} km</p>
+  <p><strong>Duration:</strong> {{ ride.duration | number:'1.0-0' }} mins</p>
+  <p><strong>Estimated Price:</strong> {{ ride.estimatedPrice | number:'1.2-2' }} €</p>
+</div>

@@ -1,6 +1,7 @@
 package com.example.sep_drive_backend.services;
 
 import com.example.sep_drive_backend.dto.NotificationMessage;
+import com.example.sep_drive_backend.constants.VehicleClassEnum;
 import com.example.sep_drive_backend.dto.RideOfferNotification;
 import com.example.sep_drive_backend.dto.RidesForDriversDTO;
 import com.example.sep_drive_backend.models.Customer;
@@ -76,6 +77,10 @@ public class RideRequestService {
         request.setVehicleClass(dto.getVehicleClass()); // now uses enum
         request.setStartLocationName(dto.getStartLocationName());
         request.setDestinationLocationName(dto.getDestinationLocationName());
+        request.setDistance(dto.getDistance());
+        request.setDuration(dto.getDuration());
+        request.setEstimatedPrice(dto.getEstimatedPrice());
+
         customer.setActive(true);
         customerRepository.save(customer);
         return repository.save(request);
@@ -268,6 +273,4 @@ public class RideRequestService {
 
         return EARTH_RADIUS_KM * c;
     }
-
-
 }

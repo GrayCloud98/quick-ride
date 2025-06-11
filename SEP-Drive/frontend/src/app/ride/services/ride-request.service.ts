@@ -22,7 +22,10 @@ export class RideRequestService {
       startLocationName: ride.pickup.name,
       destinationLocationName: ride.dropoff.name,
       startAddress: ride.pickup.address,
-      destinationAddress: ride.dropoff.address
+      destinationAddress: ride.dropoff.address,
+      distance : ride.distance,
+      duration : ride.duration,
+      estimatedPrice: ride.estimatedPrice
     };
 
     return this.http.post<Ride>(this.baseUrl, rideJson);
@@ -44,7 +47,10 @@ export class RideRequestService {
           name: ride.destinationLocationName || undefined
         },
         vehicleClass: ride.vehicleClass as VehicleClass,
-        active: true
+        active: true,
+        distance: Number(ride.distance) || 0,
+        duration: Number(ride.duration) || 0,
+        estimatedPrice: Number(ride.estimatedPrice) || 0
       }))
     );
   }

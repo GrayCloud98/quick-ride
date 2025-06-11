@@ -2,34 +2,42 @@ import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {filter, switchMap, tap} from 'rxjs';
 
-import {Ride} from '../../models/ride.model';
-
+import {Ride, VehicleClass} from '../../models/ride.model';
 import {RideRequestService} from '../../services/ride-request.service';
 import {AuthService} from '../../../auth/auth.service';
+import {RideStateService} from '../../services/ride-state.service';
 
 @Component({
   selector: 'app-active-ride-page',
   standalone: false,
   templateUrl: './active-ride-page.component.html',
   styleUrl: './active-ride-page.component.scss'
-
 })
 export class ActiveRidePageComponent implements OnInit {
-
   username: string = '';
   accessAllowed: boolean = false;
-  userHasActiveRide: boolean = true;
-  activeRide!: Ride;
+  userHasActiveRide: boolean = false;
+  activeRide: Ride = {
+    pickup: { latitude: 0, longitude: 0 },
+    dropoff: { latitude: 0, longitude: 0 },
+    vehicleClass: VehicleClass.SMALL,
+    active: false,
+    distance: 0,
+    duration: 0,
+    estimatedPrice: 0
+  };
+
   constructor(
     private rideService: RideRequestService,
     private authService: AuthService,
-    private router: Router) {
-  }
-
+    private rideStateService: RideStateService,
+    private router: Router
+  ) {}
   deactivateRide() {
     this.rideService.deactivateRide().subscribe({
       next: () => {
         this.rideService.updateActiveRideStatus();
+        this.rideStateService.resetLocations();
         void this.router.navigate(['/ride/request']);
       },
       error: (err) => console.log(err)
@@ -47,7 +55,16 @@ export class ActiveRidePageComponent implements OnInit {
       tap(hasActive => this.userHasActiveRide = hasActive),
       filter(hasActive => hasActive),
       switchMap(() => this.rideService.getRide()),
-      tap(ride => this.activeRide = ride),
+      tap(ride => {
+        this.activeRide = ride;
+        this.rideStateService.setPickupLocation({
+          lat: ride.pickup.latitude,
+          lng: ride.pickup.longitude});
+        this.rideStateService.setDropoffLocation({
+          lat : ride.dropoff.latitude,
+          lng : ride.dropoff.longitude
+        });
+      }),
     ).subscribe({
       error: err => console.log(err)
     });
