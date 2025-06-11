@@ -47,7 +47,7 @@
         *ngIf="offerState === OfferState.NONE"
         class="btn" mat-fab extended (click)="accept()"
       >
-        Accept Request
+        Send Offer
       </button>
 
       <button
@@ -63,20 +63,6 @@
       >
         Please withdraw your active offer first
       </button>
-
-      <button
-        *ngIf="offerState === OfferState.ACCEPTED && request.requestID === RequestIdOfOffer"
-        class="btn" mat-fab extended disabled
-      >
-        Offer Accepted
-      </button>
-
-<!--      <button-->
-<!--        *ngIf="offerState === OfferState.ACCEPTED && request.requestID !== RequestIdOfOffer"-->
-<!--        class="btn" mat-fab extended disabled-->
-<!--      >-->
-<!--        An Offer was accepted-->
-<!--      </button>-->
     </div>
 
   </mat-card-content>

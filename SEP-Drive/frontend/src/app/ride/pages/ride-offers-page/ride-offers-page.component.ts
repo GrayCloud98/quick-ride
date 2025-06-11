@@ -32,10 +32,7 @@ export class RideOffersPageComponent implements OnInit {
 
   acceptOffer(offerID: number) {
     this.offerService.customerAcceptOffer(offerID).subscribe({
-      next: () => {
-        const otherOffers = this.offers.filter(offer => offer.offerID !== offerID);
-        otherOffers.forEach(offer => this.rejectOffer(offer.offerID));
-      },
+      next: response => console.log(response),
       error: err => console.error(err)
     });
   }
@@ -73,7 +70,10 @@ export class RideOffersPageComponent implements OnInit {
     })
 
     this.offerService.customerGetOffers().subscribe({
-      next: (offers: Offer[]) => this.offers = offers,
+      next: (offers: Offer[]) => {
+        this.offers = offers;
+        console.log(offers)
+      },
       error: err => console.log(err)
     })
   }

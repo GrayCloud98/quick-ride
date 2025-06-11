@@ -38,7 +38,7 @@
     </div>
 
     <div class="button-container">
-      <button class="btn" mat-fab extended (click)="accept()">
+      <button class="btn" mat-fab extended (click)="accept()" [routerLink]="['/simulation']">
         Accept Offer
       </button>
       <button class="btn reject" mat-fab extended (click)="reject()">
