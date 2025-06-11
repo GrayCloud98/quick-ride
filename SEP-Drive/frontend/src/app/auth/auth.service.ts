@@ -41,8 +41,9 @@ export class AuthService {
 
     return this.http.post<UserResponse>(this.apiUrl, body, { headers }).pipe(
       map((response: UserResponse) => {
-        if (response) {
+        if (response && response.token) {
           localStorage.setItem('currentUser', JSON.stringify(response));
+          localStorage.setItem('authToken', response.token);
           this.currentUserSubject.next(response);
           const resolvedPath = this.resolveImagePath(response.photoUrl);
           this.updatePhotoUrl(resolvedPath);
@@ -58,8 +59,9 @@ export class AuthService {
 
     return this.http.post<UserResponse>(this.apiUrl2fa, body, { headers }).pipe(
       map((response: UserResponse) => {
-        if (response) {
+        if (response && response.token) {
           localStorage.setItem('currentUser', JSON.stringify(response));
+          localStorage.setItem('authToken', response.token);
           this.currentUserSubject.next(response);
           const resolvedPath = this.resolveImagePath(response.photoUrl);
           this.updatePhotoUrl(resolvedPath);
@@ -80,6 +82,7 @@ export class AuthService {
 
   clearUserData() {
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('authToken');
     this.currentUserSubject.next(null);
     this.updatePhotoUrl('assets/placeholder.png');
     window.location.href = '/';
@@ -117,8 +120,8 @@ export class AuthService {
     this.photoUrlSubject.next(newUrl ?? 'assets/placeholder.png');
   }
 
-  public isCustomer(username: string): Observable<boolean>{
-    return this.http.get<boolean>(`http://localhost:8080/api/ride-requests/${username}/is-customer`);
+  public isCustomer(): Observable<boolean>{
+    return this.http.get<boolean>(`http://localhost:8080/api/ride-requests/is-customer`);
   }
 
   get currentUserValue(): any {

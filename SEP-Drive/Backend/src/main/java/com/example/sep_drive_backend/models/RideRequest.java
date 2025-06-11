@@ -33,6 +33,22 @@ public class RideRequest {
 
     private Double destinationLatitude;
     private Double destinationLongitude;
+    @Column
+    private Double distance;
+
+    @Column
+    private Double duration;
+
+    @Column
+    private Double estimatedPrice;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 
 
     @Column
@@ -48,7 +64,7 @@ public class RideRequest {
     }
 
     public RideRequest() {}
-    public RideRequest(Long id, String startAddress, String startLocationName, String destinationLocationName, String destinationAddress, Double startLatitude, Double startLongitude, Double destinationLatitude, Double destinationLongitude, VehicleClassEnum vehicleClass, Customer customer) {
+    public RideRequest(Long id, String startAddress, String startLocationName, String destinationLocationName, String destinationAddress, Double startLatitude, Double startLongitude, Double destinationLatitude, Double destinationLongitude, VehicleClassEnum vehicleClass, Customer customer , Double distance, Double duration, Double estimatedPrice) {
         this.id = id;
         this.startAddress = startAddress;
         this.destinationAddress = destinationAddress;
@@ -60,9 +76,19 @@ public class RideRequest {
         this.customer = customer;
         this.startLocationName = startLocationName;
         this.DestinationLocationName = destinationLocationName;
+        this.distance = distance;
+        this.duration = duration;
+        this.estimatedPrice = estimatedPrice;
     }
 
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
     public String getStartLocationName() {
         return startLocationName;
@@ -149,4 +175,22 @@ public class RideRequest {
         this.vehicleClass = vehicleClass;
     }
 
+    public Double getDistance() {
+        return distance;
+    }
+    public void setDistance(Double distance) {
+        this.distance = distance;
+    }
+    public Double getDuration() {
+        return duration;
+    }
+    public void setDuration(Double duration) {
+        this.duration = duration;
+    }
+    public Double getEstimatedPrice() {
+        return estimatedPrice;
+    }
+    public void setEstimatedPrice(Double estimatedPrice) {
+        this.estimatedPrice = estimatedPrice;
+    }
 }

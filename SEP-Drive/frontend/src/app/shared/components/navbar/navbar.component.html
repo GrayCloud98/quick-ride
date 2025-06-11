@@ -1,14 +1,31 @@
 <mat-toolbar class="navbar">
-  <button mat-button class="navbar-title" (click)="goHome()">SEP-Drive</button>
+    <img
+      src="assets/Logo.png"
+      alt="SEP-Drive Logo"
+      class="navbar-logo"
+      (click)="goHome()"
+      style="height:35px; cursor:pointer; margin-right:10px;"
+    >
 
-  <button
-    *ngIf="isLoggedIn && isCustomer"
-    mat-raised-button
-    color="accent"
-    class="nav-btn"
-    (click)="activeRide ? routeToActiveRide() : routeToRideRequest()">
-    {{ activeRide ? 'Active Request' : 'Request Ride' }}
-  </button>
+  <div *ngIf="isLoggedIn">
+    <button *ngIf="isCustomer"
+            mat-raised-button
+            color="accent"
+            class="nav-btn"
+            (click)="userHasActiveRide ? routeToActiveRide() : routeToRideRequest()"
+    >
+      {{ userHasActiveRide ? 'Active Request' : 'Request Ride' }}
+    </button>
+
+    <button *ngIf="!isCustomer"
+            mat-raised-button
+            color="accent"
+            class="nav-btn"
+            (click)="routeToAvailableRides()"
+    >
+      View Requests
+    </button>
+  </div>
 
 
   <span class="spacer"></span>

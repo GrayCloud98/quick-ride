@@ -1,0 +1,63 @@
+mat-card{
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  mat-icon {
+    color: #3f51b5;
+    flex-shrink: 0;
+  }
+
+  .label {
+    flex: 0 0 250px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #3f51b5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .value {
+    flex: 1;
+    min-width: 0;
+    font-size: 1.1rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+
+
+.location-cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+app-location-card {
+  flex: 1 1 calc(50% - 8px);
+  min-width: 280px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.padding{
+  padding: 12px 16px;
+}
+
+.btn {
+  width: 100%;
+}
+
+.withdraw {
+  background-color: #ffd7d7;
+  color: #880000;
+}

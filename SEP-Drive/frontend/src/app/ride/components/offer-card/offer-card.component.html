@@ -1,0 +1,51 @@
+<mat-card>
+  <mat-card-content>
+
+    <div class="header">
+      <mat-icon>person</mat-icon>
+      <span class="label">Driver Name:</span>
+      <span class="value">{{ offer.driverName }}</span>
+    </div>
+
+    <div class="header">
+      <mat-icon>star</mat-icon>
+      <span class="label">Driver Rating:</span>
+      <span class="value">{{ offer.driverRating }}</span>
+    </div>
+
+    <div class="header">
+      <mat-icon>commute</mat-icon>
+      <span class="label">Vehicle Class:</span>
+      <span class="value">{{ offer.driverVehicle }}</span>
+    </div>
+
+    <div class="header">
+      <mat-icon>assignment</mat-icon>
+      <span class="label">Rides Count:</span>
+      <span class="value">{{ offer.ridesCount }}</span>
+    </div>
+
+    <div class="header">
+      <mat-icon>map</mat-icon>
+      <span class="label">Travelled Distance:</span>
+      <span class="value">{{ offer.travelledDistance }} km</span>
+    </div>
+
+    <div class="header">
+      <mat-icon>sell</mat-icon>
+      <span class="label">Offer ID:</span>
+      <span class="value">{{ offer.offerID }}</span>
+    </div>
+
+    <div class="button-container">
+      <button class="btn" mat-fab extended (click)="accept()">
+        Accept Offer
+      </button>
+      <button class="btn reject" mat-fab extended (click)="reject()">
+        Reject Offer
+      </button>
+    </div>
+
+  </mat-card-content>
+</mat-card>
+<br>

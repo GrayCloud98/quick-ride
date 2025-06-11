@@ -1,0 +1,84 @@
+<mat-card>
+  <mat-card-content>
+
+    <div class="header">
+      <mat-icon>route</mat-icon>
+      <span class="label">Distance to Pickup:</span>
+      <span >{{ request.driverToStartDistance | number:'1.2-2' }} km</span>
+    </div>
+
+    <div class="header">
+      <mat-icon>directions_car</mat-icon>
+      <span class="label">Requested Vehicle Type:</span>
+      <span >{{ request.desiredVehicleClass }} </span>
+    </div>
+
+    <div class="header">
+      <mat-icon>hail</mat-icon>
+      <span class="label">Customer Name:</span>
+      <span >{{ request.customerName }} </span>
+    </div>
+
+    <div class="header">
+      <mat-icon>star</mat-icon>
+      <span class="label">Customer Rating:</span>
+      <span >{{ request.customerRating }} </span>
+    </div>
+
+    <div class="header">
+      <mat-icon>hourglass_full</mat-icon>
+      <span class="label">Requested at:</span>
+      <span>{{ request.createdAt | date:"EEEE, dd.MM.yyyy — 'at' hh:mm a" }}</span>
+    </div>
+
+    <div class="header">
+      <mat-icon>sell</mat-icon>
+      <span class="label">Request ID:</span>
+      <span >{{ request.requestID }}</span>
+    </div>
+
+    <div class="location-cards-container">
+      <app-location-card label="Pickup at" [location]="request.pickup"></app-location-card>
+      <app-location-card label="Drop off at" [location]="request.dropoff"></app-location-card>
+    </div>
+
+    <div class="padding">
+      <button
+        *ngIf="offerState === OfferState.NONE"
+        class="btn" mat-fab extended (click)="accept()"
+      >
+        Accept Request
+      </button>
+
+      <button
+        *ngIf="offerState === OfferState.OFFERED && request.requestID === RequestIdOfOffer"
+        class="btn withdraw" mat-fab extended (click)="withdraw()"
+      >
+        Withdraw Offer
+      </button>
+
+      <button
+        *ngIf="offerState === OfferState.OFFERED && request.requestID !== RequestIdOfOffer"
+        class="btn" mat-fab extended disabled
+      >
+        Please withdraw your active offer first
+      </button>
+
+      <button
+        *ngIf="offerState === OfferState.ACCEPTED && request.requestID === RequestIdOfOffer"
+        class="btn" mat-fab extended disabled
+      >
+        Offer Accepted
+      </button>
+
+<!--      <button-->
+<!--        *ngIf="offerState === OfferState.ACCEPTED && request.requestID !== RequestIdOfOffer"-->
+<!--        class="btn" mat-fab extended disabled-->
+<!--      >-->
+<!--        An Offer was accepted-->
+<!--      </button>-->
+    </div>
+
+  </mat-card-content>
+</mat-card>
+<br>

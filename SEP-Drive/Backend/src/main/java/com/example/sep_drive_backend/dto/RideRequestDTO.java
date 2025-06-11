@@ -20,7 +20,14 @@ public class RideRequestDTO {
         this.destinationLongitude = request.getDestinationLongitude();
         this.startLocationName = request.getStartLocationName();
         this.DestinationLocationName = request.getDestinationLocationName();
+        this.distance = request.getDistance();
+        this.duration = request.getDuration();
+        this.estimatedPrice = request.getEstimatedPrice();
     }
+
+    private Double distance;
+    private Double duration;
+    private Double estimatedPrice;
 
 
     private String userName;
@@ -41,6 +48,24 @@ public class RideRequestDTO {
 
     private VehicleClassEnum vehicleClass;
 
+    public Double getDistance() {
+        return distance;
+    }
+    public void setDistance(Double distance) {
+        this.distance = distance;
+    }
+    public Double getDuration() {
+        return duration;
+    }
+    public void setDuration(Double duration) {
+        this.duration = duration;
+    }
+    public Double getEstimatedPrice() {
+        return estimatedPrice;
+    }
+    public void setEstimatedPrice(Double estimatedPrice) {
+        this.estimatedPrice = estimatedPrice;
+    }
     public String getStartLocationName() {
         return startLocationName;
     }

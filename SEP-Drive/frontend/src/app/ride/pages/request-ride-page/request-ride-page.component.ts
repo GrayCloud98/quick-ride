@@ -10,7 +10,6 @@ import {AuthService} from '../../../auth/auth.service';
 export class RequestRidePageComponent implements OnInit {
   username: string = '';
   accessAllowed: boolean = false;
-
   constructor(private authService: AuthService) {}
 
   ngOnInit() {
@@ -19,7 +18,7 @@ export class RequestRidePageComponent implements OnInit {
         if (user) {
           if (!user.username) return;
           this.username = user.username;
-          this.authService.isCustomer(this.username).subscribe({
+          this.authService.isCustomer().subscribe({
             next: isCustomer => this.accessAllowed = isCustomer,
             error: err => console.log(err),
           });

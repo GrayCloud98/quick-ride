@@ -21,3 +21,20 @@
   padding: 15px 30px;
   border-radius: 8px;
 }
+
+.wallet-button {
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.5rem 1.5rem;
+  border-radius: 24px;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.10);
+  background: linear-gradient(90deg, #1976d2 70%, #63a4ff 100%);
+  color: #fff;
+
+  &:hover {
+    background: linear-gradient(90deg, #1560aa 70%, #4682b4 100%);
+    color: #e3e3e3;
+    box-shadow: 0 4px 16px rgba(25, 118, 210, 0.16);
+  }
+}
