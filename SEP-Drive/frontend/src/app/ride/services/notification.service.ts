@@ -8,28 +8,29 @@ import SockJS from 'sockjs-client';
 export class NotificationService {
   private client: Client;
   private isConnected = false;
+  private pendingUsername: string | null = null;
+
+  private customerCallback?: (msg: any) => void;
+  private driverCallback?: (msg: any) => void;
 
   constructor() {
     this.client = new Client({
       webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
       reconnectDelay: 5000,
-      debug: () => {},
+      debug: () => {}
     });
 
-    this.client.onConnect = () => {
-      this.isConnected = true;
-      if (this.pendingUsername) {
-        this.subscribeToUserTopics(this.pendingUsername);
-        this.pendingUsername = null;
-      }
-    };
-
+    this.client.onConnect = () => this.onConnected();
     this.client.activate();
   }
 
-  private customerCallback?: (msg: any) => void;
-  private driverCallback?: (msg: any) => void;
-  private pendingUsername: string | null = null;
+  private onConnected() {
+    this.isConnected = true;
+    if (this.pendingUsername) {
+      this.subscribeToUserTopics(this.pendingUsername);
+      this.pendingUsername = null;
+    }
+  }
 
   setCustomerCallback(callback: (msg: any) => void) {
     this.customerCallback = callback;

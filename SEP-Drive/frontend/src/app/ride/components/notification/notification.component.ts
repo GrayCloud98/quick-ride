@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { NotificationService } from '../../services/notification.service';
 import { Router } from '@angular/router';
-import {AuthService} from '../../../auth/auth.service';
+
+import { NotificationService } from '../../services/notification.service';
+import { AuthService } from '../../../auth/auth.service';
 
 @Component({
   selector: 'app-notification',
@@ -11,36 +12,43 @@ import {AuthService} from '../../../auth/auth.service';
 })
 export class NotificationComponent implements OnInit {
   constructor(
-    private snackBar: MatSnackBar,
-    private wsService: NotificationService,
+    private authService: AuthService,
+    private notificationService: NotificationService,
     private router: Router,
-    private authService: AuthService
+    private snackBar: MatSnackBar
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
     const username = this.authService.currentUserValue?.username;
+    if (!username) return;
 
-    this.wsService.subscribe(username);
+    this.subscribeToNotifications(username);
+    this.registerCustomerNotificationHandler();
+    this.registerDriverNotificationHandler();
+  }
 
-    this.wsService.setCustomerCallback((message) => {
-      const isOfferNotification = message.message === "A driver wants to take your ride!";
+  private subscribeToNotifications(username: string) {
+    this.notificationService.subscribe(username);
+  }
 
-      const snackBarRef = this.snackBar.open(
-        message.message,
-        isOfferNotification ? 'View Offer' : 'Close',
-        { duration: 8000 }
-      );
+  private registerCustomerNotificationHandler() {
+    this.notificationService.setCustomerCallback((message) => {
+      const isOffer = message.message === 'A driver wants to take your ride!';
+      const action = isOffer ? 'View Offer' : 'Close';
 
-      if (isOfferNotification) {
+      const snackBarRef = this.snackBar.open(message.message, action, { duration: 8000 });
+
+      if (isOffer) {
         snackBarRef.onAction().subscribe(() => {
-          this.router.navigate(['/ride/offer']);
+          void this.router.navigate(['/ride/offer']);
         });
       }
     });
+  }
 
-    this.wsService.setDriverCallback((message) => {
+  private registerDriverNotificationHandler() {
+    this.notificationService.setDriverCallback((message) => {
       this.snackBar.open(message.message, 'Close', { duration: 8000 });
     });
   }
 }
-
