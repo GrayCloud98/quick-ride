@@ -9,16 +9,6 @@
 >
   <!-- Moving Marker -->
   <map-marker [position]="markerPosition" label="A"></map-marker>
-
-  <!-- Route Line -->
-  <map-polyline
-    [path]="route"
-    [options]="{
-      strokeColor: '#4285F4',
-      strokeOpacity: 0.8,
-      strokeWeight: 4
-    }"
-  ></map-polyline>
 </google-map>
 
 <!-- Control Buttons -->
@@ -31,7 +21,7 @@
 <!-- Status Display -->
 <div class="status" style="margin-top: 10px;">
   <p>Status: {{ isRunning ? 'Running' : 'Paused' }}</p>
-  <p>Step: {{ progress + 1 }} / {{ route.length }}</p>
+  <p>Step: {{ progress + 1 }} / {{ routePath.length }}</p>
   <p>Speed: {{ speed }}s total</p>
   <p *ngIf="isRunning">Estimated Time to Arrival (ETA): {{ formattedEta }}</p>
 </div>

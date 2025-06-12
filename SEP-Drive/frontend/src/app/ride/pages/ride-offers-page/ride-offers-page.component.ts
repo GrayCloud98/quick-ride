@@ -3,6 +3,8 @@ import {AuthService} from '../../../auth/auth.service';
 import {OfferService} from '../../services/offer.service';
 import {Offer} from '../../models/offer.model';
 import {filter, switchMap, tap} from 'rxjs';
+import {RideRequestService} from '../../services/ride-request.service';
+import {Router} from '@angular/router';
 
 interface SortOption {
   key: keyof Offer,
@@ -28,11 +30,25 @@ export class RideOffersPageComponent implements OnInit {
     { key: 'travelledDistance', label: 'Travelled Distance' },
   ];
   constructor(private authService: AuthService,
-              private offerService: OfferService) {}
+              private rideService: RideRequestService,
+              private offerService: OfferService,
+              private router: Router) {}
 
   acceptOffer(offerID: number) {
-    this.offerService.customerAcceptOffer(offerID).subscribe({
-      next: response => console.log(response),
+    this.offerService.customerAcceptOffer(offerID).pipe(
+      switchMap(() => this.rideService.getRide())
+    ).subscribe({
+      next: ride => {
+        const { pickup, dropoff } = ride;
+        void this.router.navigate(['/simulation'], {
+          queryParams: {
+            pickupLat: pickup.latitude,
+            pickupLng: pickup.longitude,
+            dropoffLat: dropoff.latitude,
+            dropoffLng: dropoff.longitude
+          }
+        });
+      },
       error: err => console.error(err)
     });
   }
@@ -70,10 +86,7 @@ export class RideOffersPageComponent implements OnInit {
     })
 
     this.offerService.customerGetOffers().subscribe({
-      next: (offers: Offer[]) => {
-        this.offers = offers;
-        console.log(offers)
-      },
+      next: (offers: Offer[]) => this.offers = offers,
       error: err => console.log(err)
     })
   }
