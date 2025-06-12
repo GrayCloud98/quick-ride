@@ -103,19 +103,10 @@ export class RideFormComponent implements OnInit {
   }
 
   submit() {
-  const { pickup, dropoff } = this.ride;
-
   this.rideService.submitRide(this.ride).subscribe({
     next: () => {
       this.rideService.updateActiveRideStatus();
-      this.router.navigate(['/simulation'], {
-        queryParams: {
-          pickupLat: pickup.latitude,
-          pickupLng: pickup.longitude,
-          dropoffLat: dropoff.latitude,
-          dropoffLng: dropoff.longitude
-        }
-      });
+      void this.router.navigate(['/ride/active']);
     },
     error: err => console.error(err)
   });
