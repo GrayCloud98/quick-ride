@@ -1,5 +1,6 @@
 package com.example.sep_drive_backend.models;
 
+import com.example.sep_drive_backend.constants.Ridestatus;
 import com.example.sep_drive_backend.constants.VehicleClassEnum;
 import jakarta.persistence.*;
 
@@ -50,6 +51,20 @@ public class RideRequest {
         this.createdAt = LocalDateTime.now();
     }
 
+    @OneToOne
+    @JoinColumn(name = "ride_offer_id")
+    private RideOffer rideOffer;
+
+    public RideOffer getRideOffer() {
+        return rideOffer;
+    }
+
+    public void setRideOffer(RideOffer rideOffer) {
+        this.rideOffer = rideOffer;
+    }
+
+    @Enumerated(EnumType.STRING)
+    private Ridestatus status;
 
     @Column
     @Enumerated(EnumType.STRING)
@@ -81,7 +96,12 @@ public class RideRequest {
         this.estimatedPrice = estimatedPrice;
     }
 
-
+    public Ridestatus getStatus() {
+        return status;
+    }
+    public void setStatus(Ridestatus status) {
+        this.status = status;
+    }
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }

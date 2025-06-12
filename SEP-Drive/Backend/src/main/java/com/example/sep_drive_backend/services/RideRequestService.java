@@ -1,16 +1,12 @@
 package com.example.sep_drive_backend.services;
 
+import com.example.sep_drive_backend.constants.Ridestatus;
 import com.example.sep_drive_backend.constants.VehicleClassEnum;
 import com.example.sep_drive_backend.dto.RideOfferNotification;
 import com.example.sep_drive_backend.dto.RidesForDriversDTO;
-import com.example.sep_drive_backend.models.Customer;
-import com.example.sep_drive_backend.models.Driver;
-import com.example.sep_drive_backend.models.RideOffer;
-import com.example.sep_drive_backend.models.RideRequest;
-import com.example.sep_drive_backend.repository.CustomerRepository;
-import com.example.sep_drive_backend.repository.DriverRepository;
-import com.example.sep_drive_backend.repository.RideOfferRepository;
-import com.example.sep_drive_backend.repository.RideRequestRepository;
+import com.example.sep_drive_backend.models.*;
+import com.example.sep_drive_backend.repository.*;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -28,6 +24,8 @@ import java.util.stream.Collectors;
 public class RideRequestService {
 
 
+    @Autowired
+    private WalletRepository walletRepository;
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
@@ -232,4 +230,35 @@ public class RideRequestService {
 
         return EARTH_RADIUS_KM * c;
     }
+    @Transactional
+    public void completeRide(Long rideId) {
+        RideRequest ride = rideRequestRepository.findById(rideId)
+                .orElseThrow(() -> new RuntimeException("Ride not found"));
+
+        if (ride.getStatus() == Ridestatus.COMPLETED)
+            return;
+
+        Wallet customerWallet = ride.getCustomer().getWallet();
+
+        // 🔍 Get driver via RideOffer
+        RideOffer offer = ride.getRideOffer();
+        if (offer == null || offer.getDriver() == null) {
+            throw new RuntimeException("RideOffer or Driver not found for this ride");
+        }
+
+        Wallet driverWallet = offer.getDriver().getWallet();
+
+        Double price = ride.getEstimatedPrice();
+        Long priceInCents = Math.round(price * 100);
+
+        customerWallet.setBalanceCents(customerWallet.getBalanceCents() - priceInCents);
+        driverWallet.setBalanceCents(driverWallet.getBalanceCents() + priceInCents);
+
+        ride.setStatus(Ridestatus.COMPLETED);
+
+        walletRepository.save(customerWallet);
+        walletRepository.save(driverWallet);
+        rideRequestRepository.save(ride);
+    }
+
 }
