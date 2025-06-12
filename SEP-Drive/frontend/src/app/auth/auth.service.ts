@@ -106,6 +106,17 @@ export class AuthService {
       })
     );
   }
+  getRoleFromToken(): string {
+    const token = localStorage.getItem('authToken');
+    if (!token) return '';
+    try {
+      const payload = token.split('.')[1];
+      const decoded = JSON.parse(atob(payload));
+      return decoded.role || decoded.roles?.[0] || '';
+    } catch {
+      return '';
+    }
+  }
 
   private resolveImagePath(imagePath: string | undefined): string {
     if (imagePath) {

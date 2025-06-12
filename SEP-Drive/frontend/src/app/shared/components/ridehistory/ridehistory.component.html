@@ -1,74 +1,51 @@
-<div class="fahrthistorie-container">
-  <h2>Fahrthistorie</h2>
-  <mat-form-field appearance="outline" style="width: 330px; margin-bottom: 16px;">
-    <mat-label>Suche Fahrer oder Kunde</mat-label>
-    <input matInput  placeholder="Name oder Benutzername..." />
-    <button mat-icon-button matSuffix>
-      <mat-icon>search</mat-icon>
-    </button>
-  </mat-form-field>
+<div class="history-title">
+  <h1>Fahrthistorie</h1>
+</div>
 
-  <div class="history-table-container">
-    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+<div class="search-box-wrap">
+  <div class="search-box">
+    <input matInput (keyup)="applyFilter($event)" placeholder="Suche Fahrer oder Kunde" />
+    <mat-icon class="search-icon">search</mat-icon>
+  </div>
+</div>
 
-      <!-- Fahrt-ID -->
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Fahrt-ID</th>
-        <td mat-cell *matCellDef="let row">{{ row.id }}</td>
+<div class="table-outer">
+  <div class="table-card">
+    <table mat-table [dataSource]="dataSource" matSort *ngIf="dataSource.filteredData.length > 0">
+      <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
+        <th mat-header-cell *matHeaderCellDef>{{ getColumnHeader(column) }}</th>
+        <td mat-cell *matCellDef="let row">
+          <!-- Avatar für Fahrer/Kunde, sonst normal -->
+          <ng-container [ngSwitch]="column">
+            <span *ngSwitchCase="'driverName'">
+              <img *ngIf="row.driverAvatar" [src]="row.driverAvatar" class="avatar" alt="" />
+              {{ row.driverName }}
+            </span>
+            <span *ngSwitchCase="'customerName'">
+              <img *ngIf="row.customerAvatar" [src]="row.customerAvatar" class="avatar" alt="" />
+              {{ row.customerName }}
+            </span>
+            <span *ngSwitchCase="'driverRating'">
+              {{ row.driverRating }} <span class="star">&#9733;</span>
+            </span>
+            <span *ngSwitchCase="'customerRating'">
+              {{ row.customerRating }} <span class="star">&#9733;</span>
+            </span>
+            <span *ngSwitchDefault>
+              {{ row[column] }}
+            </span>
+          </ng-container>
+        </td>
       </ng-container>
-      <!-- Datum -->
-      <ng-container matColumnDef="date">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Datum/Uhrzeit</th>
-        <td mat-cell *matCellDef="let row">{{ row.date }}</td>
-      </ng-container>
-      <!-- Distanz -->
-      <ng-container matColumnDef="distance">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Distanz</th>
-        <td mat-cell *matCellDef="let row">{{ row.distance }}</td>
-      </ng-container>
-      <!-- Dauer -->
-      <ng-container matColumnDef="duration">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Dauer</th>
-        <td mat-cell *matCellDef="let row">{{ row.duration }}</td>
-      </ng-container>
-      <!-- Geld -->
-      <ng-container matColumnDef="money">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Geld</th>
-        <td mat-cell *matCellDef="let row">{{ row.money | number:'1.2-2' }} €</td>
-      </ng-container>
-      <!-- Kundenbewertung -->
-      <ng-container matColumnDef="customerRating">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Bewertung Kunde</th>
-        <td mat-cell *matCellDef="let row">{{ row.customerRating }} <mat-icon>star</mat-icon></td>
-      </ng-container>
-      <!-- Fahrerbewertung -->
-      <ng-container matColumnDef="driverRating">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Bewertung Fahrer</th>
-        <td mat-cell *matCellDef="let row">{{ row.driverRating }} <mat-icon>star</mat-icon></td>
-      </ng-container>
-      <!-- Kundenname -->
-      <ng-container matColumnDef="customerName">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Kunde</th>
-        <td mat-cell *matCellDef="let row">{{ row.customerName }}</td>
-      </ng-container>
-      <!-- Kundenbenutzername -->
-      <ng-container matColumnDef="customerUsername">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Benutzername Kunde</th>
-        <td mat-cell *matCellDef="let row">{{ row.customerUsername }}</td>
-      </ng-container>
-      <!-- Fahrerbenutzername -->
-      <ng-container matColumnDef="driverUsername">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Benutzername Fahrer</th>
-        <td mat-cell *matCellDef="let row">{{ row.driverUsername }}</td>
-      </ng-container>
-      <!-- Fahrername -->
-      <ng-container matColumnDef="driverName">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Fahrer</th>
-        <td mat-cell *matCellDef="let row">{{ row.driverName }}</td>
-      </ng-container>
-
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
+    <div *ngIf="dataSource.filteredData.length === 0" class="no-results-message">
+      <div style="font-size:2.4rem; margin-bottom:0.5rem;">🚗</div>
+      <mat-icon>directions_car</mat-icon>
+      <span>Keine Fahrten gefunden.</span>
+      <div class="no-results-sub">Prüfe deine Suche oder versuche es später erneut.</div>
+    </div>
+
   </div>
 </div>
