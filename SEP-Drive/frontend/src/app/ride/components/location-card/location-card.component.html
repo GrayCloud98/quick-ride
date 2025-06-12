@@ -1,24 +1,24 @@
-<mat-card appearance="outlined" class="location-card">
-  <div class="location-header">
+<mat-card appearance="outlined" class="card small">
+  <div class="header">
     <mat-icon>location_on</mat-icon>
-    <span class="location-label">{{ label }}</span>
+    <span class="label">{{ label }}</span>
   </div>
   <mat-card-content>
-    <div class="location-field name">
-      <span class="field-title">Name:</span>
-      <span class="field-value bold">{{ location.name }}</span>
+    <div class="field">
+      <span class="title">Name:</span>
+      <span class="value bold">{{ location.name }}</span>
     </div>
-    <div *ngIf="location.address !== 'undefined'" class="location-field">
-      <span class="field-title">Address:</span>
-      <span class="field-value">{{ location.address }}</span>
+    <div class="field" *ngIf="location.address !== 'undefined'" >
+      <span class="title">Address:</span>
+      <span class="value">{{ location.address }}</span>
     </div>
-    <div class="location-field coordinates">
-      <span class="field-title">Latitude:</span>
-      <span class="field-value grey-italic">{{ location.latitude }}</span>
+    <div class="field">
+      <span class="title">Latitude:</span>
+      <span class="value grey-italic">{{ location.latitude }}</span>
     </div>
-    <div class="location-field coordinates">
-      <span class="field-title">Longitude:</span>
-      <span class="field-value grey-italic">{{ location.longitude }}</span>
+    <div class="field">
+      <span class="title">Longitude:</span>
+      <span class="value grey-italic">{{ location.longitude }}</span>
     </div>
   </mat-card-content>
 </mat-card>

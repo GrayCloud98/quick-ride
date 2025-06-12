@@ -1,40 +1,40 @@
-<mat-card>
+<mat-card appearance="outlined" class="card big">
   <mat-card-content>
 
-    <div class="header">
+    <div class="header field">
       <mat-icon>route</mat-icon>
       <span class="label">Distance to Pickup:</span>
-      <span >{{ request.driverToStartDistance | number:'1.2-2' }} km</span>
+      <span class="value bold">{{ request.driverToStartDistance | number:'1.2-2' }} km</span>
     </div>
 
-    <div class="header">
+    <div class="header field">
       <mat-icon>directions_car</mat-icon>
       <span class="label">Requested Vehicle Type:</span>
-      <span >{{ request.desiredVehicleClass }} </span>
+      <span class="value">{{ request.desiredVehicleClass }} </span>
     </div>
 
-    <div class="header">
+    <div class="header field">
       <mat-icon>hail</mat-icon>
       <span class="label">Customer Name:</span>
-      <span >{{ request.customerName }} </span>
+      <span class="value">{{ request.customerName }} </span>
     </div>
 
-    <div class="header">
+    <div class="header field">
       <mat-icon>star</mat-icon>
       <span class="label">Customer Rating:</span>
-      <span >{{ request.customerRating }} </span>
+      <span class="value">{{ request.customerRating }} </span>
     </div>
 
-    <div class="header">
+    <div class="header field">
       <mat-icon>hourglass_full</mat-icon>
       <span class="label">Requested at:</span>
-      <span>{{ request.createdAt | date:"EEEE, dd.MM.yyyy — 'at' hh:mm a" }}</span>
+      <span class="value grey-italic">{{ request.createdAt | date:"EEEE, dd.MM.yyyy — 'at' hh:mm a" }}</span>
     </div>
 
-    <div class="header">
+    <div class="header field">
       <mat-icon>sell</mat-icon>
       <span class="label">Request ID:</span>
-      <span >{{ request.requestID }}</span>
+      <span class="value grey-italic">{{ request.requestID }}</span>
     </div>
 
     <div class="location-cards-container">
@@ -42,7 +42,7 @@
       <app-location-card label="Drop off at" [location]="request.dropoff"></app-location-card>
     </div>
 
-    <div class="padding">
+    <div class="button-container">
       <button
         *ngIf="offerState === OfferState.NONE"
         class="btn" mat-fab extended (click)="accept()"
@@ -52,7 +52,7 @@
 
       <button
         *ngIf="offerState === OfferState.OFFERED && request.requestID === RequestIdOfOffer"
-        class="btn withdraw" mat-fab extended (click)="withdraw()"
+        class="btn warn" mat-fab extended (click)="withdraw()"
       >
         Withdraw Offer
       </button>
@@ -61,7 +61,7 @@
         *ngIf="offerState === OfferState.OFFERED && request.requestID !== RequestIdOfOffer"
         class="btn" mat-fab extended disabled
       >
-        Please withdraw your active offer first
+        Please withdraw your active Offer first
       </button>
     </div>
 
