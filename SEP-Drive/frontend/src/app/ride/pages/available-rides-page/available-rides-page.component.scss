@@ -5,15 +5,6 @@ html, body {
   overflow: hidden;
 }
 
-.main-container {
-  height: calc(100vh - 64px);
-  padding: 0;
-}
-
-.left-container {
-  padding: 16px;
-}
-
 .right-container {
   background-color: rgba(215, 227, 255, 0.31);
 }
@@ -51,9 +42,9 @@ html, body {
   gap: 1rem;
 }
 
-.req-card-container{
+.req-card-container {
   min-width: 500px;
-  max-width: 95%;
-  width: 100%;
+  max-width: 1000px;
+  width: 95%;
 }
 
