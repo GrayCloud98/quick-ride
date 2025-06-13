@@ -94,6 +94,7 @@ public class RideRequest {
         this.distance = distance;
         this.duration = duration;
         this.estimatedPrice = estimatedPrice;
+        this.status = Ridestatus.PLANNED;
     }
 
     public Ridestatus getStatus() {

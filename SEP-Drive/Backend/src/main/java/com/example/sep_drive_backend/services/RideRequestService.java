@@ -207,6 +207,7 @@ public class RideRequestService {
         for (RideOffer offer : allOffers) {
             if (!offer.getId().equals(rideOfferId)) {
                 rideOfferRepository.delete(offer);
+                rideRequest.setStatus(Ridestatus.IN_PROGRESS);
                 Driver driver = offer.getDriver();
                 driver.setActive(false);
                 driverRepository.save(driver);
@@ -240,7 +241,6 @@ public class RideRequestService {
 
         Wallet customerWallet = ride.getCustomer().getWallet();
 
-        // 🔍 Get driver via RideOffer
         RideOffer offer = ride.getRideOffer();
         if (offer == null || offer.getDriver() == null) {
             throw new RuntimeException("RideOffer or Driver not found for this ride");
