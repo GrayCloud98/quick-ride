@@ -1,7 +1,7 @@
-<div class="ride-page-container" *ngIf="accessAllowed && userHasActiveRide">
+<div class="main-container" *ngIf="accessAllowed && userHasActiveRide">
 
   <!-- Left Side: Ride Info Panel -->
-  <div class="ride-info-panel">
+  <div class="left-container scroll">
     <app-location-card
       [location]="activeRide.pickup"
       label="Pick up at">
@@ -55,7 +55,7 @@
   </div>
 
   <!-- Right Side: Map -->
-  <div class="map-panel">
+  <div class="right-container map">
     <app-map></app-map>
   </div>
 </div>

@@ -1,5 +1,5 @@
 <div class="main-container" *ngIf="accessAllowed">
-  <div class="left-container">
+  <div class="left-container scroll">
     <select-location
       [label]="'My Position'"
       [placeholder]="'Train Station'"
@@ -33,7 +33,7 @@
     </mat-radio-group>
   </div>
 
-  <div class="right-container">
+  <div class="right-container scroll">
 
       <div class="centered-box req-card-container alert error" *ngIf="!positionSet">
         Please enter your position first.

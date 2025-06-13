@@ -6,26 +6,16 @@ html, body {
 }
 
 .main-container {
-  display: flex;
   height: calc(100vh - 64px);
-  overflow: hidden;
+  padding: 0;
 }
 
 .left-container {
-  padding: 20px;
-  width: 30%;
-  min-width: 280px;
-  max-width: 500px;
-  box-sizing: border-box;
-  overflow: hidden;
+  padding: 16px;
 }
 
 .right-container {
   background-color: rgba(215, 227, 255, 0.31);
-  padding: 20px;
-  flex-grow: 1;
-  height: 100%;
-  overflow-y: auto;
 }
 
 .sort-header {
@@ -63,7 +53,7 @@ html, body {
 
 .req-card-container{
   min-width: 500px;
-  max-width: 1000px;
+  max-width: 95%;
   width: 100%;
 }
 

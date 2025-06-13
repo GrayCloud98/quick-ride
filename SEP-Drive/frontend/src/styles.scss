@@ -27,6 +27,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .button-container {
+  padding-inline: 16px;
   display: flex;
 
   .btn {
@@ -91,4 +92,32 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 mat-card{
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19) !important;
+}
+
+.main-container {
+  overflow: hidden;
+  display: flex;
+  height: calc(100vh - 64px);
+}
+
+.left-container {
+  padding: 16px;
+  width: 30%;
+  max-width: 500px;
+  &.scroll {
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+}
+
+.right-container {
+  padding: 16px;
+  flex: 1;
+  &.scroll {
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  &.map {
+    padding: 16px 16px 16px 0;
+  }
 }

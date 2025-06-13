@@ -1,5 +1,6 @@
 <div class="main-container" *ngIf="accessAllowed">
-  <div class="left-container">
+  <div class="left-container scroll">
+
     <h1 class="sort-header">Sort by</h1>
     <mat-radio-group class="sort-group">
       <div *ngFor="let option of sortOptions" class="sort-option">
@@ -22,7 +23,7 @@
     </mat-radio-group>
   </div>
 
-  <div class="right-container">
+  <div class="right-container scroll">
 
     <div class="centered-box offer-card-container alert error" *ngIf="offers.length === 0">
       You have not received any offers yet. <br><br>
