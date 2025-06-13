@@ -19,16 +19,16 @@
       </div>
       <mat-card-content>
         <div class="field">
+          <span class="title">Price:</span>
+          <span class="value bold">{{ activeRide.estimatedPrice | number:'1.2-2' }} €</span>
+        </div>
+        <div class="field">
           <span class="title">Distance:</span>
           <span class="value">{{ activeRide.distance }} km</span>
         </div>
         <div class="field">
-          <span class="title">Estimated Duration:</span>
+          <span class="title">Duration:</span>
           <span class="value">{{ activeRide.duration }} minutes</span>
-        </div>
-        <div class="field">
-          <span class="title">Estimated Price:</span>
-          <span class="value">{{ activeRide.estimatedPrice | number:'1.2-2' }} €</span>
         </div>
       </mat-card-content>
     </mat-card>

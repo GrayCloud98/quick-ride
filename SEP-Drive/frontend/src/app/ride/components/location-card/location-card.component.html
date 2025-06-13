@@ -8,17 +8,17 @@
       <span class="title">Name:</span>
       <span class="value bold">{{ location.name }}</span>
     </div>
-    <div class="field" *ngIf="location.address !== 'undefined'" >
+    <div class="field" *ngIf="location.address !== 'undefined'">
       <span class="title">Address:</span>
-      <span class="value">{{ location.address }}</span>
+      <span class="value">{{ location.address }} </span>
     </div>
     <div class="field">
       <span class="title">Latitude:</span>
-      <span class="value grey-italic">{{ location.latitude }}</span>
+      <span class="value grey-italic">{{ location.latitude | number:'1.7-7' }}</span>
     </div>
     <div class="field">
       <span class="title">Longitude:</span>
-      <span class="value grey-italic">{{ location.longitude }}</span>
+      <span class="value grey-italic">{{ location.longitude | number:'1.7-7' }}</span>
     </div>
   </mat-card-content>
 </mat-card>

@@ -70,12 +70,13 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     .title {
       font-weight: 500;
       color: #555;
+      width: 90px;
     }
 
     .value {
       font-weight: 400;
       color: #222;
-      text-align: right;
+      text-align: left;
       flex: 1;
     }
 
