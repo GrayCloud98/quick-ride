@@ -203,11 +203,27 @@ public class RideRequestService {
 
     public void cancelOffer(String username) {
         Optional<Driver> driverOptional = driverRepository.findByUsername(username);
+
+        if (!driverOptional.isPresent()) {
+            System.out.println("Driver not found for username: " + username);
+            return;
+        }
+
         Driver driver = driverOptional.get();
+
         Optional<RideOffer> rideOfferOptional = rideOfferRepository.findByDriver(driver);
+
+        if (!rideOfferOptional.isPresent()) {
+            System.out.println("No RideOffer found for driver: " + username);
+            return;
+        }
+
         RideOffer rideOffer = rideOfferOptional.get();
+
         sendCancelledNotification(rideOffer.getRideRequest().getCustomer().getUsername());
+        System.out.println("Cancelling offer for driver: " + username);
         rideOfferRepository.delete(rideOffer);
+
         driver.setActive(false);
         driverRepository.save(driver);
     }
