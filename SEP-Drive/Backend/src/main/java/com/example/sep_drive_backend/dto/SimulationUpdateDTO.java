@@ -2,9 +2,7 @@ package com.example.sep_drive_backend.dto;
 
 public class SimulationUpdateDTO {
     private Long rideId;
-    private double latitude;
-    private double longitude;
-    private double progressPercent;
+    private double progress;
     private String status;
     private int speedSeconds;
 
@@ -12,14 +10,8 @@ public class SimulationUpdateDTO {
     public Long getRideId() { return rideId; }
     public void setRideId(Long rideId) { this.rideId = rideId; }
 
-    public double getLatitude() { return latitude; }
-    public void setLatitude(double latitude) { this.latitude = latitude; }
-
-    public double getLongitude() { return longitude; }
-    public void setLongitude(double longitude) { this.longitude = longitude; }
-
-    public double getProgressPercent() { return progressPercent; }
-    public void setProgressPercent(double progressPercent) { this.progressPercent = progressPercent; }
+    public double getProgress() { return progress; }
+    public void setProgress(double progress) { this.progress = progress; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
