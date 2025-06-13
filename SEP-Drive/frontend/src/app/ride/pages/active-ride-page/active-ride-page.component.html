@@ -39,17 +39,19 @@
         <span class="label">Selected Vehicle Class</span>
       </div>
       <mat-card-content>
-        <span class="field">{{ activeRide.vehicleClass }}</span>
+        <div class="field">
+          <span class="value bold">{{ activeRide.vehicleClass }}</span>
+        </div>
       </mat-card-content>
     </mat-card>
 
     <div class="button-container">
       <button mat-fab extended class="btn" [routerLink]="['/ride/offer']">
-        View Ride Offers
+        View Offers
       </button>
 
       <button mat-fab extended class="btn warn" (click)="deactivateRide()">
-        Deactivate your ride
+        Deactivate your Request
       </button>
     </div>
   </div>

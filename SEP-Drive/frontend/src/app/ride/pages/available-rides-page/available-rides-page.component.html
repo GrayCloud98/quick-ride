@@ -11,7 +11,6 @@
 
     <h1 class="sort-header">Sort by</h1>
     <mat-radio-group  class="sort-group">
-
       <div *ngFor="let option of sortOptions" class="sort-option">
         <span class="sort-label">{{ option.label }}</span>
         <div class="radio-buttons">
@@ -29,8 +28,14 @@
           </mat-radio-button>
         </div>
       </div>
-
     </mat-radio-group>
+    <br>
+
+    <div class="button-container">
+      <button class="btn" mat-fab extended (click)="loadRequests()" [disabled]="!positionSet">
+        Refresh Requests
+      </button>
+    </div>
   </div>
 
   <div class="right-container scroll">

@@ -45,20 +45,7 @@ export class AvailableRidesPageComponent implements OnInit {
   onLocationSelected(pos: Location) {
     this.currentPosition = pos;
     this.currentPositionControl.setValue(pos);
-
-    this.offerService.driverHasActiveOffer().pipe(
-      filter(driverHasActiveOffer => driverHasActiveOffer),
-      tap(()=> this.offerState = OfferState.OFFERED),
-      switchMap(() => this.offerService.driverGetRequestIdOfOffer()),
-      tap(requestIdOfOffer => this.requestIdOfOffer = requestIdOfOffer),
-    ).subscribe({
-      error: err => console.log(err)
-    });
-
-    this.offerService.getAllActiveRequests(this.currentPosition.latitude,this.currentPosition.longitude).subscribe({
-      next: result => this.allActiveRequests = result,
-      error: err => console.log(err)
-    })
+    this.loadRequests();
     this.positionSet = true;
   }
 
@@ -104,6 +91,22 @@ export class AvailableRidesPageComponent implements OnInit {
       switchMap(() => this.authService.isCustomer()),
       tap(isCustomer => this.accessAllowed = !isCustomer)
     ).subscribe({
+      error: err => console.log(err)
+    })
+  }
+
+  loadRequests(){
+    this.offerService.driverHasActiveOffer().pipe(
+      filter(driverHasActiveOffer => driverHasActiveOffer),
+      tap(()=> this.offerState = OfferState.OFFERED),
+      switchMap(() => this.offerService.driverGetRequestIdOfOffer()),
+      tap(requestIdOfOffer => this.requestIdOfOffer = requestIdOfOffer),
+    ).subscribe({
+      error: err => console.log(err)
+    });
+
+    this.offerService.getAllActiveRequests(this.currentPosition.latitude,this.currentPosition.longitude).subscribe({
+      next: result => this.allActiveRequests = result,
       error: err => console.log(err)
     })
   }

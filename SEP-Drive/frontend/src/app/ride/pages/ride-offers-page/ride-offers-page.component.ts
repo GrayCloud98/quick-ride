@@ -85,6 +85,10 @@ export class RideOffersPageComponent implements OnInit {
       error: err => console.log(err)
     })
 
+    this.loadOffers();
+  }
+
+  loadOffers(){
     this.offerService.customerGetOffers().subscribe({
       next: (offers: Offer[]) => this.offers = offers,
       error: err => console.log(err)
