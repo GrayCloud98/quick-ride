@@ -216,12 +216,12 @@ public class RideRequestService {
                 Driver driver = offer.getDriver();
                 driver.setActive(false);
                 driverRepository.save(driver);
-                notificationService.sendAcceptNotification(driver.getUsername());
+                notificationService.sendRejectionNotification(driver.getUsername());
             }
         }
         rideOfferRepository.save(selectedOffer);
         rideRequestRepository.save(rideRequest);
-        notificationService.sendRejectionNotification(selectedOffer.getDriver().getUsername());
+        notificationService.sendAcceptNotification(selectedOffer.getDriver().getUsername());
     }
 
 
