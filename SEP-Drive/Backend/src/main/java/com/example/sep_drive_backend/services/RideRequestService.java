@@ -72,7 +72,7 @@ public class RideRequestService {
         request.setDistance(dto.getDistance());
         request.setDuration(dto.getDuration());
         request.setEstimatedPrice(dto.getEstimatedPrice());
-
+        request.setStatus(Ridestatus.PLANNED);
         customer.setActive(true);
         customerRepository.save(customer);
         return repository.save(request);
