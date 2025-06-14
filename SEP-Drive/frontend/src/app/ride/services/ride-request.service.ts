@@ -72,4 +72,31 @@ export class RideRequestService {
       error: err => console.error(err)
     });
   }
+
+
+  public getAcceptedRideDetails(): Observable<Ride> {
+  return this.http.get<any>('http://localhost:8080/api/rides/accepted').pipe(
+    map((ride: any) => ({
+      pickup: {
+        latitude: Number(ride.pickup.latitude),
+        longitude: Number(ride.pickup.longitude),
+        address: ride.pickup.address || undefined,
+        name: ride.pickup.name || undefined
+      },
+      dropoff: {
+        latitude: Number(ride.dropoff.latitude),
+        longitude: Number(ride.dropoff.longitude),
+        address: ride.dropoff.address || undefined,
+        name: ride.dropoff.name || undefined
+      },
+      vehicleClass: ride.vehicleClass as VehicleClass,
+      active: true,
+      distance: Number(ride.distance) || 0,
+      duration: Number(ride.duration) || 0,
+      estimatedPrice: Number(ride.estimatedPrice) || 0,
+      id: ride.id // Optional: if you want to keep rideId
+    }))
+  );
+}
+
 }

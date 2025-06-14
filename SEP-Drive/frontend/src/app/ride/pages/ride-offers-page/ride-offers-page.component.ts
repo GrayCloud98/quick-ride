@@ -6,6 +6,7 @@ import {filter, switchMap, tap} from 'rxjs';
 import {RideRequestService} from '../../services/ride-request.service';
 import {Router} from '@angular/router';
 
+
 interface SortOption {
   key: keyof Offer,
   label: string
@@ -35,11 +36,21 @@ export class RideOffersPageComponent implements OnInit {
               private router: Router) {}
 
   acceptOffer(offerID: number) {
-    this.offerService.customerAcceptOffer(offerID).subscribe({
-      next: () => void this.router.navigate(['/simulation']),
-      error: err => console.error(err)
-    });
-  }
+  this.offerService.customerAcceptOffer(offerID).subscribe({
+    next: (ride: any) => {
+      // assuming `ride.id` is returned in the response
+      this.router.navigate(['/simulation'], {
+        queryParams: {
+          role: 'driver',
+          rideId: ride.id
+        }
+      });
+    },
+    error: err => console.error(err)
+  });
+}
+
+
 
   rejectOffer(offerID: number) {
     this.offerService.customerRejectOffer(offerID).subscribe({

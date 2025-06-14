@@ -6,6 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { GoogleMap } from '@angular/google-maps';
 import { RideSocketService } from '../ride/services/ride-socket.service';
 import {RideRequestService} from '../ride/services/ride-request.service';
+import { Ride } from '../ride/models/ride.model';
 
 @Component({
 selector: 'app-ride-simulation',
@@ -43,46 +44,43 @@ constructor(private dialog: MatDialog, private rideStateService: RideStateServic
             private rideService: RideRequestService) { }
 
 ngOnInit(): void {
-  // Map directionsRenderer is ready
   this.directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
 
-  this.rideService.getRide().subscribe({
-    next: data => {
-      // 1. Load from URL if available
-      this.activatedRoute.queryParams.subscribe(params => {
-        const pickupLat = data.pickup.latitude;
-        const pickupLng = data.pickup.longitude;
-        const dropoffLat = data.dropoff.latitude;
-        const dropoffLng = data.dropoff.longitude;
-        this.rideId = params['rideId'];
+  this.activatedRoute.queryParams.subscribe(params => {
+    this.role = params['role'] === 'customer' ? 'customer' : 'driver';
 
-        if (!isNaN(pickupLat) && !isNaN(pickupLng) && !isNaN(dropoffLat) && !isNaN(dropoffLng)) {
-          this.pickupLocation = { lat: pickupLat, lng: pickupLng };
-          this.dropoffLocation = { lat: dropoffLat, lng: dropoffLng };
-          this.tryStartSimulation();
+    const rideObservable = this.role === 'driver'
+      ? this.rideService.getAcceptedRideDetails()
+      : this.rideService.getRide();
+
+    rideObservable.subscribe({
+      next: data => {
+        this.handleRideData(data);
+
+        if (this.role === 'customer') {
+          this.rideSocketService.subscribeToRide(this.rideId);
+          this.rideSocketService.position$.subscribe(position => {
+            if (position) this.markerPosition = position;
+          });
         }
-      });
+      },
+      error: err => console.error('Failed to load ride data:', err)
+    });
+  });
 
-      // 2. Also subscribe to RideStateService (e.g., for form input)
-      this.rideStateService.pickupLocation$.subscribe(pickup => {
-        this.pickupLocation = pickup;
-        this.tryStartSimulation();
-      });
+  // Live updates from RideStateService (optional)
+  this.rideStateService.pickupLocation$.subscribe(pickup => {
+    this.pickupLocation = pickup;
+    this.tryStartSimulation();
+  });
 
-      this.rideStateService.dropoffLocation$.subscribe(dropoff => {
-        this.dropoffLocation = dropoff;
-        this.tryStartSimulation();
-      });
-
-      if (this.role === 'customer') {
-        this.rideSocketService.subscribeToRide(this.rideId);
-        this.rideSocketService.position$.subscribe(position => {
-          if (position) this.markerPosition = position;
-        });
-      }
-    }
-  })
+  this.rideStateService.dropoffLocation$.subscribe(dropoff => {
+    this.dropoffLocation = dropoff;
+    this.tryStartSimulation();
+  });
 }
+
+
 
 
 ngAfterViewInit(): void {
@@ -201,4 +199,17 @@ private startInterval(): void {
     const seconds = this.eta % 60;
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   }
+
+  private handleRideData(ride: Ride): void {
+  this.pickupLocation = {
+    lat: ride.pickup.latitude,
+    lng: ride.pickup.longitude
+  };
+  this.dropoffLocation = {
+    lat: ride.dropoff.latitude,
+    lng: ride.dropoff.longitude
+  };
+  this.tryStartSimulation();
+}
+
 }
