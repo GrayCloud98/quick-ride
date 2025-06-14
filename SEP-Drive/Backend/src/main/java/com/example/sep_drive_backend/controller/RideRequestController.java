@@ -163,6 +163,28 @@ public class RideRequestController {
         boolean active = rideRequestService.isDriverActive(username);
         return ResponseEntity.ok(active);
     }
+    @PostMapping("/ride-request/{id}/simulation")
+    public ResponseEntity<Void> updateSimulationState(@PathVariable Long id,
+                                                      @RequestBody SimulationUpdateDTO dto) {
+        rideRequestService.updateSimulation(id, dto);
+        return ResponseEntity.ok().build();
+    }
+    @GetMapping("/ride-request/{id}/simulation")
+    public ResponseEntity<SimulationUpdateDTO> getSimulationState(@PathVariable Long id) {
+        SimulationUpdateDTO dto = rideRequestService.getSimulationState(id);
+        return ResponseEntity.ok(dto);
+    }
+    @GetMapping("/rides/accepted")
+    public ResponseEntity<AcceptedRideDetailsDTO> getAcceptedRideDetails(HttpServletRequest request) {
+        String token = jwtTokenProvider.resolveToken(request);
+        String username = jwtTokenProvider.getUsername(token);
+
+        AcceptedRideDetailsDTO rideDetails = rideRequestService.getAcceptedRideDetails(username);
+        return ResponseEntity.ok(rideDetails);
+    }
+
+
+
 
 
 }
