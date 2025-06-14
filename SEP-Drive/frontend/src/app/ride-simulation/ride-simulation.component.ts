@@ -4,6 +4,7 @@ import { RideRatingDialogComponent } from '../ride-rating-dialog/ride-rating-dia
 import { RideStateService } from '../ride/services/ride-state.service';
 import { ActivatedRoute } from '@angular/router';
 import { GoogleMap } from '@angular/google-maps';
+import { RideSocketService } from '../ride/services/ride-socket.service';
 
 @Component({
 selector: 'app-ride-simulation',
@@ -28,13 +29,15 @@ eta = 0;
 pickupLocation: google.maps.LatLngLiteral | null = null;
 dropoffLocation: google.maps.LatLngLiteral | null = null;
 
+rideId!: string;
+role: 'driver' | 'customer' = 'driver';
 private map!: google.maps.Map;
 private directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
 private directionsResult: google.maps.DirectionsResult | null = null;
 private simulationStarted = false;
 
 
-constructor(private dialog: MatDialog, private rideStateService: RideStateService, private activatedRoute: ActivatedRoute) {}
+constructor(private dialog: MatDialog, private rideStateService: RideStateService, private activatedRoute: ActivatedRoute, private rideSocketService: RideSocketService) {}
 
 ngOnInit(): void {
   // Map directionsRenderer is ready
@@ -46,6 +49,8 @@ ngOnInit(): void {
     const pickupLng = parseFloat(params['pickupLng']);
     const dropoffLat = parseFloat(params['dropoffLat']);
     const dropoffLng = parseFloat(params['dropoffLng']);
+    this.role = params['role'] === 'customer' ? 'customer' : 'driver';
+    this.rideId = params['rideId'];
 
     if (!isNaN(pickupLat) && !isNaN(pickupLng) && !isNaN(dropoffLat) && !isNaN(dropoffLng)) {
       this.pickupLocation = { lat: pickupLat, lng: pickupLng };
@@ -64,6 +69,13 @@ ngOnInit(): void {
     this.dropoffLocation = dropoff;
     this.tryStartSimulation();
   });
+
+  if (this.role === 'customer') {
+       this.rideSocketService.subscribeToRide(this.rideId);
+        this.rideSocketService.position$.subscribe(position => {
+          if (position) this.markerPosition = position;
+    });
+  }
 }
 
 
@@ -83,14 +95,13 @@ ngAfterViewInit(): void {
 
 
 private tryStartSimulation(): void {
-  if (this.simulationStarted || this.isRunning) return;  // 🛑 prevent restart if already running
-
-  if (this.pickupLocation && this.dropoffLocation) {
+    if (this.simulationStarted || !this.pickupLocation || !this.dropoffLocation) return;
     this.simulationStarted = true;
     this.center = this.pickupLocation;
-    this.startSimulation();
+    if (this.role === 'driver') {
+      this.startSimulation();
+    }
   }
-}
 
 
 
@@ -135,6 +146,9 @@ private startInterval(): void {
         this.markerPosition = this.routePath[this.progress];
         const remaining = this.routePath.length - 1 - this.progress;
         this.eta = Math.round(remaining * intervalTime / 1000);
+         if (this.role === 'driver') {
+          this.rideSocketService.sendPositionUpdate(this.rideId, this.markerPosition);
+        }
       } else {
         this.stopSimulation();
       }
@@ -153,7 +167,6 @@ private startInterval(): void {
     this.eta = 0;
     this.simulationStarted = false;   // ✅ allow restart again
     this.isRunning = false;
-    this.simulationStarted = false;
 
     this.dialog.open(RideRatingDialogComponent).afterClosed().subscribe(result => {
       if (result) {
