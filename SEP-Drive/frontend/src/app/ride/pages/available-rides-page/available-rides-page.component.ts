@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
-import {filter, switchMap, tap} from 'rxjs';
+import {filter, of, switchMap, tap} from 'rxjs';
 import {AuthService} from '../../../auth/auth.service';
 import {OfferService} from '../../services/offer.service';
 import {Location} from '../../models/location.model';
@@ -99,10 +99,18 @@ export class AvailableRidesPageComponent implements OnInit {
 
   loadRequests(){
     this.offerService.driverHasActiveOffer().pipe(
-      filter(driverHasActiveOffer => driverHasActiveOffer),
-      tap(()=> this.offerState = OfferState.OFFERED),
-      switchMap(() => this.offerService.driverGetRequestIdOfOffer()),
-      tap(requestIdOfOffer => this.requestIdOfOffer = requestIdOfOffer),
+      switchMap(driverHasActiveOffer => {
+        if (driverHasActiveOffer) {
+          this.offerState = OfferState.OFFERED;
+          return this.offerService.driverGetRequestIdOfOffer().pipe(
+            tap(requestId => this.requestIdOfOffer = requestId)
+          );
+        } else {
+          this.offerState = OfferState.NONE;
+          this.requestIdOfOffer = null;
+          return of([]);
+        }
+      })
     ).subscribe({
       error: err => console.log(err)
     });
