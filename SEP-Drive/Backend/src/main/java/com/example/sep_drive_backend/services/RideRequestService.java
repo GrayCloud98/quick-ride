@@ -4,6 +4,7 @@ import com.example.sep_drive_backend.constants.Ridestatus;
 import com.example.sep_drive_backend.constants.VehicleClassEnum;
 import com.example.sep_drive_backend.dto.RideOfferNotification;
 import com.example.sep_drive_backend.dto.RidesForDriversDTO;
+import com.example.sep_drive_backend.dto.SimulationUpdateDTO;
 import com.example.sep_drive_backend.models.*;
 import com.example.sep_drive_backend.repository.*;
 import jakarta.transaction.Transactional;
@@ -40,8 +41,7 @@ public class RideRequestService {
 
     @Autowired
     private RideOfferRepository rideOfferRepository;
-    @Autowired
-    private RideRequestRepository rideRequestRepository;
+
 
     public RideRequestService(RideRequestRepository repository, CustomerRepository customerRepository, DriverRepository driverRepository, RideOfferRepository rideOfferRepository) {
         this.repository = repository;
@@ -214,7 +214,7 @@ public class RideRequestService {
             }
         }
         rideOfferRepository.save(selectedOffer);
-        rideRequestRepository.save(rideRequest);
+        repository.save(rideRequest);
     }
 
     private static final double EARTH_RADIUS_KM = 6371.0;
@@ -233,7 +233,7 @@ public class RideRequestService {
     }
     @Transactional
     public void completeRide(Long rideId) {
-        RideRequest ride = rideRequestRepository.findById(rideId)
+        RideRequest ride = repository.findById(rideId)
                 .orElseThrow(() -> new RuntimeException("Ride not found"));
 
         if (ride.getStatus() == Ridestatus.COMPLETED)
@@ -258,7 +258,38 @@ public class RideRequestService {
 
         walletRepository.save(customerWallet);
         walletRepository.save(driverWallet);
-        rideRequestRepository.save(ride);
+        repository.save(ride);
     }
+    public void updateSimulation(Long rideId, SimulationUpdateDTO dto) {
+        RideRequest request = repository.findById(rideId)
+                .orElseThrow(() -> new NoSuchElementException("Ride not found"));
+
+        request.setCurrentLat(dto.getCurrentLat());
+        request.setCurrentLng(dto.getCurrentLng());
+        request.setSimulationSpeed(dto.getSimulationSpeed());
+        request.setStatus(dto.getStatus());
+
+
+        if (dto.getStatus() == Ridestatus.COMPLETED) {
+            finishRide(request);
+        }
+
+        repository.save(request);
+    }
+    public SimulationUpdateDTO getSimulationState(Long rideId) {
+        RideRequest request = repository.findById(rideId)
+                .orElseThrow(() -> new NoSuchElementException("Ride not found"));
+
+        SimulationUpdateDTO dto = new SimulationUpdateDTO();
+        dto.setCurrentLat(request.getCurrentLat());
+        dto.setCurrentLng(request.getCurrentLng());
+        dto.setSimulationSpeed(request.getSimulationSpeed());
+        dto.setStatus(request.getStatus());
+        return dto;
+    }
+    private void finishRide(RideRequest request) {
+        completeRide(request.getId());
+    }
+
 
 }

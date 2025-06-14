@@ -1,21 +1,36 @@
 package com.example.sep_drive_backend.dto;
 
+import com.example.sep_drive_backend.constants.Ridestatus;
+
 public class SimulationUpdateDTO {
-    private Long rideId;
-    private double progress;
-    private String status;
-    private int speedSeconds;
 
+    private Double currentLat;
+    private Double currentLng;
+    private Ridestatus status;
+    private Double simulationSpeed;
 
-    public Long getRideId() { return rideId; }
-    public void setRideId(Long rideId) { this.rideId = rideId; }
-
-    public double getProgress() { return progress; }
-    public void setProgress(double progress) { this.progress = progress; }
-
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-
-    public int getSpeedSeconds() { return speedSeconds; }
-    public void setSpeedSeconds(int speedSeconds) { this.speedSeconds = speedSeconds; }
+    public Double getCurrentLat() {
+        return currentLat;
+    }
+    public void setCurrentLat(Double currentLat) {
+        this.currentLat = currentLat;
+    }
+    public Double getCurrentLng() {
+        return currentLng;
+    }
+    public void setCurrentLng(Double currentLng) {
+        this.currentLng = currentLng;
+    }
+    public Ridestatus getStatus() {
+        return status;
+    }
+    public void setStatus(Ridestatus status) {
+        this.status = status;
+    }
+    public Double getSimulationSpeed() {
+        return simulationSpeed;
+    }
+    public void setSimulationSpeed(Double simulationSpeed) {
+        this.simulationSpeed = simulationSpeed;
+    }
 }

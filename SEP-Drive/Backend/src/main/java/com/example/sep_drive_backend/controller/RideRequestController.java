@@ -179,5 +179,18 @@ public class RideRequestController {
         boolean isDriverActive = rideRequestService.isDriverActive(username);
         return ResponseEntity.ok(isDriverActive);
     }
+    @PostMapping("/ride-request/{id}/simulation")
+    public ResponseEntity<Void> updateSimulationState(@PathVariable Long id,
+                                                      @RequestBody SimulationUpdateDTO dto) {
+        rideRequestService.updateSimulation(id, dto);
+        return ResponseEntity.ok().build();
+    }
+    @GetMapping("/ride-request/{id}/simulation")
+    public ResponseEntity<SimulationUpdateDTO> getSimulationState(@PathVariable Long id) {
+        SimulationUpdateDTO dto = rideRequestService.getSimulationState(id);
+        return ResponseEntity.ok(dto);
+    }
+
+
 
 }

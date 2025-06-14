@@ -54,6 +54,12 @@ public class RideRequest {
     @OneToOne
     @JoinColumn(name = "ride_offer_id")
     private RideOffer rideOffer;
+    @Column
+    private Double currentLat;
+
+    private Double simulationSpeed;
+    @Column
+    private Double currentLng;
 
     public RideOffer getRideOffer() {
         return rideOffer;
@@ -70,6 +76,25 @@ public class RideRequest {
     @Enumerated(EnumType.STRING)
     private VehicleClassEnum vehicleClass;
 
+    public Double getSimulationSpeed() {
+        return simulationSpeed;
+    }
+    public void setSimulationSpeed(Double simulationSpeed) {
+        this.simulationSpeed = simulationSpeed;
+    }
+    public Double getCurrentLat() {
+        return currentLat;
+    }
+
+    public void setCurrentLat(Double currentLat) {
+        this.currentLat = currentLat;
+    }
+    public Double getCurrentLng() {
+        return currentLng;
+    }
+    public void setCurrentLng(Double currentLng) {
+        this.currentLng = currentLng;
+    }
     public Customer getCustomer() {
         return customer;
     }
