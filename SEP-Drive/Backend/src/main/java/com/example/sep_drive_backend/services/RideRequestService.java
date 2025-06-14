@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 @Service
 public class RideRequestService {
 
-    private final RideRequestRepository repository;
     private final CustomerRepository customerRepository;
     private final DriverRepository driverRepository;
     private final NotificationService notificationService;
@@ -27,8 +26,7 @@ public class RideRequestService {
     private final RideRequestRepository rideRequestRepository;
 
     @Autowired
-    public RideRequestService(RideRequestRepository repository, CustomerRepository customerRepository, DriverRepository driverRepository, NotificationService notificationService, RideOfferRepository rideOfferRepository, RideRequestRepository rideRequestRepository) {
-        this.repository = repository;
+    public RideRequestService(CustomerRepository customerRepository, DriverRepository driverRepository, NotificationService notificationService, RideOfferRepository rideOfferRepository, RideRequestRepository rideRequestRepository) {
         this.customerRepository = customerRepository;
         this.driverRepository = driverRepository;
         this.notificationService = notificationService;
@@ -64,16 +62,16 @@ public class RideRequestService {
 
         customer.setActive(true);
         customerRepository.save(customer);
-        return repository.save(request);
+        return rideRequestRepository.save(request);
     }
 
     public RideRequest getActiveRideRequestForCustomer(String username) {
-        return repository.findByCustomerUsernameAndCustomerActiveTrue(username)
+        return rideRequestRepository.findByCustomerUsernameAndCustomerActiveTrue(username)
                 .orElseThrow(() -> new NoSuchElementException("No active ride request found for user: " + username));
     }
 
     public void deleteActiveRideRequest(String username) {
-        RideRequest request = repository.findByCustomerUsernameAndCustomerActiveTrue(username)
+        RideRequest request = rideRequestRepository.findByCustomerUsernameAndCustomerActiveTrue(username)
                 .orElseThrow(() -> new NoSuchElementException("No active ride request to delete"));
 
         List<RideOffer> offers = rideOfferRepository.findAllByRideRequest(request);
@@ -91,18 +89,18 @@ public class RideRequestService {
         Customer customer = request.getCustomer();
         customer.setActive(false);
         customerRepository.save(customer);
-        repository.delete(request);
+        rideRequestRepository.delete(request);
     }
 
     public boolean hasActiveRideRequest(String username) {
-        return repository.findByCustomerUsernameAndCustomerActiveTrue(username).isPresent();
+        return rideRequestRepository.findByCustomerUsernameAndCustomerActiveTrue(username).isPresent();
     }
     public boolean isCustomer(String username) {
         return customerRepository.findByUsername(username).isPresent();
     }
 
     public List<RidesForDriversDTO> getAllRideRequests(double driverLat, double driverLon) {
-        return repository.findAll().stream()
+        return rideRequestRepository.findAll().stream()
                 .map(r -> {
                     double distance = calculateDistance(
                             driverLat,
@@ -116,13 +114,13 @@ public class RideRequestService {
     }
 
     public RideOffer createRideOffer(Long rideRequestId, String driverUsername) {
-        RideRequest rideRequest = repository.findById(rideRequestId)
+        RideRequest rideRequest = rideRequestRepository.findById(rideRequestId)
                 .orElseThrow(() -> new NoSuchElementException("Ride request with id " + rideRequestId + " not found"));
 
         Driver driver = driverRepository.findByUsername(driverUsername)
                 .orElseThrow(() -> new NoSuchElementException("Driver with username " + driverUsername + " not found"));
 
-        if (Boolean.TRUE.equals(driver.getActive())) {
+        if (driver.getActive()) {
             throw new IllegalStateException("Driver already has an active offer.");
         }
 
