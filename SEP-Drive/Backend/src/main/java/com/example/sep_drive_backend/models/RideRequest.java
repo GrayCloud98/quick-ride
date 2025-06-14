@@ -31,6 +31,10 @@ public class RideRequest {
     @Column
     private String destinationAddress;
 
+    @Column
+    @Enumerated(EnumType.STRING)
+    private VehicleClassEnum vehicleClass;
+
     private Double destinationLatitude;
     private Double destinationLongitude;
     @Column
@@ -51,19 +55,8 @@ public class RideRequest {
     }
 
 
-    @Column
-    @Enumerated(EnumType.STRING)
-    private VehicleClassEnum vehicleClass;
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
-
     public RideRequest() {}
+
     public RideRequest(Long id, String startAddress, String startLocationName, String destinationLocationName, String destinationAddress, Double startLatitude, Double startLongitude, Double destinationLatitude, Double destinationLongitude, VehicleClassEnum vehicleClass, Customer customer , Double distance, Double duration, Double estimatedPrice) {
         this.id = id;
         this.startAddress = startAddress;
@@ -81,6 +74,14 @@ public class RideRequest {
         this.estimatedPrice = estimatedPrice;
     }
 
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;

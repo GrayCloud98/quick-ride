@@ -21,10 +21,9 @@ public class RidesForDriversDTO {
     private Double destinationLatitude;
     private Double destinationLongitude;
     private VehicleClassEnum requestedVehicleClass;
-    private Double distanceFromDriver;
 
 
-    public RidesForDriversDTO(RideRequest rideRequest, double distanceFromDriver) {
+    public RidesForDriversDTO(RideRequest rideRequest) {
         if (Objects.equals(rideRequest.getStartLocationName(), "My Location")) {
             this.startLocationName = "Customer's Location";
         }
@@ -43,7 +42,6 @@ public class RidesForDriversDTO {
         this.startLongitude = rideRequest.getStartLongitude();
         this.destinationLatitude = rideRequest.getDestinationLatitude();
         this.destinationLongitude = rideRequest.getDestinationLongitude();
-        this.distanceFromDriver = distanceFromDriver;
     }
 
 
@@ -109,14 +107,6 @@ public class RidesForDriversDTO {
 
     public void setDestinationLongitude(Double destinationLongitude) {
         this.destinationLongitude = destinationLongitude;
-    }
-
-    public Double getDistanceFromDriver() {
-        return distanceFromDriver;
-    }
-
-    public void setDistanceFromDriver(Double distanceFromDriver) {
-        this.distanceFromDriver = distanceFromDriver;
     }
 
     public Long getId() {

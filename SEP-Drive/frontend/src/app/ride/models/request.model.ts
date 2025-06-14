@@ -7,7 +7,7 @@ export interface Request {
   createdAt: string;
   customerName: string;
   customerRating: number;
-  driverToStartDistance: number;
+  driverToPickupDistance: number;
   desiredVehicleClass: VehicleClass;
   pickup: Location;
   dropoff: Location;
