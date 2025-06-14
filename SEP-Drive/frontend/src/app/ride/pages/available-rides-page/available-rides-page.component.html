@@ -1,5 +1,5 @@
 <div class="main-container" *ngIf="accessAllowed">
-  <div class="left-container">
+  <div class="left-container scroll">
     <select-location
       [label]="'My Position'"
       [placeholder]="'Train Station'"
@@ -11,7 +11,6 @@
 
     <h1 class="sort-header">Sort by</h1>
     <mat-radio-group  class="sort-group">
-
       <div *ngFor="let option of sortOptions" class="sort-option">
         <span class="sort-label">{{ option.label }}</span>
         <div class="radio-buttons">
@@ -29,11 +28,17 @@
           </mat-radio-button>
         </div>
       </div>
-
     </mat-radio-group>
+    <br>
+
+    <div class="button-container">
+      <button class="btn" mat-fab extended (click)="loadRequests()" [disabled]="!positionSet">
+        Refresh Requests
+      </button>
+    </div>
   </div>
 
-  <div class="right-container">
+  <div class="right-container scroll">
 
       <div class="centered-box req-card-container alert error" *ngIf="!positionSet">
         Please enter your position first.
@@ -49,7 +54,7 @@
           [request]="request"
           [offerState]="offerState"
           [RequestIdOfOffer]="requestIdOfOffer"
-          (onAccept)="acceptRequest(request.requestID)"
+          (onAccept)="sendOffer(request.requestID)"
           (onWithdraw)="withdrawOffer()"
         />
       </div>
@@ -58,6 +63,6 @@
 </div>
 
 
-<div *ngIf="!accessAllowed" class="centered-box alert error" style="width: 500px">
+<div *ngIf="!accessAllowed" class="mini centered-box alert error">
   Please log in as a Driver first.
 </div>
