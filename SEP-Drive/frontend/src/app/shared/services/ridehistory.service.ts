@@ -8,7 +8,7 @@ export interface TripHistoryDTO {
   date: string;
   distance: number;
   duration: string;
-  amount: number;
+  money: number;
   customerRating: number;
   driverRating: number;
   customerName: string;
@@ -37,7 +37,7 @@ export class RideHistoryService {
           date: ride.endTime,
           distance: ride.distanceKm,
           duration: ride.durationMin,
-          amount: ride.priceEuro,
+          money: ride.priceEuro,
           customerRating: ride.customerRating,
           driverRating: ride.driverRating,
           customerName: ride.customerFullName,

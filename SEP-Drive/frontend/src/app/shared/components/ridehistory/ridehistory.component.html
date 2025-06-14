@@ -11,41 +11,6 @@
 
 <div class="table-outer">
     <div class="table-card">
-        <!-- Tabelle wird nur angezeigt, wenn Daten vorhanden -->
-        <table mat-table [dataSource]="dataSource" matSort *ngIf="!loading && dataSource.filteredData.length > 0">
-            <!-- Dynamisch alle Spalten, je nach Rolle -->
-            <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
-                <th mat-header-cell *matHeaderCellDef>{{ getColumnHeader(column) }}</th>
-                <td mat-cell *matCellDef="let row">
-                    <ng-container [ngSwitch]="column">
-                        <!-- Fahrer-Avatar und Name -->
-                        <span *ngSwitchCase="'driverName'">
-              <img *ngIf="row.driverAvatar" [src]="row.driverAvatar" class="avatar" alt="" />
-                            {{ row.driverName }}
-            </span>
-                        <!-- Kunden-Avatar und Name -->
-                        <span *ngSwitchCase="'customerName'">
-              <img *ngIf="row.customerAvatar" [src]="row.customerAvatar" class="avatar" alt="" />
-                            {{ row.customerName }}
-            </span>
-                        <!-- Bewertung Fahrer -->
-                        <span *ngSwitchCase="'driverRating'">
-              {{ row.driverRating }} <span class="star">&#9733;</span>
-            </span>
-                        <!-- Bewertung Kunde -->
-                        <span *ngSwitchCase="'customerRating'">
-              {{ row.customerRating }} <span class="star">&#9733;</span>
-            </span>
-                        <!-- Standardanzeige für andere Spalten -->
-                        <span *ngSwitchDefault>
-              {{ row[column] }}
-            </span>
-                    </ng-container>
-                </td>
-            </ng-container>
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
 
         <!-- Ladeanzeige -->
         <div *ngIf="loading" class="loading-message">
@@ -53,19 +18,63 @@
             <div>Fahrthistorie wird geladen...</div>
         </div>
 
+        <!-- Fehleranzeige -->
+        <div *ngIf="error && !loading" class="error-message">
+            <mat-icon color="warn">error_outline</mat-icon>
+            <span>{{ error }}</span>
+        </div>
+
+        <!-- Tabelle -->
+        <table mat-table [dataSource]="dataSource" matSort *ngIf="!loading && !error && dataSource.filteredData.length > 0">
+            <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
+                <th mat-header-cell *matHeaderCellDef>{{ getColumnHeader(column) }}</th>
+                <td mat-cell *matCellDef="let row">
+                    <ng-container [ngSwitch]="column">
+
+                        <!-- Fahrer-Avatar und Name -->
+                        <span *ngSwitchCase="'driverName'">
+                            <img *ngIf="row.driverAvatar" [src]="row.driverAvatar" class="avatar" alt="" />
+                            {{ row.driverName }}
+                        </span>
+
+                        <!-- Kunden-Avatar und Name -->
+                        <span *ngSwitchCase="'customerName'">
+                            <img *ngIf="row.customerAvatar" [src]="row.customerAvatar" class="avatar" alt="" />
+                            {{ row.customerName }}
+                        </span>
+
+                        <!-- Bewertung Fahrer -->
+                        <span *ngSwitchCase="'driverRating'">
+                            {{ row.driverRating }} <span class="star">&#9733;</span>
+                        </span>
+
+                        <!-- Bewertung Kunde -->
+                        <span *ngSwitchCase="'customerRating'">
+                            {{ row.customerRating }} <span class="star">&#9733;</span>
+                        </span>
+
+                        <!-- Geld-Spalte (amount) -->
+                        <span *ngSwitchCase="'money'">
+                            {{ row.money | number:'1.2-2' }} €
+                        </span>
+
+                        <span *ngSwitchDefault>
+                            {{ row[column] }}
+                        </span>
+
+                    </ng-container>
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
         <!-- Keine Ergebnisse -->
-        <div *ngIf="!loading && dataSource.filteredData.length === 0" class="no-results-message">
+        <div *ngIf="!loading && !error && dataSource.filteredData.length === 0" class="no-results-message">
             <div style="font-size:2.4rem; margin-bottom:0.5rem;">🚗</div>
             <mat-icon>directions_car</mat-icon>
             <span>Keine Fahrten gefunden.</span>
             <div class="no-results-sub">Prüfe deine Suche oder versuche es später erneut.</div>
         </div>
-
-        <!-- Fehleranzeige -->
-        <div *ngIf="error" class="error-message">
-            <mat-icon color="warn">error_outline</mat-icon>
-            <span>{{error}}</span>
-        </div>
     </div>
 </div>
-
