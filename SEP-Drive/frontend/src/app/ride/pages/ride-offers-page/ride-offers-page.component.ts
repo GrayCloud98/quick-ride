@@ -5,6 +5,7 @@ import {Offer} from '../../models/offer.model';
 import {filter, switchMap, tap} from 'rxjs';
 import {RideRequestService} from '../../services/ride-request.service';
 import {Router} from '@angular/router';
+import { Ride } from '../../models/ride.model';
 
 
 interface SortOption {
@@ -35,18 +36,24 @@ export class RideOffersPageComponent implements OnInit {
               private offerService: OfferService,
               private router: Router) {}
 
-  acceptOffer(offerID: number) {
+ acceptOffer(offerID: number) {
   this.offerService.customerAcceptOffer(offerID).subscribe({
-    next: (ride: any) => {
-      // assuming `ride.id` is returned in the response
-      this.router.navigate(['/simulation'], {
-        queryParams: {
-          role: 'driver',
-          rideId: ride.id
-        }
+    next: () => {
+      this.rideService.getAcceptedRideDetails().subscribe({
+        next: (ride: Ride) => {
+          this.router.navigate(['/simulation'], {
+            queryParams: {
+              role: 'driver',
+              rideId: ride.id
+            }
+          });
+        },
+        error: err => console.error('❌ Failed to load accepted ride:', err)
       });
     },
-    error: err => console.error(err)
+    error: err => {
+      console.error('❌ Accept offer failed:', err);
+    }
   });
 }
 
