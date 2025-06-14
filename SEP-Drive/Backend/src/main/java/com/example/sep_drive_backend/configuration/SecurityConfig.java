@@ -35,11 +35,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth
                             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                            .requestMatchers("/", "/home", "/h2-console/**", "/api/auth/**", "/uploads/**", "/ws/**").permitAll()
+                            .requestMatchers("/", "/home", "/h2-console/**", "/api/auth/**", "/uploads/**", "/ws/**","/api/trips/complete").permitAll()
                             .anyRequest().authenticated();
                 })
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/h2-console/**", "/api/auth/**", "/api/ride-requests/**", "/api/wallet/**")
+                        .ignoringRequestMatchers("/h2-console/**", "/api/auth/**", "/api/ride-requests/**", "/api/wallet/**", "/api/trips/complete")
                 )
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
                 .formLogin(form -> form.disable())
