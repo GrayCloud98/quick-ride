@@ -56,7 +56,7 @@ export class OfferService {
     );
   }
 
-  public driverAcceptRequest(requestID: number) {
+  public driverSendOffer(requestID: number) {
     const params = {rideRequestId: requestID};
     return this.http.post(this.baseUrl + '/offer-ride', null, {params});
   }

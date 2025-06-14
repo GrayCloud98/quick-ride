@@ -51,8 +51,8 @@ export class AvailableRidesPageComponent implements OnInit {
     this.positionSet = true;
   }
 
-  acceptRequest(requestID: number) {
-    this.offerService.driverAcceptRequest(requestID).subscribe({
+  sendOffer(requestID: number) {
+    this.offerService.driverSendOffer(requestID).subscribe({
       next: (response: any) => this.requestIdOfOffer = response.rideRequest.id,
       error: err => console.log(err)
     })
