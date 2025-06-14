@@ -8,9 +8,11 @@ import com.example.sep_drive_backend.models.RideRequest;
 import com.example.sep_drive_backend.repository.RideOfferRepository;
 import com.example.sep_drive_backend.services.RideRequestService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -190,6 +192,15 @@ public class RideRequestController {
         SimulationUpdateDTO dto = rideRequestService.getSimulationState(id);
         return ResponseEntity.ok(dto);
     }
+    @GetMapping("/rides/accepted")
+    public ResponseEntity<AcceptedRideDetailsDTO> getAcceptedRideDetails(HttpServletRequest request) {
+        String token = jwtTokenProvider.resolveToken(request);
+        String username = jwtTokenProvider.getUsername(token);
+
+        AcceptedRideDetailsDTO rideDetails = rideRequestService.getAcceptedRideDetails(username);
+        return ResponseEntity.ok(rideDetails);
+    }
+
 
 
 

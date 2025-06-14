@@ -2,18 +2,13 @@ package com.example.sep_drive_backend.services;
 
 import com.example.sep_drive_backend.constants.Ridestatus;
 import com.example.sep_drive_backend.constants.VehicleClassEnum;
-import com.example.sep_drive_backend.dto.RideOfferNotification;
-import com.example.sep_drive_backend.dto.RidesForDriversDTO;
-import com.example.sep_drive_backend.dto.SimulationUpdateDTO;
+import com.example.sep_drive_backend.dto.*;
 import com.example.sep_drive_backend.models.*;
 import com.example.sep_drive_backend.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import com.example.sep_drive_backend.dto.RideRequestDTO;
-
-
 
 
 import java.util.List;
@@ -289,6 +284,55 @@ public class RideRequestService {
     }
     private void finishRide(RideRequest request) {
         completeRide(request.getId());
+    }
+    public AcceptedRideDetailsDTO getAcceptedRideDetails(String username) {
+        RideRequest ride = null;
+
+        Optional<Customer> customerOpt = customerRepository.findByUsername(username);
+        if (customerOpt.isPresent()) {
+            ride = repository.findByCustomerUsernameAndCustomerActiveTrue(username)
+                    .orElseThrow(() -> new NoSuchElementException("No active ride for this customer"));
+        } else {
+            Optional<Driver> driverOpt = driverRepository.findByUsername(username);
+            if (driverOpt.isPresent()) {
+                Driver driver = driverOpt.get();
+                RideOffer offer = rideOfferRepository.findByDriver(driver)
+                        .orElseThrow(() -> new NoSuchElementException("No offer made by this driver"));
+                ride = offer.getRideRequest();
+                if (ride.getStatus() != Ridestatus.IN_PROGRESS) {
+                    throw new NoSuchElementException("Ride is not accepted yet");
+                }
+            } else {
+                throw new NoSuchElementException("User not found as customer or driver");
+            }
+        }
+
+        AcceptedRideDetailsDTO dto = new AcceptedRideDetailsDTO();
+        dto.setRideId(ride.getId());
+        dto.setStatus(Ridestatus.valueOf(ride.getStatus().name()));
+
+        dto.setStartLat(ride.getStartLatitude());
+        dto.setStartLng(ride.getStartLongitude());
+        dto.setDestLat(ride.getDestinationLatitude());
+        dto.setDestLng(ride.getDestinationLongitude());
+
+        dto.setCurrentLat(ride.getCurrentLat());
+        dto.setCurrentLng(ride.getCurrentLng());
+        dto.setSimulationSpeed(ride.getSimulationSpeed());
+        dto.setEstimatedPrice(ride.getEstimatedPrice());
+
+        dto.setCustomerUsername(ride.getCustomer().getUsername());
+
+        RideOffer offer = ride.getRideOffer();
+        if (offer != null && offer.getDriver() != null) {
+            Driver driver = offer.getDriver();
+            dto.setDriverUsername(driver.getUsername());
+            dto.setDriverFullName(driver.getFirstName() + " " + driver.getLastName());
+            dto.setVehicleClass(VehicleClassEnum.valueOf(driver.getVehicleClass().name()));
+            dto.setDriverRating((double) driver.getRating());
+        }
+
+        return dto;
     }
 
 
