@@ -35,20 +35,8 @@ export class RideOffersPageComponent implements OnInit {
               private router: Router) {}
 
   acceptOffer(offerID: number) {
-    this.offerService.customerAcceptOffer(offerID).pipe(
-      switchMap(() => this.rideService.getRide())
-    ).subscribe({
-      next: ride => {
-        const { pickup, dropoff } = ride;
-        void this.router.navigate(['/simulation'], {
-          queryParams: {
-            pickupLat: pickup.latitude,
-            pickupLng: pickup.longitude,
-            dropoffLat: dropoff.latitude,
-            dropoffLng: dropoff.longitude
-          }
-        });
-      },
+    this.offerService.customerAcceptOffer(offerID).subscribe({
+      next: () => void this.router.navigate(['/simulation']),
       error: err => console.error(err)
     });
   }
