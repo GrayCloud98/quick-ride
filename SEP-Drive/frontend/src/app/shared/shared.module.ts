@@ -21,6 +21,7 @@ import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import { UserNotFoundComponent } from './components/user-not-found/user-not-found.component';
 import { RidehistoryComponent } from './components/ridehistory/ridehistory.component';
 import { MatSortModule } from '@angular/material/sort';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import {
   MatCell,
   MatCellDef,
@@ -78,6 +79,7 @@ import {
     MatHeaderRow,
     MatRowDef,
     MatHeaderRowDef,
+    MatProgressSpinnerModule
   ],
   exports: [
     ButtonComponent,
