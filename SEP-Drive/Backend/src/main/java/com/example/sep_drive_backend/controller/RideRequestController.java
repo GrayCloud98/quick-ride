@@ -8,11 +8,9 @@ import com.example.sep_drive_backend.models.RideRequest;
 import com.example.sep_drive_backend.repository.RideOfferRepository;
 import com.example.sep_drive_backend.services.RideRequestService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
