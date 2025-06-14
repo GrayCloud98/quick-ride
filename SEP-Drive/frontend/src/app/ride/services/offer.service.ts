@@ -12,20 +12,16 @@ export class OfferService {
   baseUrl = 'http://localhost:8080/api/ride-requests';
   constructor(private http: HttpClient) { }
 
-  public getAllActiveRequests(driverLat: number, driverLon: number): Observable<Request[]>{
-    const body = {
-      driverLat: driverLat,
-      driverLon: driverLon
-    }
+  public getAllActiveRequests(): Observable<Request[]>{
 
-    return this.http.post<Request[]>(this.baseUrl + '/all-active-rides', body).pipe(
+    return this.http.get<Request[]>(this.baseUrl + '/all-active-rides').pipe(
       map((response: any[]) => response.map(
         (request: any) => ({
           requestID: request.id,
           createdAt: request.createdAt,
           customerName: request.customerName,
           customerRating: request.customerRating,
-          driverToStartDistance: request.distanceFromDriver,
+          driverToPickupDistance: 0,
           desiredVehicleClass: request.requestedVehicleClass,
           pickup: {
             latitude: request.startLatitude,

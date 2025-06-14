@@ -6,6 +6,7 @@ import {OfferService} from '../../services/offer.service';
 import {Location} from '../../models/location.model';
 import {Request} from '../../models/request.model';
 import {OfferState} from '../../models/offer.model';
+import {DistanceService} from '../../services/distance.service';
 
 interface SortOption {
   key: keyof Request,
@@ -27,7 +28,7 @@ export class AvailableRidesPageComponent implements OnInit {
 
   allActiveRequests: Request[] = [];
   sortOptions: SortOption[] = [
-    { key: 'driverToStartDistance', label: 'Distance to Pickup' },
+    { key: 'driverToPickupDistance', label: 'Distance to Pickup' },
     { key: 'desiredVehicleClass', label: 'Requested Vehicle Type' },
     { key: 'customerName', label: 'Customer Name' },
     { key: 'customerRating', label: 'Customer Rating' },
@@ -39,7 +40,8 @@ export class AvailableRidesPageComponent implements OnInit {
   requestIdOfOffer: number | null = null;
 
   constructor(private offerService: OfferService,
-              private authService: AuthService) {
+              private authService: AuthService,
+              private distanceService: DistanceService,) {
   }
 
   onLocationSelected(pos: Location) {
@@ -105,9 +107,23 @@ export class AvailableRidesPageComponent implements OnInit {
       error: err => console.log(err)
     });
 
-    this.offerService.getAllActiveRequests(this.currentPosition.latitude,this.currentPosition.longitude).subscribe({
-      next: result => this.allActiveRequests = result,
+    this.offerService.getAllActiveRequests().subscribe({
+      next: result => {
+        this.allActiveRequests = result;
+
+        this.allActiveRequests.forEach(
+          request => {
+            this.distanceService.getDistanceDurationAndPrice(
+              { lat: this.currentPosition.latitude, lng: this.currentPosition.longitude },
+              { lat: request.pickup.latitude, lng: request.pickup.longitude },
+              request.desiredVehicleClass
+            ).then(res => {
+              request.driverToPickupDistance = res.distance;
+            }).catch(err => console.error('Google Distance API error', err));
+          }
+        );
+      },
       error: err => console.log(err)
-    })
+    });
   }
 }
