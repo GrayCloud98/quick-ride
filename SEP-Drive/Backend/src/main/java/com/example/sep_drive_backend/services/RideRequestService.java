@@ -1,8 +1,4 @@
 package com.example.sep_drive_backend.services;
-
-import com.example.sep_drive_backend.dto.NotificationMessage;
-import com.example.sep_drive_backend.constants.VehicleClassEnum;
-import com.example.sep_drive_backend.dto.RideOfferNotification;
 import com.example.sep_drive_backend.dto.RidesForDriversDTO;
 import com.example.sep_drive_backend.models.Customer;
 import com.example.sep_drive_backend.models.Driver;
@@ -12,8 +8,6 @@ import com.example.sep_drive_backend.repository.CustomerRepository;
 import com.example.sep_drive_backend.repository.DriverRepository;
 import com.example.sep_drive_backend.repository.RideOfferRepository;
 import com.example.sep_drive_backend.repository.RideRequestRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import com.example.sep_drive_backend.dto.RideRequestDTO;
 
@@ -28,36 +22,28 @@ import java.util.stream.Collectors;
 @Service
 public class RideRequestService {
 
-
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
-
-    @Autowired
     private final RideRequestRepository repository;
-
-    @Autowired
     private final CustomerRepository customerRepository;
-
-    @Autowired
     private final DriverRepository driverRepository;
+    private final NotificationService notificationService;
+    private final RideOfferRepository rideOfferRepository;
+    private final RideRequestRepository rideRequestRepository;
 
-    @Autowired
-    private RideOfferRepository rideOfferRepository;
-    @Autowired
-    private RideRequestRepository rideRequestRepository;
 
-    public RideRequestService(RideRequestRepository repository, CustomerRepository customerRepository, DriverRepository driverRepository, RideOfferRepository rideOfferRepository) {
+    public RideRequestService(RideRequestRepository repository, CustomerRepository customerRepository, DriverRepository driverRepository, NotificationService notificationService, RideOfferRepository rideOfferRepository, RideRequestRepository rideRequestRepository) {
         this.repository = repository;
         this.customerRepository = customerRepository;
         this.driverRepository = driverRepository;
+        this.notificationService = notificationService;
         this.rideOfferRepository = rideOfferRepository;
+        this.rideRequestRepository = rideRequestRepository;
     }
 
 
     public RideRequest createRideRequest(RideRequestDTO dto) {
         Optional<Customer> customerOptional = customerRepository.findByUsername(dto.getUserName());
 
-        if (!customerOptional.isPresent()) {
+        if (customerOptional.isEmpty()) {
             throw new IllegalArgumentException("Customer with username " + dto.getUserName() + " not found");
         }
 
@@ -103,7 +89,7 @@ public class RideRequestService {
             if (driver != null) {
                 driver.setActive(false);
                 driverRepository.save(driver);
-                sendRejectionNotification(driver.getUsername());
+                notificationService.sendRejectionNotification(driver.getUsername());
             }
         }
 
@@ -137,7 +123,6 @@ public class RideRequestService {
 
         Optional<RideRequest> rideRequestOptional = repository.findById(rideRequestId);
         RideRequest rideRequest = rideRequestOptional.orElseThrow(() -> new NoSuchElementException("Ride request with id " + rideRequestId + " not found"));
-        Customer customer = rideRequest.getCustomer();
         Optional<Driver> driverOptional = driverRepository.findByUsername(driverUsername);
         Driver driver = driverOptional.orElseThrow(() -> new NoSuchElementException("Driver with username " + driverUsername + " not found"));
         if (!driver.getActive()) {
@@ -147,19 +132,7 @@ public class RideRequestService {
             driver.setActive(true);
             driverRepository.save(driver);
             RideOffer savedOffer = rideOfferRepository.save(rideOffer);
-
-            RideOfferNotification notification = new RideOfferNotification();
-            notification.setMessage("A driver wants to take your ride!");
-            notification.setDriverName(driver.getFirstName() + " " + driver.getLastName());
-            notification.setDriverRating(driver.getRating());
-            notification.setTotalRides(driver.getTotalRides());
-            notification.setTotalTravelledDistance(0);
-            notification.setVehicleClass(driver.getVehicleClass());
-
-            String customerUsername = rideRequest.getCustomer().getUsername();
-
-            messagingTemplate.convertAndSend("/topic/customer/" + customerUsername, notification);
-            System.out.println("Notification sent to customer " + customerUsername);
+            notificationService.sendOfferNotification(driver, rideRequest);
             return savedOffer;
         } else {
             return null;
@@ -194,7 +167,7 @@ public class RideRequestService {
             if (driver != null) {
                 driver.setActive(false);
                 driverRepository.save(driver);
-                sendRejectionNotification(driver.getUsername());
+                notificationService.sendRejectionNotification(driver.getUsername());
             }
         } else {
             System.out.println("Ride offer not found.");
@@ -204,7 +177,7 @@ public class RideRequestService {
     public void cancelOffer(String username) {
         Optional<Driver> driverOptional = driverRepository.findByUsername(username);
 
-        if (!driverOptional.isPresent()) {
+        if (driverOptional.isEmpty()) {
             System.out.println("Driver not found for username: " + username);
             return;
         }
@@ -213,14 +186,14 @@ public class RideRequestService {
 
         Optional<RideOffer> rideOfferOptional = rideOfferRepository.findByDriver(driver);
 
-        if (!rideOfferOptional.isPresent()) {
+        if (rideOfferOptional.isEmpty()) {
             System.out.println("No RideOffer found for driver: " + username);
             return;
         }
 
         RideOffer rideOffer = rideOfferOptional.get();
 
-        sendCancelledNotification(rideOffer.getRideRequest().getCustomer().getUsername());
+        notificationService.sendCancelledNotification(rideOffer.getRideRequest().getCustomer().getUsername());
         System.out.println("Cancelling offer for driver: " + username);
         rideOfferRepository.delete(rideOffer);
 
@@ -243,36 +216,15 @@ public class RideRequestService {
                 Driver driver = offer.getDriver();
                 driver.setActive(false);
                 driverRepository.save(driver);
-                sendRejectionNotification(driver.getUsername());
+                notificationService.sendAcceptNotification(driver.getUsername());
             }
         }
         rideOfferRepository.save(selectedOffer);
         rideRequestRepository.save(rideRequest);
-        sendRejectionNotification(selectedOffer.getDriver().getUsername());
+        notificationService.sendRejectionNotification(selectedOffer.getDriver().getUsername());
     }
 
 
-    private void sendRejectionNotification(String username) {
-        NotificationMessage message = new NotificationMessage(
-                "rejection",
-                "Your Ride Offer was rejected, you can now create new Ride Offers",
-                "REJECTED",
-                null
-        );
-        messagingTemplate.convertAndSend("/topic/driver/" + username, message);
-        System.out.println("Rejection notification sent to " + username);
-    }
-
-    private void sendCancelledNotification(String username) {
-        NotificationMessage message = new NotificationMessage(
-                "cancellation",
-                "Offer for your RideRequest was cancelled",
-                null,
-                null
-        );
-        messagingTemplate.convertAndSend("/topic/customer/" + username, message);
-        System.out.println("Cancellation notification sent to " + username);
-    }
 
 
     private static final double EARTH_RADIUS_KM = 6371.0;
