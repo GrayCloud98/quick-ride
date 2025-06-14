@@ -7,6 +7,8 @@ import {Location} from '../../models/location.model';
 import {Request} from '../../models/request.model';
 import {OfferState} from '../../models/offer.model';
 import {DistanceService} from '../../services/distance.service';
+import { Router } from '@angular/router';
+import { RideSocketService } from '../../services/ride-socket.service'; // correct path
 
 interface SortOption {
   key: keyof Request,
@@ -41,7 +43,9 @@ export class AvailableRidesPageComponent implements OnInit {
 
   constructor(private offerService: OfferService,
               private authService: AuthService,
-              private distanceService: DistanceService,) {
+              private distanceService: DistanceService,
+              private router: Router,
+              private rideSocketService: RideSocketService) {
   }
 
   onLocationSelected(pos: Location) {
@@ -87,15 +91,35 @@ export class AvailableRidesPageComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.authService.currentUser.pipe(
-      filter(user => !!user?.username),
-      tap(user => this.username = user!.username!),
-      switchMap(() => this.authService.isCustomer()),
-      tap(isCustomer => this.accessAllowed = !isCustomer)
-    ).subscribe({
-      error: err => console.log(err)
-    })
-  }
+  this.authService.currentUser.pipe(
+    filter(user => !!user?.username),
+    tap(user => this.username = user!.username!),
+    switchMap(() => this.authService.isCustomer()),
+    tap(isCustomer => this.accessAllowed = !isCustomer)
+  ).subscribe({
+    error: err => console.log(err)
+  });
+
+  // ✅ Connect WebSocket and subscribe to ride acceptance for synchronization
+  this.rideSocketService.connect();
+
+  this.offerService.driverGetRequestIdOfOffer().subscribe(rideRequestId => {
+    if (rideRequestId) {
+      this.rideSocketService.subscribeToRideAccepted(rideRequestId);
+
+      this.rideSocketService.acceptedRide$.subscribe(() => {
+        console.log("🚦 Driver notified: Ride accepted by customer");
+        this.router.navigate(['/simulation'], {
+          queryParams: {
+            rideId: rideRequestId,
+            role: 'driver'
+          }
+        });
+      });
+    }
+  });
+}
+
 
   loadRequests(){
     this.offerService.driverHasActiveOffer().pipe(

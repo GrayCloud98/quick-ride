@@ -182,6 +182,8 @@ public class RideRequestService {
         driverRepository.save(driver);
     }
 
+    // === Backend: RideRequestService.java (Only update acceptRideOffer method) ===
+
     public void acceptRideOffer(Long rideOfferId, String customerUsername) {
         RideOffer selectedOffer = rideOfferRepository.findById(rideOfferId)
                 .orElseThrow(() -> new RuntimeException("Offer not found"));
@@ -190,19 +192,28 @@ public class RideRequestService {
         if (!rideRequest.getCustomer().getUsername().equals(customerUsername)) {
             throw new RuntimeException("User not authorized to accept this offer");
         }
+
         List<RideOffer> allOffers = rideOfferRepository.findAllByRideRequest(rideRequest);
         for (RideOffer offer : allOffers) {
             if (!offer.getId().equals(rideOfferId)) {
                 rideOfferRepository.delete(offer);
-                rideRequest.setStatus(Ridestatus.IN_PROGRESS);
                 Driver driver = offer.getDriver();
                 driver.setActive(false);
                 driverRepository.save(driver);
             }
         }
+
+        // Set accepted offer
+        rideRequest.setRideOffer(selectedOffer);
+        rideRequest.setStatus(Ridestatus.IN_PROGRESS);
+
         rideOfferRepository.save(selectedOffer);
         repository.save(rideRequest);
+
+        // Notify both parties that the ride has started
+        messagingTemplate.convertAndSend("/topic/ride/" + rideRequest.getId() + "/accepted", "Ride accepted by customer");
     }
+
 
     private static final double EARTH_RADIUS_KM = 6371.0;
 

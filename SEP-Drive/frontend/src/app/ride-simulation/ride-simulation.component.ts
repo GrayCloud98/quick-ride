@@ -43,11 +43,13 @@ private simulationStarted = false;
 constructor(private dialog: MatDialog, private rideStateService: RideStateService, private activatedRoute: ActivatedRoute, private rideSocketService: RideSocketService,
             private rideService: RideRequestService) { }
 
+
 ngOnInit(): void {
   this.directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
 
   this.activatedRoute.queryParams.subscribe(params => {
     this.role = params['role'] === 'customer' ? 'customer' : 'driver';
+    this.rideId = params['rideId']; // ✅ fix: extract rideId FIRST
 
     const rideObservable = this.role === 'driver'
       ? this.rideService.getAcceptedRideDetails()
@@ -58,7 +60,7 @@ ngOnInit(): void {
         this.handleRideData(data);
 
         if (this.role === 'customer') {
-          this.rideSocketService.subscribeToRide(this.rideId);
+          this.rideSocketService.subscribeToRide(this.rideId); // ✅ now it's defined
           this.rideSocketService.position$.subscribe(position => {
             if (position) this.markerPosition = position;
           });
@@ -67,52 +69,49 @@ ngOnInit(): void {
       error: err => console.error('Failed to load ride data:', err)
     });
   });
-
-  // Live updates from RideStateService (optional)
-  this.rideStateService.pickupLocation$.subscribe(pickup => {
-    this.pickupLocation = pickup;
-    this.tryStartSimulation();
-  });
-
-  this.rideStateService.dropoffLocation$.subscribe(dropoff => {
-    this.dropoffLocation = dropoff;
-    this.tryStartSimulation();
-  });
 }
-
 
 
 
 ngAfterViewInit(): void {
-  setTimeout(() => {
+  const checkMapReady = setInterval(() => {
     if (this.mapComponent?.googleMap) {
       this.map = this.mapComponent.googleMap;
       this.directionsRenderer.setMap(this.map);
-      console.log('✅ Map is ready:', this.map);
+      console.log('✅ Google Map initialized and renderer set');
 
       if (this.directionsResult) {
         this.directionsRenderer.setDirections(this.directionsResult);
+        console.log('✅ DirectionsRenderer applied after init');
       }
+
+      clearInterval(checkMapReady); // Cleanup
     }
-  });
+  }, 200);
 }
 
 
+
 private tryStartSimulation(): void {
-    if (this.simulationStarted || !this.pickupLocation || !this.dropoffLocation) return;
+    console.log('⏳ tryStartSimulation');
+    if (this.simulationStarted || !this.pickupLocation || !this.dropoffLocation) {
+      console.warn('❌ Cannot start simulation. Missing data.');
+      return;
+    }
+
     this.simulationStarted = true;
     this.center = this.pickupLocation;
-    if (this.role === 'driver') {
-      this.startSimulation();
-    }
+    this.startSimulation(); // for both roles
   }
 
 
 
-startSimulation(): void {
-    if (this.isRunning || !this.pickupLocation || !this.dropoffLocation) return;
 
-    this.isRunning = true;
+startSimulation(): void {
+    if (!this.pickupLocation || !this.dropoffLocation) {
+      console.error('❌ Missing pickup/dropoff:', this.pickupLocation, this.dropoffLocation);
+      return;
+    }
 
     const directionsService = new google.maps.DirectionsService();
 
@@ -121,23 +120,25 @@ startSimulation(): void {
       destination: this.dropoffLocation,
       travelMode: google.maps.TravelMode.DRIVING
     }).then(result => {
+      console.log('✅ Directions loaded:', result);
+      this.directionsResult = result;
+
       const path = result.routes[0].overview_path;
       this.routePath = path.map(p => ({ lat: p.lat(), lng: p.lng() }));
       this.markerPosition = this.routePath[0];
-      this.progress = 0;
 
-      this.directionsResult = result; // ✅ Store result
-      this.directionsRenderer.setDirections(result); // ✅ apply to map if ready
-
+      if (this.map) {
+        this.directionsRenderer.setMap(this.map);
+        this.directionsRenderer.setDirections(result);
+      }
 
       this.startInterval();
     }).catch(error => {
-      this.isRunning = false;
-      console.error('Directions request failed:', error);
+      console.error('❌ Directions API failed:', error);
     });
   }
 
-private startInterval(): void {
+  private startInterval(): void {
     if (this.routePath.length < 2) return;
 
     const intervalTime = (this.speed * 1000) / (this.routePath.length - 1);
@@ -148,9 +149,11 @@ private startInterval(): void {
       if (this.progress < this.routePath.length - 1) {
         this.progress++;
         this.markerPosition = this.routePath[this.progress];
+
         const remaining = this.routePath.length - 1 - this.progress;
         this.eta = Math.round(remaining * intervalTime / 1000);
-         if (this.role === 'driver') {
+
+        if (this.role === 'driver') {
           this.rideSocketService.sendPositionUpdate(this.rideId, this.markerPosition);
         }
       } else {
@@ -169,23 +172,21 @@ private startInterval(): void {
     this.progress = 0;
     this.markerPosition = this.routePath.length > 0 ? this.routePath[0] : { lat: 0, lng: 0 };
     this.eta = 0;
-    this.simulationStarted = false;   // ✅ allow restart again
+    this.simulationStarted = false;
     this.isRunning = false;
 
     this.dialog.open(RideRatingDialogComponent).afterClosed().subscribe(result => {
       if (result) {
-        console.log('User rated the ride:', result.rating);
-        console.log('Feedback:', result.feedback);
-        // TODO: send to backend or confirmation logic
+        console.log('🟢 Ride rated:', result.rating, result.feedback);
       }
     });
   }
 
   onSpeedChange(value: number): void {
     this.speed = Number(value);
-    if (this.isRunning && this.routePath.length > 1 ) {
+    if (this.isRunning && this.routePath.length > 1) {
       this.pauseSimulation();
-      this.startSimulation(); // Restart at new speed
+      this.startSimulation();
     }
   }
 
@@ -201,15 +202,18 @@ private startInterval(): void {
   }
 
   private handleRideData(ride: Ride): void {
-  this.pickupLocation = {
-    lat: ride.pickup.latitude,
-    lng: ride.pickup.longitude
-  };
-  this.dropoffLocation = {
-    lat: ride.dropoff.latitude,
-    lng: ride.dropoff.longitude
-  };
-  this.tryStartSimulation();
-}
+    console.log('📦 handleRideData():', ride);
 
+    this.pickupLocation = {
+      lat: ride.pickup.latitude,
+      lng: ride.pickup.longitude
+    };
+
+    this.dropoffLocation = {
+      lat: ride.dropoff.latitude,
+      lng: ride.dropoff.longitude
+    };
+
+    this.tryStartSimulation();
+  }
 }

@@ -1,69 +1,80 @@
-import {Component, OnInit} from '@angular/core';
-import {AuthService} from '../../../auth/auth.service';
-import {OfferService} from '../../services/offer.service';
-import {Offer} from '../../models/offer.model';
-import {filter, switchMap, tap} from 'rxjs';
-import {RideRequestService} from '../../services/ride-request.service';
-import {Router} from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../../../auth/auth.service';
+import { OfferService } from '../../services/offer.service';
+import { Offer } from '../../models/offer.model';
+import { filter, switchMap, tap } from 'rxjs';
+import { RideRequestService } from '../../services/ride-request.service';
+import { Router } from '@angular/router';
 import { Ride } from '../../models/ride.model';
-
+import { RideStateService } from '../../services/ride-state.service';
+import { RideSocketService } from '../../services/ride-socket.service';
 
 interface SortOption {
-  key: keyof Offer,
-  label: string
+key: keyof Offer,
+label: string
 }
+
 @Component({
-  selector: 'ride-offers-page',
-  standalone: false,
-  templateUrl: './ride-offers-page.component.html',
-  styleUrl: './ride-offers-page.component.scss'
+selector: 'ride-offers-page',
+standalone: false,
+templateUrl: './ride-offers-page.component.html',
+styleUrl: './ride-offers-page.component.scss'
 })
 export class RideOffersPageComponent implements OnInit {
-  accessAllowed: boolean = false;
-  username: string = '';
+accessAllowed: boolean = false;
+username: string = '';
 
-  offers: Offer[] = [];
-  sortOptions: SortOption[] = [
-    { key: 'offerID', label: 'Offer ID' },
-    { key: 'driverName', label: 'Driver Name' },
-    { key: 'driverRating', label: 'Driver Rating' },
-    { key: 'driverVehicle', label: 'Driver Vehicle' },
-    { key: 'ridesCount', label: 'Rides Count' },
-    { key: 'travelledDistance', label: 'Travelled Distance' },
-  ];
-  constructor(private authService: AuthService,
-              private rideService: RideRequestService,
-              private offerService: OfferService,
-              private router: Router) {}
+offers: Offer[] = [];
+sortOptions: SortOption[] = [
+{ key: 'offerID', label: 'Offer ID' },
+{ key: 'driverName', label: 'Driver Name' },
+{ key: 'driverRating', label: 'Driver Rating' },
+{ key: 'driverVehicle', label: 'Driver Vehicle' },
+{ key: 'ridesCount', label: 'Rides Count' },
+{ key: 'travelledDistance', label: 'Travelled Distance' },
+];
 
- acceptOffer(offerID: number) {
-  this.offerService.customerAcceptOffer(offerID).subscribe({
-    next: () => {
-      this.rideService.getAcceptedRideDetails().subscribe({
-        next: (ride: Ride) => {
-          this.router.navigate(['/simulation'], {
-            queryParams: {
-              role: 'driver',
-              rideId: ride.id
+constructor(
+    private authService: AuthService,
+    private rideService: RideRequestService,
+    private offerService: OfferService,
+    private router: Router,
+    private rideStateService: RideStateService,
+    private rideSocketService: RideSocketService
+  ) {}
+
+  acceptOffer(offerID: number) {
+    this.offerService.customerAcceptOffer(offerID).subscribe({
+      next: () => {
+        this.rideService.getAcceptedRideDetails().subscribe({
+          next: (ride: Ride) => {
+            if (ride.id !== undefined) {
+              this.rideStateService.setCurrentRideId(ride.id.toString());
+              this.rideSocketService.connect();
+              this.rideSocketService.subscribeToRideAccepted(Number(ride.id));
             }
-          });
-        },
-        error: err => console.error('❌ Failed to load accepted ride:', err)
-      });
-    },
-    error: err => {
-      console.error('❌ Accept offer failed:', err);
-    }
-  });
-}
 
-
+            this.router.navigate(['/simulation'], {
+              queryParams: {
+                role: 'customer',
+                rideId: ride.id
+              }
+            });
+          },
+          error: err => console.error('❌ Failed to load accepted ride:', err)
+        });
+      },
+      error: err => {
+        console.error('❌ Accept offer failed:', err);
+      }
+    });
+  }
 
   rejectOffer(offerID: number) {
     this.offerService.customerRejectOffer(offerID).subscribe({
       next: () => this.offers = this.offers.filter(offer => offer.offerID !== offerID),
       error: err => console.log(err)
-    })
+    });
   }
 
   sortOffers(attr: keyof Offer, direction: 'asc' | 'desc') {
@@ -81,23 +92,29 @@ export class RideOffersPageComponent implements OnInit {
     this.offers.sort(compare);
   }
 
-  ngOnInit() {
-    this.authService.currentUser.pipe(
-      filter(user => !!user?.username),
-      tap(user => this.username = user!.username!),
-      switchMap(() => this.authService.isCustomer()),
-      tap(isCustomer => this.accessAllowed = isCustomer)
-    ).subscribe({
-      error: err => console.log(err)
+  ngOnInit(): void {
+  this.authService.currentUser.pipe(
+    filter(user => !!user?.username),
+    tap(user => this.username = user!.username!),
+    switchMap(() => this.authService.isCustomer()),
+    tap(isCustomer => {
+      this.accessAllowed = isCustomer;
+      if (!isCustomer) {
+        alert('Please log in as a customer to access ride offers.');
+        return;
+      }
+      this.loadOffers();  // ✅ only load offers if customer
     })
+  ).subscribe({
+    error: err => console.error('Auth error:', err)
+  });
+}
 
-    this.loadOffers();
-  }
 
-  loadOffers(){
+  loadOffers() {
     this.offerService.customerGetOffers().subscribe({
       next: (offers: Offer[]) => this.offers = offers,
       error: err => console.log(err)
-    })
+    });
   }
 }

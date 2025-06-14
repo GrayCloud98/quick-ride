@@ -1,50 +1,47 @@
 import { Injectable } from '@angular/core';
-import { Client, IMessage, StompSubscription } from '@stomp/stompjs';
+import { Client, Message, over } from 'stompjs';
 import SockJS from 'sockjs-client';
 import { BehaviorSubject } from 'rxjs';
 
-@Injectable({
-providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class RideSocketService {
-private client: Client;
-private subscription?: StompSubscription;
+private stompClient!: Client;
+private connected = false;
 
-public position$ = new BehaviorSubject<{ lat: number; lng: number } | null>(null);
+private positionSubject = new BehaviorSubject<{ lat: number, lng: number } | null>(null);
+public position$ = this.positionSubject.asObservable();
 
-constructor() {
-    this.client = new Client({
-      webSocketFactory: () => new SockJS('http://localhost:8080/ws'), // Replace with your backend WS URL
-      reconnectDelay: 5000,
-      debug: str => console.log('[WebSocket]', str)
-    });
+private acceptedSubject = new BehaviorSubject<boolean>(false);
+public acceptedRide$ = this.acceptedSubject.asObservable();
 
-    this.client.onConnect = () => {
-      console.log('Connected to WebSocket');
-    };
-
-    this.client.onStompError = frame => {
-      console.error('Broker reported error:', frame.headers['message']);
-    };
-
-    this.client.activate();
-  }
-
-  subscribeToRide(rideId: string) {
-    this.subscription = this.client.subscribe(`/topic/ride-progress/${rideId}`, (message: IMessage) => {
-      const data = JSON.parse(message.body);
-      this.position$.next(data.position);
+connect(): void {
+    const socket = new SockJS('http://localhost:8080/ws');
+    this.stompClient = over(socket);
+    this.stompClient.connect({}, () => {
+      this.connected = true;
+      console.log('✅ WebSocket connected');
     });
   }
 
-  sendPositionUpdate(rideId: string, position: { lat: number; lng: number }) {
-    this.client.publish({
-      destination: `/app/ride-progress/${rideId}`,
-      body: JSON.stringify({ position })
+  subscribeToRide(rideId: string): void {
+    if (!this.connected) return;
+
+    this.stompClient.subscribe(`/topic/ride/${rideId}/position`, (message: Message) => {
+      const position = JSON.parse(message.body);
+      this.positionSubject.next(position);
     });
   }
 
-  unsubscribe() {
-    this.subscription?.unsubscribe();
+  sendPositionUpdate(rideId: string, position: { lat: number, lng: number }): void {
+    if (!this.connected) return;
+    this.stompClient.send(`/app/ride/${rideId}/position`, {}, JSON.stringify(position));
+  }
+
+  subscribeToRideAccepted(rideRequestId: number): void {
+    if (!this.connected) return;
+
+    this.stompClient.subscribe(`/topic/ride/${rideRequestId}/accepted`, () => {
+      this.acceptedSubject.next(true);
+    });
   }
 }
