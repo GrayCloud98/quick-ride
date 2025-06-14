@@ -1,5 +1,6 @@
 package com.example.sep_drive_backend.controller;
 import com.example.sep_drive_backend.dto.*;
+import com.example.sep_drive_backend.models.Driver;
 import com.example.sep_drive_backend.models.JwtTokenProvider;
 import com.example.sep_drive_backend.models.RideOffer;
 import com.example.sep_drive_backend.models.RideRequest;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController

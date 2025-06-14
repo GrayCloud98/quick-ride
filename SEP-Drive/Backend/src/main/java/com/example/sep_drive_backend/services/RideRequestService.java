@@ -100,17 +100,9 @@ public class RideRequestService {
         return customerRepository.findByUsername(username).isPresent();
     }
 
-    public List<RidesForDriversDTO> getAllRideRequests(double driverLat, double driverLon) {
+    public List<RidesForDriversDTO> getAllRideRequests() {
         return repository.findAll().stream()
-                .map(r -> {
-                    double distance = calculateDistance(
-                            driverLat,
-                            driverLon,
-                            r.getStartLatitude(),
-                            r.getStartLongitude()
-                    );
-                    return new RidesForDriversDTO(r, distance);
-                })
+                .map(RidesForDriversDTO::new)
                 .collect(Collectors.toList());
     }
     public RideOffer createRideOffer(Long rideRequestId, String driverUsername) {
@@ -334,6 +326,24 @@ public class RideRequestService {
 
         return dto;
     }
+    public List<RideOfferNotification> getOffersForCustomer(String username) {
+        RideRequest activeRequest = getActiveRideRequestForCustomer(username);
 
+        List<RideOffer> offers = rideOfferRepository.findAllByRideRequest(activeRequest);
+
+        return offers.stream().map(offer -> {
+            Driver driver = offer.getDriver();
+
+            RideOfferNotification notification = new RideOfferNotification();
+            notification.setRideOfferId(offer.getId());
+            notification.setDriverName(driver.getFirstName() + " " + driver.getLastName());
+            notification.setDriverRating(driver.getRating());
+            notification.setTotalRides(driver.getTotalRides());
+            notification.setTotalTravelledDistance(0);
+            notification.setVehicleClass(driver.getVehicleClass());
+
+            return notification;
+        }).collect(Collectors.toList());
+    }
 
 }
