@@ -30,7 +30,7 @@ eta = 0;
 pickupLocation: google.maps.LatLngLiteral | null = null;
 dropoffLocation: google.maps.LatLngLiteral | null = null;
 
-
+rideCompleted = false;
 rideId!: string;
 role: 'driver' | 'customer' = 'driver';
 private map!: google.maps.Map;
@@ -112,32 +112,30 @@ private tryStartSimulation(): void {
 
 
 startSimulation(): void {
-    if (this.isRunning || !this.pickupLocation || !this.dropoffLocation) return;
+  if (this.isRunning || !this.pickupLocation || !this.dropoffLocation || this.rideCompleted) return;
 
-    this.isRunning = true;
+  this.isRunning = true;
+  const directionsService = new google.maps.DirectionsService();
 
-    const directionsService = new google.maps.DirectionsService();
+  directionsService.route({
+    origin: this.pickupLocation,
+    destination: this.dropoffLocation,
+    travelMode: google.maps.TravelMode.DRIVING
+  }).then(result => {
+    const path = result.routes[0].overview_path;
+    this.routePath = path.map(p => ({ lat: p.lat(), lng: p.lng() }));
+    this.markerPosition = this.routePath[0];
+    this.progress = 0;
 
-    directionsService.route({
-      origin: this.pickupLocation,
-      destination: this.dropoffLocation,
-      travelMode: google.maps.TravelMode.DRIVING
-    }).then(result => {
-      const path = result.routes[0].overview_path;
-      this.routePath = path.map(p => ({ lat: p.lat(), lng: p.lng() }));
-      this.markerPosition = this.routePath[0];
-      this.progress = 0;
+    this.directionsResult = result;
+    this.directionsRenderer.setDirections(result);
 
-      this.directionsResult = result; // ✅ Store result
-      this.directionsRenderer.setDirections(result); // ✅ apply to map if ready
-
-
-      this.startInterval();
-    }).catch(error => {
-      this.isRunning = false;
-      console.error('Directions request failed:', error);
-    });
-  }
+    this.startInterval();
+  }).catch(error => {
+    this.isRunning = false;
+    console.error('Directions request failed:', error);
+  });
+}
 
 private startInterval(): void {
   if (this.routePath.length < 2 || this.progress >= this.routePath.length - 1) return;
@@ -186,14 +184,12 @@ resumeSimulation(): void {
   this.eta = 0;
   this.markerPosition = this.routePath.length > 0 ? this.routePath[0] : { lat: 0, lng: 0 };
 
+  this.rideCompleted = true; // ✅ Prevent restarting
+
   if (showRating) {
     this.dialog.open(RideRatingDialogComponent).afterClosed().subscribe(result => {
       if (result) {
-        console.log('⭐ Rated:', result.rating);
-        console.log('📝 Feedback:', result.feedback);
-        this.rideService.submitRideRating(Number(this.rideId), result.rating, result.feedback).subscribe({
-        next: () => console.log(' Rating submitted successfully'),
-        error: err => console.error('Failed to submit rating:',err)});
+        this.rideService.submitRideRating(Number(this.rideId), result.rating, result.feedback).subscribe();
       }
     });
   }
