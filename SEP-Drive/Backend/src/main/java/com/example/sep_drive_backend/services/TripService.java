@@ -38,14 +38,17 @@ public class TripService {
             dto.setPriceEuro(trip.getPriceEuro());
             dto.setCustomerRating(trip.getCustomerRating());
             dto.setDriverRating(trip.getDriverRating());
-
-            User customer = trip.getCustomer();
-            User driver = trip.getDriver();
-
-            dto.setCustomerUsername(customer.getUsername());
-            dto.setCustomerFullName(customer.getFirstName() + " " + customer.getLastName());
-            dto.setDriverUsername(driver.getUsername());
-            dto.setDriverFullName(driver.getFirstName() + " " + driver.getLastName());
+            dto.setCustomerFullName(trip.getCustomerFullName());
+            dto.setDriverFullName(trip.getDriverFullName());
+            dto.setCustomerUsername(trip.getCustomerUsername());
+            dto.setDriverUsername(trip.getDriverUsername());
+//            User customer = trip.getCustomer();
+//            User driver = trip.getDriver();
+//
+//            dto.setCustomerUsername(customer.getUsername());
+//            dto.setCustomerFullName(customer.getFirstName() + " " + customer.getLastName());
+//            dto.setDriverUsername(driver.getUsername());
+//            dto.setDriverFullName(driver.getFirstName() + " " + driver.getLastName());
 
             return dto;
         }).collect(Collectors.toList());
