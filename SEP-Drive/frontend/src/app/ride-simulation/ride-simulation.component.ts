@@ -75,12 +75,12 @@ private loadRideDetails(): void {
       next: (ride: Ride) => {
         console.log('📦 Ride details received:', ride);
         this.pickupLocation = {
-          lat: ride.pickup.latitude,
-          lng: ride.pickup.longitude
+          lat: ride.pickup.startLat,
+          lng: ride.pickup.startLng
         };
         this.dropoffLocation = {
-          lat: ride.dropoff.latitude,
-          lng: ride.dropoff.longitude
+          lat: ride.dropoff.destLat,
+          lng: ride.dropoff.startLng
         };
         this.center = this.pickupLocation;
         this.tryStartSimulation();
