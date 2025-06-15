@@ -98,5 +98,11 @@ export class RideRequestService {
     }))
   );
 }
+public submitRideRating(rideId: number, rating: number, feedback: string) {
+  return this.http.post('http://localhost:8080/api/rides/rate', {
+    rating,
+    feedback
+  });
+}
 
 }

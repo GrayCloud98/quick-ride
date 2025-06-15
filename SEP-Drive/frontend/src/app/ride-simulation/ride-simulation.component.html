@@ -14,6 +14,7 @@
 <!-- Control Buttons -->
 <div class="controls" style="margin-top: 20px;">
   <button (click)="startSimulation()" [disabled]="isRunning">Start</button>
+  <button (click)="resumeSimulation()" [disabled]="isRunning || !simulationStarted || progress >= routePath.length - 1">Resume</button>
   <button (click)="pauseSimulation()" [disabled]="!isRunning">Pause</button>
   <button (click)="stopSimulation()">Reset</button>
 </div>

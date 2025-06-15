@@ -36,7 +36,7 @@ role: 'driver' | 'customer' = 'driver';
 private map!: google.maps.Map;
 private directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
 private directionsResult: google.maps.DirectionsResult | null = null;
-private simulationStarted = false;
+public simulationStarted = false;
 
 
 constructor(private dialog: MatDialog, private rideStateService: RideStateService, private activatedRoute: ActivatedRoute, private rideSocketService: RideSocketService,
@@ -140,56 +140,74 @@ startSimulation(): void {
   }
 
 private startInterval(): void {
-    if (this.routePath.length < 2) return;
+  if (this.routePath.length < 2 || this.progress >= this.routePath.length - 1) return;
 
-    const intervalTime = (this.speed * 1000) / (this.routePath.length - 1);
-    this.eta = Math.round((this.routePath.length - 1) * intervalTime / 1000);
-    this.isRunning = true;
+  const intervalTime = (this.speed * 1000) / (this.routePath.length - 1);
+  this.eta = Math.round((this.routePath.length - 1 - this.progress) * intervalTime / 1000);
+  this.isRunning = true;
 
-    this.intervalId = setInterval(() => {
-      if (this.progress < this.routePath.length - 1) {
-        this.progress++;
-        this.markerPosition = this.routePath[this.progress];
-        const remaining = this.routePath.length - 1 - this.progress;
-        this.eta = Math.round(remaining * intervalTime / 1000);
-         if (this.role === 'driver') {
-          this.rideSocketService.sendPositionUpdate(this.rideId, this.markerPosition);
-        }
-      } else {
-        this.stopSimulation();
-      }
-    }, intervalTime);
-  }
+  this.intervalId = setInterval(() => {
+    this.progress++;
+    this.markerPosition = this.routePath[this.progress];
+    this.eta = Math.round((this.routePath.length - 1 - this.progress) * intervalTime / 1000);
+
+    if (this.role === 'driver') {
+      this.rideSocketService.sendPositionUpdate(this.rideId, this.markerPosition);
+    }
+
+    if (this.progress >= this.routePath.length - 1) {
+      this.stopSimulation(true); // Show rating at natural end
+    }
+  }, intervalTime);
+}
 
   pauseSimulation(): void {
+  if (this.isRunning) {
     this.isRunning = false;
     clearInterval(this.intervalId);
+    console.log('⏸️ Simulation paused');
   }
+}
 
-  stopSimulation(): void {
-    this.pauseSimulation();
-    this.progress = 0;
-    this.markerPosition = this.routePath.length > 0 ? this.routePath[0] : { lat: 0, lng: 0 };
-    this.eta = 0;
-    this.simulationStarted = false;   // ✅ allow restart again
-    this.isRunning = false;
+resumeSimulation(): void {
+  if (!this.isRunning && this.simulationStarted && this.progress < this.routePath.length - 1) {
+    this.startInterval();
+    console.log('▶️ Simulation resumed');
+  } else {
+    console.warn('⏸️ Cannot resume simulation');
+  }
+}
 
+  stopSimulation(showRating = true): void {
+  clearInterval(this.intervalId);
+  this.isRunning = false;
+  this.simulationStarted = false;
+  this.progress = 0;
+  this.eta = 0;
+  this.markerPosition = this.routePath.length > 0 ? this.routePath[0] : { lat: 0, lng: 0 };
+
+  if (showRating) {
     this.dialog.open(RideRatingDialogComponent).afterClosed().subscribe(result => {
       if (result) {
-        console.log('User rated the ride:', result.rating);
-        console.log('Feedback:', result.feedback);
-        // TODO: send to backend or confirmation logic
+        console.log('⭐ Rated:', result.rating);
+        console.log('📝 Feedback:', result.feedback);
+        this.rideService.submitRideRating(Number(this.rideId), result.rating, result.feedback).subscribe({
+        next: () => console.log(' Rating submitted successfully'),
+        error: err => console.error('Failed to submit rating:',err)});
       }
     });
   }
+}
 
   onSpeedChange(value: number): void {
-    this.speed = Number(value);
-    if (this.isRunning && this.routePath.length > 1 ) {
-      this.pauseSimulation();
-      this.startSimulation(); // Restart at new speed
-    }
+  this.speed = Number(value);
+  if (this.isRunning) {
+    // Restart interval with new speed but keep progress
+    clearInterval(this.intervalId);
+    this.startInterval();
+    console.log(`⚙️ Speed changed to ${this.speed}`);
   }
+}
 
   handleSpeedInput(event: Event): void {
     const input = event.target as HTMLInputElement;
