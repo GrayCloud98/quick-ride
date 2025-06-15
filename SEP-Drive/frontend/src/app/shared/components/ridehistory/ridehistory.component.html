@@ -57,6 +57,9 @@
                         <span *ngSwitchCase="'money'">
                             {{ row.money | number:'1.2-2' }} €
                         </span>
+                      <span *ngSwitchCase="'date'">
+                        {{ row.date | date:'short' }}
+                        </span>
 
                         <span *ngSwitchDefault>
                             {{ row[column] }}
