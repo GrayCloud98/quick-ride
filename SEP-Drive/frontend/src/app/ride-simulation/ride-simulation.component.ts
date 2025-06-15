@@ -6,7 +6,6 @@ import { ActivatedRoute } from '@angular/router';
 import { GoogleMap } from '@angular/google-maps';
 import { RideSocketService } from '../ride/services/ride-socket.service';
 import {RideRequestService} from '../ride/services/ride-request.service';
-import { Ride } from '../ride/models/ride.model';
 
 @Component({
 selector: 'app-ride-simulation',
@@ -43,112 +42,106 @@ private simulationStarted = false;
 constructor(private dialog: MatDialog, private rideStateService: RideStateService, private activatedRoute: ActivatedRoute, private rideSocketService: RideSocketService,
             private rideService: RideRequestService) { }
 
-
 ngOnInit(): void {
-    this.directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
+  // Map directionsRenderer is ready
+  this.directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
 
-    this.activatedRoute.queryParams.subscribe(params => {
-      this.role = params['role'] === 'customer' ? 'customer' : 'driver';
-      this.rideId = params['rideId'];
+  this.rideService.getRide().subscribe({
+    next: data => {
+      // 1. Load from URL if available
+      this.activatedRoute.queryParams.subscribe(params => {
+        const pickupLat = data.pickup.latitude;
+        const pickupLng = data.pickup.longitude;
+        const dropoffLat = data.dropoff.latitude;
+        const dropoffLng = data.dropoff.longitude;
+        this.rideId = params['rideId'];
 
-      this.loadRideDetails();
-    });
-  }
-
-  ngAfterViewInit(): void {
-    const waitForMap = setInterval(() => {
-      if (this.mapComponent?.googleMap) {
-        this.map = this.mapComponent.googleMap;
-        this.directionsRenderer.setMap(this.map);
-        console.log('✅ Map initialized');
-        if (this.directionsResult) {
-          this.directionsRenderer.setDirections(this.directionsResult);
+        if (!isNaN(pickupLat) && !isNaN(pickupLng) && !isNaN(dropoffLat) && !isNaN(dropoffLng)) {
+          this.pickupLocation = { lat: pickupLat, lng: pickupLng };
+          this.dropoffLocation = { lat: dropoffLat, lng: dropoffLng };
+          this.tryStartSimulation();
         }
-        clearInterval(waitForMap);
-      }
-    }, 200);
-  }
+      });
 
-private loadRideDetails(): void {
-    const rideObservable = this.rideService.getAcceptedRideDetails(); // JWT handles user identity
-    rideObservable.subscribe({
-      next: (ride: Ride) => {
-        console.log('📦 Ride details received:', ride);
-        this.pickupLocation = {
-          lat: ride.pickup.startLat,
-          lng: ride.pickup.startLng
-        };
-        this.dropoffLocation = {
-          lat: ride.dropoff.destLat,
-          lng: ride.dropoff.startLng
-        };
-        this.center = this.pickupLocation;
+      // 2. Also subscribe to RideStateService (e.g., for form input)
+      this.rideStateService.pickupLocation$.subscribe(pickup => {
+        this.pickupLocation = pickup;
         this.tryStartSimulation();
+      });
 
-        if (this.role === 'customer') {
-          this.rideSocketService.subscribeToRide(this.rideId);
-          this.rideSocketService.position$.subscribe(position => {
-            if (position) this.markerPosition = position;
-          });
-        }
-      },
-      error: err => {
-        console.error('❌ Failed to load ride data:', err);
+      this.rideStateService.dropoffLocation$.subscribe(dropoff => {
+        this.dropoffLocation = dropoff;
+        this.tryStartSimulation();
+      });
+
+      if (this.role === 'customer') {
+        this.rideSocketService.subscribeToRide(this.rideId);
+        this.rideSocketService.position$.subscribe(position => {
+          if (position) this.markerPosition = position;
+        });
       }
-    });
-  }
-private tryStartSimulation(): void {
-    if (this.simulationStarted || !this.pickupLocation || !this.dropoffLocation || !this.map) {
-      console.warn('⏳ Simulation cannot start yet');
-      return;
     }
+  })
+}
 
+
+ngAfterViewInit(): void {
+  setTimeout(() => {
+    if (this.mapComponent?.googleMap) {
+      this.map = this.mapComponent.googleMap;
+      this.directionsRenderer.setMap(this.map);
+      console.log('✅ Map is ready:', this.map);
+
+      if (this.directionsResult) {
+        this.directionsRenderer.setDirections(this.directionsResult);
+      }
+    }
+  });
+}
+
+
+private tryStartSimulation(): void {
+    if (this.simulationStarted || !this.pickupLocation || !this.dropoffLocation) return;
     this.simulationStarted = true;
     this.center = this.pickupLocation;
-
     if (this.role === 'driver') {
       this.startSimulation();
-    } else {
-      this.drawRouteOnly();
     }
   }
 
-  private drawRouteOnly(): void {
-    const directionsService = new google.maps.DirectionsService();
-    directionsService.route({
-      origin: this.pickupLocation!,
-      destination: this.dropoffLocation!,
-      travelMode: google.maps.TravelMode.DRIVING
-    }).then(result => {
-      console.log('✅ Customer directions loaded');
-      this.directionsResult = result;
-      this.routePath = result.routes[0].overview_path.map(p => ({ lat: p.lat(), lng: p.lng() }));
-      this.markerPosition = this.routePath[0];
-      this.directionsRenderer.setDirections(result);
-    }).catch(error => {
-      console.error('❌ Route draw failed:', error);
-    });
-  }
 
-  startSimulation(): void {
+
+startSimulation(): void {
+    if (this.isRunning || !this.pickupLocation || !this.dropoffLocation) return;
+
+    this.isRunning = true;
+
     const directionsService = new google.maps.DirectionsService();
+
     directionsService.route({
-      origin: this.pickupLocation!,
-      destination: this.dropoffLocation!,
+      origin: this.pickupLocation,
+      destination: this.dropoffLocation,
       travelMode: google.maps.TravelMode.DRIVING
     }).then(result => {
-      console.log('✅ Driver directions loaded');
-      this.directionsResult = result;
-      this.routePath = result.routes[0].overview_path.map(p => ({ lat: p.lat(), lng: p.lng() }));
+      const path = result.routes[0].overview_path;
+      this.routePath = path.map(p => ({ lat: p.lat(), lng: p.lng() }));
       this.markerPosition = this.routePath[0];
-      this.directionsRenderer.setDirections(result);
+      this.progress = 0;
+
+      this.directionsResult = result; // ✅ Store result
+      this.directionsRenderer.setDirections(result); // ✅ apply to map if ready
+
+
       this.startInterval();
     }).catch(error => {
-      console.error('❌ Simulation route failed:', error);
+      this.isRunning = false;
+      console.error('Directions request failed:', error);
     });
   }
 
-  private startInterval(): void {
+private startInterval(): void {
+    if (this.routePath.length < 2) return;
+
     const intervalTime = (this.speed * 1000) / (this.routePath.length - 1);
     this.eta = Math.round((this.routePath.length - 1) * intervalTime / 1000);
     this.isRunning = true;
@@ -157,13 +150,11 @@ private tryStartSimulation(): void {
       if (this.progress < this.routePath.length - 1) {
         this.progress++;
         this.markerPosition = this.routePath[this.progress];
-
-        if (this.role === 'driver') {
-          this.rideSocketService.sendPositionUpdate(this.rideId, this.markerPosition);
-        }
-
         const remaining = this.routePath.length - 1 - this.progress;
         this.eta = Math.round(remaining * intervalTime / 1000);
+         if (this.role === 'driver') {
+          this.rideSocketService.sendPositionUpdate(this.rideId, this.markerPosition);
+        }
       } else {
         this.stopSimulation();
       }
@@ -177,25 +168,26 @@ private tryStartSimulation(): void {
 
   stopSimulation(): void {
     this.pauseSimulation();
-    this.simulationStarted = false;
     this.progress = 0;
-    this.isRunning = false;
+    this.markerPosition = this.routePath.length > 0 ? this.routePath[0] : { lat: 0, lng: 0 };
     this.eta = 0;
-    this.markerPosition = this.routePath[0];
+    this.simulationStarted = false;   // ✅ allow restart again
+    this.isRunning = false;
 
     this.dialog.open(RideRatingDialogComponent).afterClosed().subscribe(result => {
       if (result) {
-        console.log('⭐ Ride rated:', result.rating, result.feedback);
-        // Optionally: send to backend
+        console.log('User rated the ride:', result.rating);
+        console.log('Feedback:', result.feedback);
+        // TODO: send to backend or confirmation logic
       }
     });
   }
 
   onSpeedChange(value: number): void {
-    this.speed = value;
-    if (this.isRunning) {
+    this.speed = Number(value);
+    if (this.isRunning && this.routePath.length > 1 ) {
       this.pauseSimulation();
-      this.startInterval();
+      this.startSimulation(); // Restart at new speed
     }
   }
 
