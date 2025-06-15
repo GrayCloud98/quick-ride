@@ -28,26 +28,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        String path = request.getRequestURI();
-
-        // ✅ Diese Endpoints sollen den Filter überspringen
-        if (path.equals("/api/trips/complete") ||
-                path.startsWith("/api/auth") ||
-                path.startsWith("/h2-console") ||
-                path.startsWith("/uploads") ||
-                path.startsWith("/ws")) {
-
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         String token = jwtTokenProvider.resolveToken(request);
 
         if (token != null && jwtTokenProvider.validateToken(token)) {
             String username = jwtTokenProvider.getUsername(token);
 
             UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(username, null, null); // Add authorities if needed
+                    new UsernamePasswordAuthenticationToken(username, null, null); // Falls nötig, hier Authorities setzen
             auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
@@ -55,4 +42,3 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
-

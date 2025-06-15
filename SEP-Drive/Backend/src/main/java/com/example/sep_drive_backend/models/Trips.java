@@ -20,8 +20,6 @@ public class Trips {
 
     private double Speed;
 
-
-
     private LocalDateTime endTime;
 
     private double distanceKm;
@@ -40,6 +38,14 @@ public class Trips {
     @ManyToOne
     @JoinColumn(name = "driver_id")
     private User driver;
+
+
+    private String customerFullName;
+    private String customerUsername;
+
+    private String driverFullName;
+    private String driverUsername;
+
 
     public Long getId() {
         return id;
@@ -126,6 +132,37 @@ public class Trips {
 
     public void setSpeed(int seconds) {
         this.Speed = seconds;
+    }
+    public String getCustomerFullName() {
+        return customerFullName;
+    }
+
+    public void setCustomerFullName(String customerFullName) {
+        this.customerFullName = customerFullName;
+    }
+
+    public String getCustomerUsername() {
+        return customerUsername;
+    }
+
+    public void setCustomerUsername(String customerUsername) {
+        this.customerUsername = customerUsername;
+    }
+
+    public String getDriverFullName() {
+        return driverFullName;
+    }
+
+    public void setDriverFullName(String driverFullName) {
+        this.driverFullName = driverFullName;
+    }
+
+    public String getDriverUsername() {
+        return driverUsername;
+    }
+
+    public void setDriverUsername(String driverUsername) {
+        this.driverUsername = driverUsername;
     }
 
 }
