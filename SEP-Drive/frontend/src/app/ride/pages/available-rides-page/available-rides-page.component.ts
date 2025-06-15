@@ -7,45 +7,41 @@ import {Location} from '../../models/location.model';
 import {Request} from '../../models/request.model';
 import {OfferState} from '../../models/offer.model';
 import {DistanceService} from '../../services/distance.service';
-import { Router } from '@angular/router';
-import { RideSocketService } from '../../services/ride-socket.service'; // correct path
 
 interface SortOption {
-  key: keyof Request,
-  label: string
+key: keyof Request,
+label: string
 }
 @Component({
-  selector: 'requests-list',
-  standalone: false,
-  templateUrl: './available-rides-page.component.html',
-  styleUrl: './available-rides-page.component.scss'
+selector: 'requests-list',
+standalone: false,
+templateUrl: './available-rides-page.component.html',
+styleUrl: './available-rides-page.component.scss'
 })
 export class AvailableRidesPageComponent implements OnInit {
-  accessAllowed: boolean = false;
-  username: string = '';
+accessAllowed: boolean = false;
+username: string = '';
 
-  currentPositionControl = new FormControl<Location | string>('', [Validators.required]);
-  currentPosition!: Location;
-  positionSet = false;
+currentPositionControl = new FormControl<Location | string>('', [Validators.required]);
+currentPosition!: Location;
+positionSet = false;
 
-  allActiveRequests: Request[] = [];
-  sortOptions: SortOption[] = [
-    { key: 'driverToPickupDistance', label: 'Distance to Pickup' },
-    { key: 'desiredVehicleClass', label: 'Requested Vehicle Type' },
-    { key: 'customerName', label: 'Customer Name' },
-    { key: 'customerRating', label: 'Customer Rating' },
-    { key: 'createdAt', label: 'Request Time' },
-    { key: 'requestID', label: 'Request ID' },
-  ];
+allActiveRequests: Request[] = [];
+sortOptions: SortOption[] = [
+{ key: 'driverToPickupDistance', label: 'Distance to Pickup' },
+{ key: 'desiredVehicleClass', label: 'Requested Vehicle Type' },
+{ key: 'customerName', label: 'Customer Name' },
+{ key: 'customerRating', label: 'Customer Rating' },
+{ key: 'createdAt', label: 'Request Time' },
+{ key: 'requestID', label: 'Request ID' },
+];
 
-  offerState = OfferState.NONE;
-  requestIdOfOffer: number | null = null;
+offerState = OfferState.NONE;
+requestIdOfOffer: number | null = null;
 
-  constructor(private offerService: OfferService,
+constructor(private offerService: OfferService,
               private authService: AuthService,
-              private distanceService: DistanceService,
-              private router: Router,
-              private rideSocketService: RideSocketService) {
+              private distanceService: DistanceService,) {
   }
 
   onLocationSelected(pos: Location) {
@@ -91,35 +87,15 @@ export class AvailableRidesPageComponent implements OnInit {
   }
 
   ngOnInit() {
-  this.authService.currentUser.pipe(
-    filter(user => !!user?.username),
-    tap(user => this.username = user!.username!),
-    switchMap(() => this.authService.isCustomer()),
-    tap(isCustomer => this.accessAllowed = !isCustomer)
-  ).subscribe({
-    error: err => console.log(err)
-  });
-
-  // ✅ Connect WebSocket and subscribe to ride acceptance for synchronization
-  this.rideSocketService.connect();
-
-  this.offerService.driverGetRequestIdOfOffer().subscribe(rideRequestId => {
-    if (rideRequestId) {
-      this.rideSocketService.subscribeToRideAccepted(rideRequestId);
-
-      this.rideSocketService.acceptedRide$.subscribe(() => {
-        console.log("🚦 Driver notified: Ride accepted by customer");
-        this.router.navigate(['/simulation'], {
-          queryParams: {
-            rideId: rideRequestId,
-            role: 'driver'
-          }
-        });
-      });
-    }
-  });
-}
-
+    this.authService.currentUser.pipe(
+      filter(user => !!user?.username),
+      tap(user => this.username = user!.username!),
+      switchMap(() => this.authService.isCustomer()),
+      tap(isCustomer => this.accessAllowed = !isCustomer)
+    ).subscribe({
+      error: err => console.log(err)
+    })
+  }
 
   loadRequests(){
     this.offerService.driverHasActiveOffer().pipe(
