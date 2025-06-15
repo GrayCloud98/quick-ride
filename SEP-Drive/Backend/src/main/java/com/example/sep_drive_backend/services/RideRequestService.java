@@ -74,6 +74,8 @@ public class RideRequestService {
         request.setEstimatedPrice(dto.getEstimatedPrice());
         request.setStatus(Ridestatus.PLANNED);
         customer.setActive(true);
+        request.setCurrentLat(dto.getStartLatitude());
+        request.setCurrentLng(dto.getStartLongitude());
         customerRepository.save(customer);
         return repository.save(request);
     }
@@ -202,12 +204,12 @@ public class RideRequestService {
         for (RideOffer offer : allOffers) {
             if (!offer.getId().equals(rideOfferId)) {
                 rideOfferRepository.delete(offer);
-                rideRequest.setStatus(Ridestatus.IN_PROGRESS);
                 Driver driver = offer.getDriver();
                 driver.setActive(false);
                 driverRepository.save(driver);
             }
         }
+        rideRequest.setStatus(Ridestatus.IN_PROGRESS);
         rideOfferRepository.save(selectedOffer);
         repository.save(rideRequest);
     }
@@ -286,9 +288,13 @@ public class RideRequestService {
         completeRide(request.getId());
     }
     public AcceptedRideDetailsDTO getAcceptedRideDetails(String username) {
-        RideRequest ride = null;
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be null or empty");
+        }
 
+        RideRequest ride = null;
         Optional<Customer> customerOpt = customerRepository.findByUsername(username);
+
         if (customerOpt.isPresent()) {
             ride = repository.findByCustomerUsernameAndCustomerActiveTrue(username)
                     .orElseThrow(() -> new NoSuchElementException("No active ride for this customer"));
@@ -307,28 +313,47 @@ public class RideRequestService {
             }
         }
 
+        // Validate required location fields
+        if (ride.getCurrentLat() == null || ride.getCurrentLng() == null) {
+            throw new IllegalStateException("Ride location data is missing. Simulation may not have started.");
+        }
+
         AcceptedRideDetailsDTO dto = new AcceptedRideDetailsDTO();
         dto.setRideId(ride.getId());
         dto.setStatus(Ridestatus.valueOf(ride.getStatus().name()));
 
-        dto.setStartLat(ride.getStartLatitude());
-        dto.setStartLng(ride.getStartLongitude());
-        dto.setDestLat(ride.getDestinationLatitude());
-        dto.setDestLng(ride.getDestinationLongitude());
-
+        // Set locations with null checks (though we validated currentLat/Lng above)
+        dto.setStartLat(ride.getStartLatitude() != null ? ride.getStartLatitude() : 0.0);
+        dto.setStartLng(ride.getStartLongitude() != null ? ride.getStartLongitude() : 0.0);
+        dto.setDestLat(ride.getDestinationLatitude() != null ? ride.getDestinationLatitude() : 0.0);
+        dto.setDestLng(ride.getDestinationLongitude() != null ? ride.getDestinationLongitude() : 0.0);
         dto.setCurrentLat(ride.getCurrentLat());
         dto.setCurrentLng(ride.getCurrentLng());
-        dto.setSimulationSpeed(ride.getSimulationSpeed());
+
+        // Set optional fields with null checks
+        dto.setSimulationSpeed(ride.getSimulationSpeed() != null ? ride.getSimulationSpeed() : 1.0);
         dto.setEstimatedPrice(ride.getEstimatedPrice());
 
-        dto.setCustomerUsername(ride.getCustomer().getUsername());
+        // Handle customer info
+        if (ride.getCustomer() != null) {
+            dto.setCustomerUsername(ride.getCustomer().getUsername());
+        }
 
+        // Handle driver info if available
         RideOffer offer = ride.getRideOffer();
         if (offer != null && offer.getDriver() != null) {
             Driver driver = offer.getDriver();
             dto.setDriverUsername(driver.getUsername());
-            dto.setDriverFullName(driver.getFirstName() + " " + driver.getLastName());
-            dto.setVehicleClass(VehicleClassEnum.valueOf(driver.getVehicleClass().name()));
+
+            String fullName = "";
+            if (driver.getFirstName() != null) fullName += driver.getFirstName();
+            if (driver.getLastName() != null) fullName += " " + driver.getLastName();
+            dto.setDriverFullName(fullName.trim());
+
+            if (driver.getVehicleClass() != null) {
+                dto.setVehicleClass(VehicleClassEnum.valueOf(driver.getVehicleClass().name()));
+            }
+
             dto.setDriverRating((double) driver.getRating());
         }
 

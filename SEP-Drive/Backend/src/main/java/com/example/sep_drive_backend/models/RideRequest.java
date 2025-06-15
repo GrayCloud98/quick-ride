@@ -120,6 +120,8 @@ public class RideRequest {
         this.duration = duration;
         this.estimatedPrice = estimatedPrice;
         this.status = Ridestatus.PLANNED;
+        this.currentLat=this.startLatitude;
+        this.currentLng=this.startLongitude;
     }
 
     public Ridestatus getStatus() {
