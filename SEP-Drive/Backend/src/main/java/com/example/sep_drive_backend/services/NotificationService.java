@@ -17,7 +17,7 @@ public class NotificationService {
 
     public void sendOfferNotification(Driver driver, RideRequest rideRequest) {
         RideOfferNotification notification = new RideOfferNotification();
-        notification.setMessage("A driver wants to take your ride!");
+        notification.setMessage("You received an Offer for your Request!");
         notification.setDriverName(driver.getFirstName() + " " + driver.getLastName());
         notification.setDriverRating(driver.getRating());
         notification.setTotalRides(driver.getTotalRides());
@@ -32,7 +32,7 @@ public class NotificationService {
     public void sendRejectionNotification(String username) {
         NotificationMessage message = new NotificationMessage(
                 "rejection",
-                "Your Ride Offer was rejected, you can now create new Ride Offers",
+                "Your Offer was rejected, you can now send new Offers",
                 "REJECTED",
                 null
         );
@@ -43,7 +43,7 @@ public class NotificationService {
     public void sendAcceptNotification(String username) {
         NotificationMessage message = new NotificationMessage(
                 "acceptance",
-                "Your Ride Offer was accepted, you can now view your simulation",
+                "Your Offer was accepted, you can now view your Simulation",
                 "Accepted",
                 username
         );
@@ -55,7 +55,7 @@ public class NotificationService {
     public void sendCancelledNotification(String username) {
         NotificationMessage message = new NotificationMessage(
                 "cancellation",
-                "Offer for your RideRequest was cancelled",
+                "An Offer for your Request was withdrawn",
                 null,
                 null
         );
