@@ -198,8 +198,4 @@ public class RideRequestController {
         AcceptedRideDetailsDTO rideDetails = rideRequestService.getAcceptedRideDetails(username);
         return ResponseEntity.ok(rideDetails);
     }
-
-
-
-
 }
