@@ -9,6 +9,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   width: fit-content;
 }
 
+.mini{
+  width: 500px
+}
+
 .alert {
   padding: 0.75rem;
   border-radius: 4px;
@@ -20,4 +24,101 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .error {
   background: #ffebee;
   color: #c62828;
+}
+
+.button-container {
+  padding-inline: 16px;
+  display: flex;
+
+  .btn {
+    width: 100%;
+  }
+
+  .warn {
+    background-color: #ffd7d7;
+    color: #880000;
+  }
+}
+
+.card {
+  padding: 16px;
+
+  &.small {max-width: 600px}
+  &.big {max-width: 1000px}
+
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+
+    .label {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #3f51b5;
+    }
+
+    mat-icon {
+      color: #3f51b5;
+    }
+  }
+
+  .field {
+    display: flex;
+    padding: 4px 0;
+
+    .title {
+      font-weight: 500;
+      color: #555;
+      width: 90px;
+    }
+
+    .value {
+      font-weight: 400;
+      color: #222;
+      text-align: left;
+      flex: 1;
+    }
+
+    .bold {
+      font-weight: 700;
+    }
+
+    .grey-italic {
+      font-style: italic;
+      color: #888;
+    }
+  }
+}
+
+mat-card{
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19) !important;
+}
+
+.main-container {
+  overflow: hidden;
+  display: flex;
+  height: calc(100vh - 64px);
+}
+
+.left-container {
+  padding: 16px;
+  width: 30%;
+  max-width: 500px;
+  &.scroll {
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+}
+
+.right-container {
+  padding: 16px;
+  flex: 1;
+  &.scroll {
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  &.map {
+    padding: 16px 16px 16px 0;
+  }
 }

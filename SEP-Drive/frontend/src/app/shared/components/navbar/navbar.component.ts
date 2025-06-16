@@ -6,6 +6,7 @@ import {FormControl} from '@angular/forms';
 import {Observable} from 'rxjs';
 import {AuthService} from '../../../auth/auth.service';
 import {RideRequestService} from '../../../ride/services/ride-request.service';
+import {RidehistoryComponent} from '../ridehistory/ridehistory.component';
 
 @Component({
   selector: 'app-navbar',
@@ -81,6 +82,9 @@ export class NavbarComponent implements OnInit {
 
   goToProfile() {
     this.router.navigate([`/${(this.username)}`]);
+  }
+  goToridehistory(){
+    this.router.navigate([`/history`])
   }
 
   goHome() {

@@ -19,14 +19,26 @@ import { MatIconModule } from '@angular/material/icon';
 import { ReactiveFormsModule } from '@angular/forms';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import { UserNotFoundComponent } from './components/user-not-found/user-not-found.component';
-
+import { RidehistoryComponent } from './components/ridehistory/ridehistory.component';
+import { MatSortModule } from '@angular/material/sort';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatHeaderCell,
+  MatHeaderCellDef, MatHeaderRow, MatHeaderRowDef,
+  MatRow, MatRowDef,
+  MatTable
+} from '@angular/material/table';
 @NgModule({
   declarations: [
     ButtonComponent,
     InputComponent,
     NavbarComponent,
     LoginDialogComponent,
-    UserNotFoundComponent
+    UserNotFoundComponent,
+    RidehistoryComponent,
   ],
   imports: [
     CommonModule,
@@ -34,6 +46,7 @@ import { UserNotFoundComponent } from './components/user-not-found/user-not-foun
     MatButton,
     RouterLink,
     FormsModule,
+    MatSortModule,
     MatFormField,
     MatIconButton,
     MatInput,
@@ -55,7 +68,18 @@ import { UserNotFoundComponent } from './components/user-not-found/user-not-foun
     MatAutocompleteModule,
     MatFormFieldModule,
     MatIconModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCell,
+    MatCell,
+    MatHeaderCellDef,
+    MatCellDef,
+    MatRow,
+    MatHeaderRow,
+    MatRowDef,
+    MatHeaderRowDef,
+    MatProgressSpinnerModule
   ],
   exports: [
     ButtonComponent,

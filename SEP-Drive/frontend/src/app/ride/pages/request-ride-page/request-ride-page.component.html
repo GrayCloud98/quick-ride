@@ -1,13 +1,13 @@
-<div *ngIf="accessAllowed" class="request-ride-layout">
-  <div class="request-form">
+<div *ngIf="accessAllowed" class="main-container">
+  <div class="left-container scroll">
     <ride-form/>
   </div>
 
-  <div class="request-map">
+  <div class="right-container map">
     <app-map/>
   </div>
 </div>
 
-<div *ngIf="!accessAllowed" class="centered-box alert error" style="width: 500px">
+<div *ngIf="!accessAllowed" class="mini centered-box alert error">
   Please log in as a Customer first.
 </div>
