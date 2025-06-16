@@ -23,9 +23,7 @@ public class TripService {
     @Autowired
     private UserRepository userRepository;
 
-    /**
-     * Fahrt-Historie für Kunden oder Fahrer
-     */
+    //von entity zu DTO zu frontende
     public List<TripeDTO> getTripHistoryForUser(String username) {
         List<Trips> trips = tripRepository.findCompletedTripsByUser(username);
 
@@ -54,9 +52,7 @@ public class TripService {
         }).collect(Collectors.toList());
     }
 
-    /**
-     * Fahrt abschließen und speichern (Daten kommen vom Frontend)
-     */
+    //von controller zu completed zu trips
     public void completeTrip(TripCompleteRequest request) {
 
         User customer = userRepository.findByUsername(request.getCustomerUsername())
@@ -84,9 +80,7 @@ public class TripService {
         tripRepository.save(trip);
     }
 
-    /**
-     * Alle Fahrten eines Nutzers (optional, je nach Bedarf)
-     */
+
     public List<Trips> getTripsForUser(String username, String role) {
         if ("DRIVER".equalsIgnoreCase(role)) {
             return tripRepository.findByDriverUsername(username);
