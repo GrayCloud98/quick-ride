@@ -31,6 +31,7 @@ import {
   MatRow, MatRowDef,
   MatTable
 } from '@angular/material/table';
+
 @NgModule({
   declarations: [
     ButtonComponent,
@@ -41,6 +42,7 @@ import {
     RidehistoryComponent,
   ],
   imports: [
+    MatSortModule,
     CommonModule,
     MatToolbar,
     MatButton,

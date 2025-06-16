@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import {AuthService} from "../../../auth/auth.service";
@@ -12,35 +12,36 @@ import { RideHistoryService, TripHistoryDTO } from '../../services/ridehistory.s
   standalone: false
 })
 export class RidehistoryComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = [];
+  displayedColumns: string[] = [
+    'id', 'date', 'distance', 'duration', 'amount',
+    'driverRating', 'driverName', 'driverUsername',
+    'customerRating', 'customerName', 'customerUsername'
+  ];
   constructor(
-        private rideHistoryService: RideHistoryService,
-        private readonly authService: AuthService
-  ) {
-  }
+    private rideHistoryService: RideHistoryService,
+    private readonly authService: AuthService
+  ) {}
   dataSource = new MatTableDataSource<TripHistoryDTO>([]);
   loading = true;
   error: string | null = null;
-  @ViewChild(MatSort) sort!: MatSort;
+
 
   columnHeaders: { [key: string]: string } = {
-    id: 'Fahrt-ID',
-    date: 'Datum/Uhrzeit',
-    distance: 'Distanz',
-    duration: 'Dauer',
-    money: 'Geld',
-    driverRating: 'Bewertung Fahrer',
-    driverName: 'Fahrer',
-    driverUsername: 'Benutzername Fahrer',
-    customerRating: 'Bewertung Kunde',
-    customerName: 'Kunde',
-    customerUsername: 'Benutzername Kunde'
+    id: 'Trip-id',
+    date: 'Date/Time',
+    distance: 'Distance',
+    duration: 'Duration',
+    amount: 'Money',
+    driverRating: 'DriverRating',
+    driverName: 'DriverName',
+    driverUsername: 'DriverUsername',
+    customerRating: 'CustomerRating',
+    customerName: 'CustomerName',
+    customerUsername: 'CustomerUsername'
   };
 
-  getColumnHeader(column: string): string {
-    return this.columnHeaders[column] || column;
-  }
 
+  @ViewChild(MatSort) sort!: MatSort;
   iscustomer :boolean | null= null;
   ngOnInit() {
     this.authService.isCustomer().subscribe({
@@ -48,12 +49,12 @@ export class RidehistoryComponent implements OnInit, AfterViewInit {
         this.iscustomer = iscustomer;
         if (iscustomer) {
           this.displayedColumns = [
-            'id', 'date', 'distance', 'duration', 'money',
+            'id', 'date', 'distance', 'duration', 'amount',
             'driverRating', 'driverName', 'driverUsername'
           ];
         } else {
           this.displayedColumns = [
-            'id', 'date', 'distance', 'duration', 'money',
+            'id', 'date', 'distance', 'duration', 'amount',
             'customerRating', 'customerName', 'customerUsername'
           ];
         }
@@ -69,16 +70,22 @@ export class RidehistoryComponent implements OnInit, AfterViewInit {
         });
       },
       error: err => {
-        this.error = 'Rolle konnte nicht bestimmt werden';
+        this.error = 'Role could not be determined';
         this.loading = false;
       }
     });
   }
+
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;
   }
+
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  getColumnHeader(column: string): string {
+    return this.columnHeaders[column] || column;
   }
 }

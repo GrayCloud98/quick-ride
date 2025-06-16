@@ -171,3 +171,18 @@
   margin-top: 4rem; // zu viel!
   padding-top: 4rem;
 }
+::ng-deep .mat-table {
+  background: white !important;
+  color: black !important;
+  z-index: 1 !important;
+}
+::ng-deep .mat-header-cell,
+::ng-deep .mat-cell {
+  pointer-events: auto !important;
+  background: inherit !important;
+  color: inherit !important;
+  z-index: 2 !important;
+}
+::ng-deep .mat-sort-header-container {
+  pointer-events: auto !important;
+}

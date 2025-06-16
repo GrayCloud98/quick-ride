@@ -8,7 +8,7 @@ export interface TripHistoryDTO {
   date: string;
   distance: number;
   duration: string;
-  money: number;
+  amount: number;
   customerRating: number;
   driverRating: number;
   customerName: string;
@@ -27,14 +27,14 @@ export class RideHistoryService {
   }
 
   getTripHistory(): Observable<TripHistoryDTO[]> {
-    return this.http.get<TripHistoryDTO[]>(this.apiUrl+"/kunde1").pipe(
+    return this.http.get<TripHistoryDTO[]>(this.apiUrl).pipe(
       map((rides: any[]) => rides.map(
         (ride: any) => ({
           id: ride.tripId,
           date: ride.endTime,
           distance: ride.distanceKm,
           duration: ride.durationMin,
-          money: ride.priceEuro,
+          amount: ride.priceEuro,
           customerRating: ride.customerRating,
           driverRating: ride.driverRating,
           customerName: ride.customerFullName,

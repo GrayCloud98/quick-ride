@@ -34,6 +34,7 @@ import { GoogleMapsModule } from '@angular/google-maps';
 import { RideSimulationComponent } from './ride-simulation/ride-simulation.component';
 import { RideRatingDialogComponent } from './ride-rating-dialog/ride-rating-dialog.component';
 import { WalletPageComponent } from './profile-page/wallet-page/wallet-page.component';
+import { MatSortModule } from '@angular/material/sort';
 
 
 @NgModule({
@@ -48,6 +49,7 @@ import { WalletPageComponent } from './profile-page/wallet-page/wallet-page.comp
     WalletPageComponent
   ],
   imports: [
+    MatSortModule,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
