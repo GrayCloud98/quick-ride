@@ -49,7 +49,7 @@ ngOnInit(): void {
     next: data => {
       this.simulation = data;
 
-      // TODO DELTE ME
+      // TODO DELETE ME
       this.simulation.currentLng = 123;
 
       this.simulationService.postUpdateSimulation(this.simulation).subscribe({
@@ -61,10 +61,11 @@ ngOnInit(): void {
           })
         }
       });
+      // TODO END DELETE
     },
     error: err => console.log("getAcceptedRideDetails", err)
+
   })
-  // TODO END DELETE
 
   this.directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
 
