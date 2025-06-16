@@ -1,5 +1,6 @@
 package com.example.sep_drive_backend.models;
 
+import com.example.sep_drive_backend.constants.Ridestatus;
 import com.example.sep_drive_backend.constants.VehicleClassEnum;
 import jakarta.persistence.*;
 
@@ -39,6 +40,20 @@ public class RideRequest {
     private Double destinationLongitude;
     @Column
     private Double distance;
+    @Enumerated(EnumType.STRING)
+    private Ridestatus status;
+
+
+    @OneToOne
+    @JoinColumn(name = "ride_offer_id")
+    private RideOffer rideOffer;
+    @Column
+    private Double currentLat;
+
+    private Double simulationSpeed;
+    @Column
+    private Double currentLng;
+
 
     @Column
     private Double duration;
@@ -72,8 +87,49 @@ public class RideRequest {
         this.distance = distance;
         this.duration = duration;
         this.estimatedPrice = estimatedPrice;
+        this.status = Ridestatus.PLANNED;
     }
 
+
+    public Ridestatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(Ridestatus status) {
+        this.status = status;
+    }
+
+    public RideOffer getRideOffer() {
+        return rideOffer;
+    }
+
+    public void setRideOffer(RideOffer rideOffer) {
+        this.rideOffer = rideOffer;
+    }
+
+    public Double getCurrentLat() {
+        return currentLat;
+    }
+
+    public void setCurrentLat(Double currentLat) {
+        this.currentLat = currentLat;
+    }
+
+    public Double getSimulationSpeed() {
+        return simulationSpeed;
+    }
+
+    public void setSimulationSpeed(Double simulationSpeed) {
+        this.simulationSpeed = simulationSpeed;
+    }
+
+    public Double getCurrentLng() {
+        return currentLng;
+    }
+
+    public void setCurrentLng(Double currentLng) {
+        this.currentLng = currentLng;
+    }
 
     public Customer getCustomer() {
         return customer;

@@ -1,4 +1,5 @@
 package com.example.sep_drive_backend.services;
+import com.example.sep_drive_backend.constants.Ridestatus;
 import com.example.sep_drive_backend.dto.RideOfferNotification;
 import com.example.sep_drive_backend.dto.RidesForDriversDTO;
 import com.example.sep_drive_backend.models.Customer;
@@ -43,26 +44,28 @@ public class RideRequestService {
             throw new IllegalStateException("Customer already has an active ride request.");
         }
 
-        RideRequest request = new RideRequest(
-                null,
-                dto.getStartAddress(),
-                dto.getStartLocationName(),
-                dto.getDestinationLocationName(),
-                dto.getDestinationAddress(),
-                dto.getStartLatitude(),
-                dto.getStartLongitude(),
-                dto.getDestinationLatitude(),
-                dto.getDestinationLongitude(),
-                dto.getVehicleClass(),
-                customer,
-                dto.getDistance(),
-                dto.getDuration(),
-                dto.getEstimatedPrice()
-        );
-
+        RideRequest request = new RideRequest();
+        request.setCustomer(customer);
+        request.setStartAddress(dto.getStartAddress());
+        request.setStartLatitude(dto.getStartLatitude());
+        request.setStartLongitude(dto.getStartLongitude());
+        request.setDestinationAddress(dto.getDestinationAddress());
+        request.setDestinationLatitude(dto.getDestinationLatitude());
+        request.setDestinationLongitude(dto.getDestinationLongitude());
+        request.setVehicleClass(dto.getVehicleClass()); // now uses enum
+        request.setStartLocationName(dto.getStartLocationName());
+        request.setDestinationLocationName(dto.getDestinationLocationName());
+        request.setDistance(dto.getDistance());
+        request.setDuration(dto.getDuration());
+        request.setEstimatedPrice(dto.getEstimatedPrice());
+        request.setStatus(Ridestatus.PLANNED);
         customer.setActive(true);
+        request.setCurrentLat(dto.getStartLatitude());
+        request.setCurrentLng(dto.getStartLongitude());
+        request.setSimulationSpeed(1.0);
         customerRepository.save(customer);
         return rideRequestRepository.save(request);
+
     }
 
     public RideRequest getActiveRideRequestForCustomer(String username) {
@@ -212,6 +215,8 @@ public class RideRequestService {
             }
         }
 
+        rideRequest.setRideOffer(selectedOffer);
+        rideRequest.setStatus(Ridestatus.IN_PROGRESS);
         rideOfferRepository.save(selectedOffer);
         rideRequestRepository.save(rideRequest);
         notificationService.sendAcceptNotification(selectedOffer.getDriver().getUsername());
