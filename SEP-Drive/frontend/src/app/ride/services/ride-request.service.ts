@@ -9,8 +9,10 @@ import {Ride, VehicleClass} from '../models/ride.model';
 })
 export class RideRequestService {
 
-  private baseUrl= 'http://localhost:8080/api/ride-requests';
-  constructor(private http: HttpClient) {}
+  private baseUrl = 'http://localhost:8080/api/ride-requests';
+
+  constructor(private http: HttpClient) {
+  }
 
   public submitRide(ride: Ride) {
     const rideJson: any = {
@@ -23,8 +25,8 @@ export class RideRequestService {
       destinationLocationName: ride.dropoff.name,
       startAddress: ride.pickup.address,
       destinationAddress: ride.dropoff.address,
-      distance : ride.distance,
-      duration : ride.duration,
+      distance: ride.distance,
+      duration: ride.duration,
       estimatedPrice: ride.estimatedPrice
     };
 
@@ -72,58 +74,4 @@ export class RideRequestService {
       error: err => console.error(err)
     });
   }
-
-
-  public getAcceptedRideDetails(): Observable<Simulation> {
-    return this.http.get<any>(this.baseUrl + '/rides/accepted').pipe(
-      map((simulation: any) => ({
-        rideId: simulation.rideId,
-        status: simulation.status,
-        startLat: simulation.startLat,
-        startLng: simulation.startLng,
-        destLat: simulation.destLat,
-        destLng: simulation.destLng,
-        currentLat: simulation.currentLat,
-        currentLng: simulation.currentLng,
-        simulationSpeed: simulation.simulationSpeed,
-        estimatedPrice: simulation.estimatedPrice,
-        customerUsername: simulation.customerUsername,
-        driverUsername: simulation.driverUsername,
-        driverFullName: simulation.driverFullName,
-        vehicleClass: simulation.vehicleClass,
-        driverRating: simulation.driverRating
-      }))
-    );
-}
-public submitRideRating(rideId: number, rating: number, feedback: string) {
-  return this.http.post('http://localhost:8080/api/rides/rate', {
-    rating,
-    feedback
-  });
-}
-}
-
-export enum SimulationStatus {
-  PLANNED,
-  IN_PROGRESS,
-  PAUSED,
-  COMPLETED
-}
-
-export interface Simulation {
-      rideId: number,
-      status: SimulationStatus,
-      startLat: number,
-      startLng: number,
-      destLat: number,
-      destLng: number,
-      currentLat: number,
-      currentLng: number,
-      simulationSpeed: number,
-      estimatedPrice: number,
-      customerUsername: string,
-      driverUsername: string,
-      driverFullName: string,
-      vehicleClass: VehicleClass,
-      driverRating: string
 }

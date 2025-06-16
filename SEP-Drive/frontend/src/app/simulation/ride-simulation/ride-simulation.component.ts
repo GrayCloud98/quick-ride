@@ -1,11 +1,11 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { RideRatingDialogComponent } from '../ride-rating-dialog/ride-rating-dialog.component';
-import { RideStateService } from '../ride/services/ride-state.service';
+import { RideStateService } from '../../ride/services/ride-state.service';
 import { ActivatedRoute } from '@angular/router';
 import { GoogleMap } from '@angular/google-maps';
-import { RideSocketService } from '../ride/services/ride-socket.service';
-import {RideRequestService, Simulation} from '../ride/services/ride-request.service';
+import { RideSocketService } from '../../ride/services/ride-socket.service';
+import {SimulationService, Simulation} from '../simulation.service';
 
 @Component({
 selector: 'app-ride-simulation',
@@ -41,19 +41,20 @@ simulation!: Simulation;
 
 
 constructor(private dialog: MatDialog, private rideStateService: RideStateService, private activatedRoute: ActivatedRoute, private rideSocketService: RideSocketService,
-            private rideService: RideRequestService) { }
+            private simulationService: SimulationService) { }
 
 ngOnInit(): void {
   // Map directionsRenderer is ready
-  this.rideService.getAcceptedRideDetails().subscribe({
+  this.simulationService.getAcceptedRideDetails().subscribe({
     next: data => {
       this.simulation = data;
 
+      // TODO DELTE ME
       this.simulation.currentLng = 123;
 
-      this.rideService.postUpdateSimulation(this.simulation).subscribe({
+      this.simulationService.postUpdateSimulation(this.simulation).subscribe({
         next: () => {
-          this.rideService.getUpdateSimulation(this.simulation.rideId).subscribe({
+          this.simulationService.getUpdateSimulation(this.simulation.rideId).subscribe({
             next: data => {
               console.log("getUpdateSimulation", data)
             }
@@ -63,10 +64,11 @@ ngOnInit(): void {
     },
     error: err => console.log("getAcceptedRideDetails", err)
   })
+  // TODO END DELETE
 
   this.directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
 
-  this.rideService.getAcceptedRideDetails().subscribe({
+  this.simulationService.getAcceptedRideDetails().subscribe({
     next: data => {
       console.log(data)
       // 1. Load from URL if available
@@ -210,7 +212,7 @@ resumeSimulation(): void {
   if (showRating) {
     this.dialog.open(RideRatingDialogComponent).afterClosed().subscribe(result => {
       if (result) {
-        this.rideService.submitRideRating(Number(this.rideId), result.rating, result.feedback).subscribe();
+        this.simulationService.submitRideRating(Number(this.rideId), result.rating, result.feedback).subscribe();
       }
     });
   }
