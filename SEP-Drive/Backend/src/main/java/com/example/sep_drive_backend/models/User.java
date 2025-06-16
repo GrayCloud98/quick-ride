@@ -32,7 +32,7 @@ public abstract class User {
     private String profilePicture;
     private int totalRides;
     private float rating;
-
+    private int numberOfRatings ;
 
     public User() {}
 
@@ -45,6 +45,9 @@ public abstract class User {
         this.password = password;
         this.role = role;
         this.profilePicture = profilePicture;
+        this.totalRides = 0;
+        this.rating = 0;
+        this.numberOfRatings = 0;
     }
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -145,6 +148,16 @@ public abstract class User {
     public void setEmail(String email) {
         this.email = email;
     }
-
+    public int getNumberOfRatings() {
+        return numberOfRatings;
+    }
+    public void setNumberOfRatings(int numberOfRatings) {
+        this.numberOfRatings = numberOfRatings;
+    }
+    public void addRating(float newRating) {
+        float total = this.rating * this.numberOfRatings;
+        this.numberOfRatings++;
+        this.rating = (total + newRating) / this.numberOfRatings;
+    }
 
 }

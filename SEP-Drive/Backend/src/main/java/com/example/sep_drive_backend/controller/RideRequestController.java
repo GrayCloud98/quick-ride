@@ -192,4 +192,21 @@ public class RideRequestController {
         AcceptedRideDetailsDTO rideDetails = rideRequestService.getAcceptedRideDetails(username);
         return ResponseEntity.ok(rideDetails);
     }
+    @PostMapping("/rate")
+    public ResponseEntity<String> rateRide(@RequestParam Long rideId,
+                                           @RequestParam float rating,
+                                           HttpServletRequest request) {
+        String token = jwtTokenProvider.resolveToken(request);
+        String username = jwtTokenProvider.getUsername(token);
+
+        try {
+            String resultMessage = rideRequestService.rateRide(rideId, rating, username);
+            return ResponseEntity.ok(resultMessage);
+        } catch (NoSuchElementException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+    }
+
 }

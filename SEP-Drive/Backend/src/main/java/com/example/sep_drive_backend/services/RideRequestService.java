@@ -351,6 +351,37 @@ public class RideRequestService {
 
         return dto;
     }
+    public String rateRide(Long rideId, float rating, String username) {
+        RideRequest ride = rideRequestRepository.findById(rideId)
+                .orElseThrow(() -> new NoSuchElementException("Ride not found"));
+
+        if (ride.getStatus() != Ridestatus.COMPLETED) {
+            return "Ride is not completed yet.";
+        }
+
+        Optional<Customer> customerOpt = customerRepository.findByUsername(username);
+        if (customerOpt.isPresent()) {
+            RideOffer offer = ride.getRideOffer();
+            if (offer == null || offer.getDriver() == null) {
+                return "No driver to rate.";
+            }
+
+            Driver driver = offer.getDriver();
+            driver.addRating(rating);
+            driverRepository.save(driver);
+            return "Driver rated successfully.";
+        }
+
+        Optional<Driver> driverOpt = driverRepository.findByUsername(username);
+        if (driverOpt.isPresent()) {
+            Customer customer = ride.getCustomer();
+            customer.addRating(rating);
+            customerRepository.save(customer);
+            return "Customer rated successfully.";
+        }
+
+        throw new SecurityException("User not authorized.");
+    }
 
 
 }
