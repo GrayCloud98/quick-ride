@@ -46,7 +46,21 @@ constructor(private dialog: MatDialog, private rideStateService: RideStateServic
 ngOnInit(): void {
   // Map directionsRenderer is ready
   this.rideService.getAcceptedRideDetails().subscribe({
-    next: data => this.simulation = data,
+    next: data => {
+      this.simulation = data;
+
+      this.simulation.currentLng = 123;
+
+      this.rideService.postUpdateSimulation(this.simulation).subscribe({
+        next: () => {
+          this.rideService.getUpdateSimulation(this.simulation.rideId).subscribe({
+            next: data => {
+              console.log("getUpdateSimulation", data)
+            }
+          })
+        }
+      });
+    },
     error: err => console.log("getAcceptedRideDetails", err)
   })
 
