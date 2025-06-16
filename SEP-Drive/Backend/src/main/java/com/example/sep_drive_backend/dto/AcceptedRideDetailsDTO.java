@@ -49,6 +49,9 @@ public class AcceptedRideDetailsDTO {
     public Double getDestLat() {
         return destLat;
     }
+    public AcceptedRideDetailsDTO (){
+        this.status=Ridestatus.PLANNED;
+    }
     public void setDestLat(double destLat) {
         this.destLat = destLat;
     }
