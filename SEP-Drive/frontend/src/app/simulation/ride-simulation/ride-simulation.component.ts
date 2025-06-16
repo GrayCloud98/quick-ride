@@ -5,7 +5,7 @@ import { RideStateService } from '../../ride/services/ride-state.service';
 import { ActivatedRoute } from '@angular/router';
 import { GoogleMap } from '@angular/google-maps';
 import { RideSocketService } from '../../ride/services/ride-socket.service';
-import {SimulationService, Simulation} from '../simulation.service';
+import {SimulationService, Simulation, SimulationStatus} from '../simulation.service';
 
 @Component({
 selector: 'app-ride-simulation',
@@ -44,70 +44,72 @@ constructor(private dialog: MatDialog, private rideStateService: RideStateServic
             private simulationService: SimulationService) { }
 
 ngOnInit(): void {
-  // Map directionsRenderer is ready
-  this.simulationService.getAcceptedRideDetails().subscribe({
-    next: data => {
-      this.simulation = data;
-
-      // TODO DELETE ME
-      this.simulation.currentLng = 123;
-
-      this.simulationService.postUpdateSimulation(this.simulation).subscribe({
-        next: () => {
-          this.simulationService.getUpdateSimulation(this.simulation.rideId).subscribe({
-            next: data => {
-              console.log("getUpdateSimulation", data)
-            }
-          })
-        }
-      });
-      // TODO END DELETE
-    },
-    error: err => console.log("getAcceptedRideDetails", err)
-
-  })
-
-  this.directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
-
-  this.simulationService.getAcceptedRideDetails().subscribe({
-    next: data => {
-      console.log(data)
-      // 1. Load from URL if available
-      this.activatedRoute.queryParams.subscribe(params => {
-        const pickupLat = this.simulation.startLat;
-        const pickupLng = this.simulation.startLng;
-        const dropoffLat = this.simulation.destLat;
-        const dropoffLng = this.simulation.destLng;
-        this.rideId = params['rideId'];
-
-        if (!isNaN(pickupLat) && !isNaN(pickupLng) && !isNaN(dropoffLat) && !isNaN(dropoffLng)) {
-          this.pickupLocation = { lat: pickupLat, lng: pickupLng };
-          this.dropoffLocation = { lat: dropoffLat, lng: dropoffLng };
-          this.tryStartSimulation();
-        }
-      });
-
-      // 2. Also subscribe to RideStateService (e.g., for form input)
-      this.rideStateService.pickupLocation$.subscribe(pickup => {
-        this.pickupLocation = pickup;
-        this.tryStartSimulation();
-      });
-
-      this.rideStateService.dropoffLocation$.subscribe(dropoff => {
-        this.dropoffLocation = dropoff;
-        this.tryStartSimulation();
-      });
-
-      if (this.role === 'customer') {
-        this.rideSocketService.subscribeToRide(this.rideId);
-        this.rideSocketService.position$.subscribe(position => {
-          if (position) this.markerPosition = position;
-        });
-      }
+  this.activatedRoute.queryParams.subscribe(params => {
+    const roleParam = params['role'];
+    if (roleParam === 'driver' || roleParam === 'customer') {
+      this.role = roleParam;
+    } else {
+      console.warn('No valid role provided in URL. Defaulting to "driver".');
+      this.role = 'driver';
     }
-  })
-}
 
+    console.log('🌐 Role is:', this.role);
+
+    // Proceed only after role is set
+    this.simulationService.getAcceptedRideDetails().subscribe({
+      next: data => {
+        this.simulation = data;
+        this.rideId = data.rideId.toString();
+        this.pickupLocation = { lat: data.startLat, lng: data.startLng };
+        this.dropoffLocation = { lat: data.destLat, lng: data.destLng };
+        this.center = this.pickupLocation;
+
+        this.tryStartSimulation();
+
+        // Start polling for both roles
+        setInterval(() => {
+          this.simulationService.getUpdateSimulation(Number(this.rideId)).subscribe({
+            next: update => {
+              console.log('[POLL]', this.role, '| Status:', update.status, '| Speed:', update.simulationSpeed);
+
+              this.simulation.currentLat = update.currentLat;
+              this.simulation.currentLng = update.currentLng;
+              this.simulation.status = update.status;
+              this.simulation.simulationSpeed = update.simulationSpeed;
+
+              this.markerPosition = {
+                lat: update.currentLat,
+                lng: update.currentLng
+              };
+
+              if (update.status === SimulationStatus.COMPLETED) {
+                this.stopSimulation(false);
+              }
+
+              if (update.status === SimulationStatus.PAUSED && this.isRunning) {
+                this.pauseSimulation();
+              }
+
+              if (update.status === SimulationStatus.IN_PROGRESS && !this.isRunning && !this.rideCompleted) {
+                this.resumeSimulation();
+              }
+
+              if (this.speed !== update.simulationSpeed) {
+                this.speed = update.simulationSpeed;
+                if (this.isRunning) {
+                  clearInterval(this.intervalId);
+                  this.startInterval();
+                }
+              }
+            },
+            error: err => console.error('[POLL ERROR]', err)
+          });
+        }, 50);
+      },
+      error: err => console.error("getAcceptedRideDetails failed", err)
+    });
+  });
+}
 
 ngAfterViewInit(): void {
   setTimeout(() => {
@@ -173,9 +175,15 @@ private startInterval(): void {
     this.markerPosition = this.routePath[this.progress];
     this.eta = Math.round((this.routePath.length - 1 - this.progress) * intervalTime / 1000);
 
-    if (this.role === 'driver') {
-      this.rideSocketService.sendPositionUpdate(this.rideId, this.markerPosition);
-    }
+
+  this.simulation.currentLat = this.markerPosition.lat;
+  this.simulation.currentLng = this.markerPosition.lng;
+  this.simulation.status = SimulationStatus.IN_PROGRESS;
+  this.simulation.simulationSpeed = this.speed;
+
+  this.simulationService.postUpdateSimulation(this.simulation).subscribe();
+
+
 
     if (this.progress >= this.routePath.length - 1) {
       this.stopSimulation(true); // Show rating at natural end
@@ -187,18 +195,23 @@ private startInterval(): void {
   if (this.isRunning) {
     this.isRunning = false;
     clearInterval(this.intervalId);
-    console.log('⏸️ Simulation paused');
+    this.simulation.status = SimulationStatus.PAUSED;
+
+    this.simulationService.postUpdateSimulation(this.simulation).subscribe();
   }
 }
 
+
 resumeSimulation(): void {
   if (!this.isRunning && this.simulationStarted && this.progress < this.routePath.length - 1) {
-    this.startInterval();
-    console.log('▶️ Simulation resumed');
-  } else {
-    console.warn('⏸️ Cannot resume simulation');
+    this.simulation.status = SimulationStatus.IN_PROGRESS;
+
+    this.simulationService.postUpdateSimulation(this.simulation).subscribe(() => {
+      this.startInterval();
+    });
   }
 }
+
 
   stopSimulation(showRating = true): void {
   clearInterval(this.intervalId);
@@ -206,11 +219,12 @@ resumeSimulation(): void {
   this.simulationStarted = false;
   this.progress = 0;
   this.eta = 0;
-  this.markerPosition = this.routePath.length > 0 ? this.routePath[0] : { lat: 0, lng: 0 };
+  this.rideCompleted = true;
 
-  this.rideCompleted = true; // ✅ Prevent restarting
+  this.simulation.status = SimulationStatus.COMPLETED;
+  this.simulationService.postUpdateSimulation(this.simulation).subscribe();
 
-  if (showRating) {
+  if (showRating && this.role === 'driver') {
     this.dialog.open(RideRatingDialogComponent).afterClosed().subscribe(result => {
       if (result) {
         this.simulationService.submitRideRating(Number(this.rideId), result.rating, result.feedback).subscribe();
@@ -221,12 +235,14 @@ resumeSimulation(): void {
 
   onSpeedChange(value: number): void {
   this.speed = Number(value);
+  this.simulation.simulationSpeed = this.speed;
+
   if (this.isRunning) {
-    // Restart interval with new speed but keep progress
     clearInterval(this.intervalId);
     this.startInterval();
-    console.log(`⚙️ Speed changed to ${this.speed}`);
   }
+
+  this.simulationService.postUpdateSimulation(this.simulation).subscribe();
 }
 
   handleSpeedInput(event: Event): void {
