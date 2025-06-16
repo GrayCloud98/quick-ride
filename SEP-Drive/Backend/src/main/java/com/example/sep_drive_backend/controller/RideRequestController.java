@@ -6,6 +6,7 @@ import com.example.sep_drive_backend.models.JwtTokenProvider;
 import com.example.sep_drive_backend.models.RideOffer;
 import com.example.sep_drive_backend.models.RideRequest;
 import com.example.sep_drive_backend.repository.RideOfferRepository;
+import com.example.sep_drive_backend.services.LoginService;
 import com.example.sep_drive_backend.services.RideRequestService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -23,17 +25,15 @@ import java.util.stream.Collectors;
 public class RideRequestController {
 
 
-    private RideRequestService rideRequestService;
+    private final RideRequestService rideRequestService;
+    private final LoginService loginService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
-    private RideOfferRepository rideOfferRepository;
-
-    @Autowired
-    public RideRequestController(RideRequestService rideRequestService) {
+    public RideRequestController(RideRequestService rideRequestService, LoginService loginService, JwtTokenProvider jwtTokenProvider) {
         this.rideRequestService = rideRequestService;
+        this.loginService = loginService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @PostMapping
@@ -42,7 +42,7 @@ public class RideRequestController {
         try {
             String token = jwtTokenProvider.resolveToken(request);
             String username = jwtTokenProvider.getUsername(token);
-            dto.setUserName(username); // Inject username from token, not from client
+            dto.setUserName(username);
 
             RideRequest rideRequest = rideRequestService.createRideRequest(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(rideRequest);
@@ -87,98 +87,92 @@ public class RideRequestController {
         return ResponseEntity.noContent().build();
     }
 
-//    @GetMapping("/all-active-rides")
-//    public ResponseEntity<List<RidesForDriversDTO>> getAllRideRequests() {
-//        List<RidesForDriversDTO> rideRequests = rideRequestService.getAllRideRequests();
-//        return ResponseEntity.ok(rideRequests);
-//    }
-
-
-    @PostMapping("/all-active-rides")
-    public ResponseEntity<List<RidesForDriversDTO>> getAllRideRequests(
-            @RequestBody DriverLocationDTO location) {
-
-
-        double driverLat = location.getDriverLat();
-        double driverLon = location.getDriverLon();
-
-        List<RidesForDriversDTO> rideRequests = rideRequestService.getAllRideRequests(driverLat, driverLon);
+    @GetMapping("/all-active-rides")
+    public ResponseEntity<List<RidesForDriversDTO>> getAllRideRequests() {
+        List<RidesForDriversDTO> rideRequests = rideRequestService.getAllRideRequests();
         return ResponseEntity.ok(rideRequests);
     }
 
     @PostMapping("/offer-ride")
-    public ResponseEntity<RideOffer> offerRide(@RequestParam Long rideRequestId, HttpServletRequest request) {
-        String token = jwtTokenProvider.resolveToken(request);
-        String username = jwtTokenProvider.getUsername(token);
-
-        RideOffer offer = rideRequestService.createRideOffer(rideRequestId, username);
-        return ResponseEntity.ok(offer);
+    public ResponseEntity<?> offerRide(@RequestParam Long rideRequestId, HttpServletRequest request) {
+        String username = loginService.extractUsername(request);
+        try {
+            RideOffer offer = rideRequestService.createRideOffer(rideRequestId, username);
+            return ResponseEntity.ok(offer);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/reject-offer")
-    public ResponseEntity<Void> rejectOffer(@RequestParam Long rideOfferId, HttpServletRequest request) {
-        rideRequestService.rejectOffer(rideOfferId);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> rejectOffer(@RequestParam Long rideOfferId) {
+        try {
+            rideRequestService.rejectOffer(rideOfferId);
+            return ResponseEntity.noContent().build();
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/cancel-offer")
-    public ResponseEntity<Void> cancelOffer(HttpServletRequest request) {
-        String token = jwtTokenProvider.resolveToken(request);
-        String username = jwtTokenProvider.getUsername(token);
-        rideRequestService.cancelOffer(username);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> cancelOffer(HttpServletRequest request) {
+        String username = loginService.extractUsername(request);
+        try {
+            rideRequestService.cancelOffer(username);
+            return ResponseEntity.noContent().build();
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
-    @GetMapping("offer-request-id")
-    public ResponseEntity<Long> getDriverOfferRideRequestId(HttpServletRequest request) {
-        String token = jwtTokenProvider.resolveToken(request);
-        String username = jwtTokenProvider.getUsername(token);
-
+    @GetMapping("/offer-request-id")
+    public ResponseEntity<?> getDriverOfferRideRequestId(HttpServletRequest request) {
+        String username = loginService.extractUsername(request);
         Long rideRequestId = rideRequestService.getRideRequestIdIfDriverOffer(username);
-        return ResponseEntity.ok(rideRequestId);
+        if (rideRequestId != null) {
+            return ResponseEntity.ok(rideRequestId);
+        } else {
+            return ResponseEntity.noContent().build();
+        }
     }
 
     @GetMapping("/offers")
-    public ResponseEntity<List<RideOfferNotification>> getOffersForCustomer(HttpServletRequest request) {
-        String token = jwtTokenProvider.resolveToken(request);
-        String username = jwtTokenProvider.getUsername(token);
+    public ResponseEntity<?> getOffersForCustomer(HttpServletRequest request) {
+        String username = loginService.extractUsername(request);
 
-        RideRequest activeRequest = rideRequestService.getActiveRideRequestForCustomer(username);
-        List<RideOffer> offers = rideOfferRepository.findAllByRideRequest(activeRequest);
-
-        List<RideOfferNotification> notifications = offers.stream().map(offer -> {
-            Driver driver = offer.getDriver();
-
-            RideOfferNotification notification = new RideOfferNotification();
-            notification.setRideOfferId(offer.getId());
-            notification.setDriverName(driver.getFirstName() + " " + driver.getLastName());
-            notification.setDriverRating(driver.getRating());
-            notification.setTotalRides(driver.getTotalRides());
-            notification.setTotalTravelledDistance(0);
-            notification.setVehicleClass(driver.getVehicleClass());
-            return notification;
-        }).collect(Collectors.toList());
-
-        return ResponseEntity.ok(notifications);
+        try {
+            List<RideOfferNotification> notifications = rideRequestService.getOffersForCustomer(username);
+            return ResponseEntity.ok(notifications);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
-    @PostMapping("/accept-offer")
-    public ResponseEntity<Void> acceptOffer(@RequestParam Long rideOfferId, HttpServletRequest request) {
-        String token = jwtTokenProvider.resolveToken(request);
-        String username = jwtTokenProvider.getUsername(token);
-        rideRequestService.acceptRideOffer(rideOfferId, username);
-        return ResponseEntity.ok().build();
 
+    @PostMapping("/accept-offer")
+    public ResponseEntity<?> acceptOffer(@RequestParam Long rideOfferId, HttpServletRequest request) {
+        String username = loginService.extractUsername(request);
+        try {
+            rideRequestService.acceptRideOffer(rideOfferId, username);
+            return ResponseEntity.ok().build();
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        }
     }
 
     @GetMapping("/is-driver-active")
-    public ResponseEntity<Boolean> isDriverActive (HttpServletRequest request) {
-
-        String token = jwtTokenProvider.resolveToken(request);
-        String username = jwtTokenProvider.getUsername(token);
-
-        boolean isDriverActive = rideRequestService.isDriverActive(username);
-        return ResponseEntity.ok(isDriverActive);
+    public ResponseEntity<Boolean> isDriverActive(HttpServletRequest request) {
+        String username = loginService.extractUsername(request);
+        boolean active = rideRequestService.isDriverActive(username);
+        return ResponseEntity.ok(active);
     }
+
+
+
+
     @PostMapping("/ride-request/{id}/simulation")
     public ResponseEntity<Void> updateSimulationState(@PathVariable Long id,
                                                       @RequestBody SimulationUpdateDTO dto) {

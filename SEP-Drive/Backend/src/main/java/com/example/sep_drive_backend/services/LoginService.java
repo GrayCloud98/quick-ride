@@ -6,6 +6,7 @@ import com.example.sep_drive_backend.models.Driver;
 import com.example.sep_drive_backend.models.JwtTokenProvider;
 import com.example.sep_drive_backend.repository.CustomerRepository;
 import com.example.sep_drive_backend.repository.DriverRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -91,5 +92,12 @@ public class LoginService {
         verificationCodes.put(username, code);
         emailService.sendVerificationCode(email, code);
     }
+
+    public String extractUsername(HttpServletRequest request) {
+        String token = jwtTokenProvider.resolveToken(request);
+        return jwtTokenProvider.getUsername(token);
+    }
+
+
 }
 
