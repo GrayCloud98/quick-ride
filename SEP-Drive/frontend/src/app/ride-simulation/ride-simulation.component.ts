@@ -5,7 +5,7 @@ import { RideStateService } from '../ride/services/ride-state.service';
 import { ActivatedRoute } from '@angular/router';
 import { GoogleMap } from '@angular/google-maps';
 import { RideSocketService } from '../ride/services/ride-socket.service';
-import {RideRequestService} from '../ride/services/ride-request.service';
+import {RideRequestService, Simulation} from '../ride/services/ride-request.service';
 
 @Component({
 selector: 'app-ride-simulation',
@@ -37,6 +37,7 @@ private map!: google.maps.Map;
 private directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
 private directionsResult: google.maps.DirectionsResult | null = null;
 public simulationStarted = false;
+simulation!: Simulation;
 
 
 constructor(private dialog: MatDialog, private rideStateService: RideStateService, private activatedRoute: ActivatedRoute, private rideSocketService: RideSocketService,
@@ -44,16 +45,22 @@ constructor(private dialog: MatDialog, private rideStateService: RideStateServic
 
 ngOnInit(): void {
   // Map directionsRenderer is ready
+  this.rideService.getAcceptedRideDetails().subscribe({
+    next: data => this.simulation = data,
+    error: err => console.log("getAcceptedRideDetails", err)
+  })
+
   this.directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
 
-  this.rideService.getRide().subscribe({
+  this.rideService.getAcceptedRideDetails().subscribe({
     next: data => {
+      console.log(data)
       // 1. Load from URL if available
       this.activatedRoute.queryParams.subscribe(params => {
-        const pickupLat = data.pickup.latitude;
-        const pickupLng = data.pickup.longitude;
-        const dropoffLat = data.dropoff.latitude;
-        const dropoffLng = data.dropoff.longitude;
+        const pickupLat = this.simulation.startLat;
+        const pickupLng = this.simulation.startLng;
+        const dropoffLat = this.simulation.destLat;
+        const dropoffLng = this.simulation.destLng;
         this.rideId = params['rideId'];
 
         if (!isNaN(pickupLat) && !isNaN(pickupLng) && !isNaN(dropoffLat) && !isNaN(dropoffLng)) {

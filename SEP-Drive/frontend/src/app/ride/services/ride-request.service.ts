@@ -74,29 +74,26 @@ export class RideRequestService {
   }
 
 
-  public getAcceptedRideDetails(): Observable<Ride> {
-  return this.http.get<any>('http://localhost:8080/api/rides/accepted').pipe(
-    map((ride: any) => ({
-      pickup: {
-        latitude: Number(ride.pickup.latitude),
-        longitude: Number(ride.pickup.longitude),
-        address: ride.pickup.address || undefined,
-        name: ride.pickup.name || undefined
-      },
-      dropoff: {
-        latitude: Number(ride.dropoff.latitude),
-        longitude: Number(ride.dropoff.longitude),
-        address: ride.dropoff.address || undefined,
-        name: ride.dropoff.name || undefined
-      },
-      vehicleClass: ride.vehicleClass as VehicleClass,
-      active: true,
-      distance: Number(ride.distance) || 0,
-      duration: Number(ride.duration) || 0,
-      estimatedPrice: Number(ride.estimatedPrice) || 0,
-      id: ride.id // Optional: if you want to keep rideId
-    }))
-  );
+  public getAcceptedRideDetails(): Observable<Simulation> {
+    return this.http.get<any>(this.baseUrl + '/rides/accepted').pipe(
+      map((simulation: any) => ({
+        rideId: simulation.rideId,
+        status: simulation.status,
+        startLat: simulation.startLat,
+        startLng: simulation.startLng,
+        destLat: simulation.destLat,
+        destLng: simulation.destLng,
+        currentLat: simulation.currentLat,
+        currentLng: simulation.currentLng,
+        simulationSpeed: simulation.simulationSpeed,
+        estimatedPrice: simulation.estimatedPrice,
+        customerUsername: simulation.customerUsername,
+        driverUsername: simulation.driverUsername,
+        driverFullName: simulation.driverFullName,
+        vehicleClass: simulation.vehicleClass,
+        driverRating: simulation.driverRating
+      }))
+    );
 }
 public submitRideRating(rideId: number, rating: number, feedback: string) {
   return this.http.post('http://localhost:8080/api/rides/rate', {
@@ -104,5 +101,29 @@ public submitRideRating(rideId: number, rating: number, feedback: string) {
     feedback
   });
 }
+}
 
+export enum SimulationStatus {
+  PLANNED,
+  IN_PROGRESS,
+  PAUSED,
+  COMPLETED
+}
+
+export interface Simulation {
+      rideId: number,
+      status: SimulationStatus,
+      startLat: number,
+      startLng: number,
+      destLat: number,
+      destLng: number,
+      currentLat: number,
+      currentLng: number,
+      simulationSpeed: number,
+      estimatedPrice: number,
+      customerUsername: string,
+      driverUsername: string,
+      driverFullName: string,
+      vehicleClass: VehicleClass,
+      driverRating: string
 }
