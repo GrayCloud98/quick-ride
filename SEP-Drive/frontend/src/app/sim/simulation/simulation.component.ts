@@ -23,9 +23,8 @@ export class SimulationComponent implements AfterViewInit {
   private pointer!: google.maps.marker.AdvancedMarkerElement;
   private animationFrameId: number | null = null;
   private path: google.maps.LatLngLiteral[] = [];
-  private animationStartTime: number = 0;
-  private pausedAt: number = 0;
-
+  private currentIndex = 0;
+  duration: number = 3;
   isRunning = false;
   isPaused = false;
 
@@ -105,31 +104,24 @@ export class SimulationComponent implements AfterViewInit {
 
   private animate(): void {
     const totalSteps = this.path.length;
-    const totalDurationMs = 30 * 1000; // 30 seconds
-    let index = 0;
+    const stepDurationMs = (this.duration * 1000) / totalSteps;
 
-    const step = (now: number) => {
+    const step = () => {
       if (!this.isRunning || this.isPaused) return;
 
-      const elapsed = now - this.animationStartTime;
-      const progress = elapsed / totalDurationMs;
-      const currentIndex = Math.floor(progress * totalSteps);
+      this.pointer.position = this.path[this.currentIndex];
+      this.currentIndex++;
 
-      if (currentIndex >= totalSteps) {
+      if (this.currentIndex >= totalSteps) {
         this.pointer.position = this.path[totalSteps - 1];
         this.isRunning = false;
         return;
       }
 
-      if (currentIndex > index) {
-        index = currentIndex;
-        this.pointer.position = this.path[index];
-      }
-
-      this.animationFrameId = requestAnimationFrame(step);
+      this.animationFrameId = window.setTimeout(() => requestAnimationFrame(step), stepDurationMs);
     };
 
-    this.animationFrameId = requestAnimationFrame(step);
+    requestAnimationFrame(step);
   }
 
 
@@ -163,29 +155,24 @@ export class SimulationComponent implements AfterViewInit {
   start(): void {
     if (!this.path.length) return;
 
+    this.currentIndex = 0;
     this.isRunning = true;
     this.isPaused = false;
-    this.animationStartTime = performance.now();
     this.animate();
   }
 
   pause(): void {
-    if (!this.isRunning || this.isPaused) return;
-
     this.isPaused = true;
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;
     }
-    this.pausedAt = performance.now();
   }
 
   resume(): void {
     if (!this.isRunning || !this.isPaused) return;
 
     this.isPaused = false;
-    const pausedDuration = performance.now() - this.pausedAt;
-    this.animationStartTime += pausedDuration;
     this.animate();
   }
 

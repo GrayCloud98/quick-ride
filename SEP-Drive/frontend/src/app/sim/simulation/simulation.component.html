@@ -8,6 +8,13 @@
       </div>
       <button class="btn warn" mat-fab extended (click)="end()">End</button>
     </div>
+
+    <input style="width: 100%;"
+      type="range"
+      min="3"
+      max="30"
+      [(ngModel)]="duration"
+    />
   </div>
 
   <div class="right-container">
