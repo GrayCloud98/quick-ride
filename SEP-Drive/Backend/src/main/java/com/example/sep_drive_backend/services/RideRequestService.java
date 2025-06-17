@@ -302,6 +302,10 @@ public class RideRequestService {
        customerRepository.save(ride.getCustomer());
         driver.setActive(false);
         driverRepository.save(driver);
+
+        ride.setRideOffer(null);
+        rideRequestRepository.save(ride);
+        rideOfferRepository.delete(offer);
         rideRequestRepository.delete(ride);
     }
 
