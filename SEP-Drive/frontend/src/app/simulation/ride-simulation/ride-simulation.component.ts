@@ -107,7 +107,7 @@ ngOnInit(): void {
             },
             error: err => console.error('[POLL ERROR]', err)
           });
-        }, 50);
+        }, 5);
       },
       error: err => console.error("getAcceptedRideDetails failed", err)
     });
