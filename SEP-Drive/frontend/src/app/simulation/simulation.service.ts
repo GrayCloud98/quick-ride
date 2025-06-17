@@ -62,6 +62,20 @@ export class SimulationService {
       }))
     );
   }
+
+  rating(id: number, rating: number) {
+    console.log('ratingService 😂', id, rating);
+    return this.http.post(
+      this.baseUrl + '/rate',
+      null,
+      {
+        params: {
+          rideId: id.toString(),
+          rating: rating.toString()
+        }
+      }
+    );
+  }
 }
 
 export enum SimulationStatus {

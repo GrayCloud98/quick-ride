@@ -73,7 +73,7 @@ ngOnInit(): void {
         this.pollingIntervalId = setInterval(() => {
           this.simulationService.getUpdateSimulation(Number(this.rideId)).subscribe({
             next: update => {
-              console.log('[POLL]', this.role, '| Status:', update.status, '| Speed:', update.simulationSpeed);
+              // console.log('[POLL]', this.role, '| Status:', update.status, '| Speed:', update.simulationSpeed);
 
               this.simulation.currentLat = update.currentLat;
               this.simulation.currentLng = update.currentLng;
@@ -105,7 +105,7 @@ ngOnInit(): void {
                 }
               }
             },
-            error: err => console.error('[POLL ERROR]', err)
+            error: err => {}
           });
         }, 5);
       },
@@ -225,7 +225,17 @@ resumeSimulation(): void {
   this.rideCompleted = true;
 
   this.simulation.status = SimulationStatus.COMPLETED;
-  this.simulationService.postUpdateSimulation(this.simulation).subscribe();
+  this.simulationService.postUpdateSimulation(this.simulation).subscribe({
+    error: () => {
+      if (this.intervalId) {
+        clearInterval(this.intervalId);
+      }
+
+      if (this.pollingIntervalId) {
+        clearInterval(this.pollingIntervalId);
+      }
+    }
+  });
 
   if (showRating && this.role === 'driver') {
     this.dialog.open(RideRatingDialogComponent).afterClosed().subscribe(result => {
