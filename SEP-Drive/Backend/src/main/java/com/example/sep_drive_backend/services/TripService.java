@@ -23,9 +23,7 @@ public class TripService {
     @Autowired
     private UserRepository userRepository;
 
-    /**
-     * Fahrt-Historie für Kunden oder Fahrer
-     */
+    //von entity zu DTO zu frontende
     public List<TripeDTO> getTripHistoryForUser(String username) {
         List<Trips> trips = tripRepository.findCompletedTripsByUser(username);
 
@@ -38,22 +36,23 @@ public class TripService {
             dto.setPriceEuro(trip.getPriceEuro());
             dto.setCustomerRating(trip.getCustomerRating());
             dto.setDriverRating(trip.getDriverRating());
-
-            User customer = trip.getCustomer();
-            User driver = trip.getDriver();
-
-            dto.setCustomerUsername(customer.getUsername());
-            dto.setCustomerFullName(customer.getFirstName() + " " + customer.getLastName());
-            dto.setDriverUsername(driver.getUsername());
-            dto.setDriverFullName(driver.getFirstName() + " " + driver.getLastName());
+            dto.setCustomerFullName(trip.getCustomerFullName());
+            dto.setDriverFullName(trip.getDriverFullName());
+            dto.setCustomerUsername(trip.getCustomerUsername());
+            dto.setDriverUsername(trip.getDriverUsername());
+//            User customer = trip.getCustomer();
+//            User driver = trip.getDriver();
+//
+//            dto.setCustomerUsername(customer.getUsername());
+//            dto.setCustomerFullName(customer.getFirstName() + " " + customer.getLastName());
+//            dto.setDriverUsername(driver.getUsername());
+//            dto.setDriverFullName(driver.getFirstName() + " " + driver.getLastName());
 
             return dto;
         }).collect(Collectors.toList());
     }
 
-    /**
-     * Fahrt abschließen und speichern (Daten kommen vom Frontend)
-     */
+    //von controller zu completed zu trips
     public void completeTrip(TripCompleteRequest request) {
 
         User customer = userRepository.findByUsername(request.getCustomerUsername())
@@ -81,9 +80,7 @@ public class TripService {
         tripRepository.save(trip);
     }
 
-    /**
-     * Alle Fahrten eines Nutzers (optional, je nach Bedarf)
-     */
+
     public List<Trips> getTripsForUser(String username, String role) {
         if ("DRIVER".equalsIgnoreCase(role)) {
             return tripRepository.findByDriverUsername(username);
