@@ -1,39 +1,75 @@
-<h2>Ride Simulation</h2>
+<div class="main-container">
 
-<!-- Google Map Container -->
-<google-map
-  height="400px"
-  width="100%"
-  [center]="center"
-  [zoom]="zoom"
->
-  <!-- Moving Marker -->
-  <map-marker [position]="markerPosition" label="A"></map-marker>
-</google-map>
+  <div class="left-container scroll">
 
-<!-- Control Buttons -->
-<div class="controls" style="margin-top: 20px;">
-  <button (click)="startSimulation()" [disabled]="isRunning">Start</button>
-  <button (click)="resumeSimulation()" [disabled]="isRunning || !simulationStarted || progress >= routePath.length - 1">Resume</button>
-  <button (click)="pauseSimulation()" [disabled]="!isRunning">Pause</button>
-  <button (click)="stopSimulation()">Reset</button>
+    <mat-card appearance="outlined" class="card big">
+      <mat-card-content>
+        <div class="header field">
+          <mat-icon>person</mat-icon>
+          <span class="label">Status:</span>
+          <span class="value bold">{{ isRunning ? 'Running' : 'Paused' }}</span>
+        </div>
+
+        <div class="header field">
+          <mat-icon>person</mat-icon>
+          <span class="label">Speed:</span>
+          <span class="value bold">{{ speed }}s total</span>
+        </div>
+
+        <div class="header field">
+          <mat-icon>person</mat-icon>
+          <span class="label">Estimated Time:</span>
+          <span class="value bold">{{ formattedEta }}</span>
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Control Buttons -->
+    <div class="button-container" style="margin-top: 20px;">
+
+      <button mat-fab extended class="btn" (click)="startSimulation()" [disabled]="isRunning">
+        Start
+      </button>
+
+      <button mat-fab extended class="btn" (click)="resumeSimulation()" [disabled]="isRunning || !simulationStarted || progress >= routePath.length - 1">
+        Resume
+      </button>
+
+      <button mat-fab extended class="btn warn"  (click)="pauseSimulation()" [disabled]="!isRunning">
+        Pause
+      </button>
+
+    </div>
+
+
+    <!-- Speed Control -->
+    <label for="speed">Simulation Duration (3–30 sec):</label>
+    <input
+      type="range"
+      id="speed"
+      min="3"
+      max="30"
+      [value]="speed"
+      (input)="handleSpeedInput($event)"
+    >
+  </div>
+
+
+  <div class="right-container">
+    <!-- Google Map Container -->
+    <google-map
+      height="100%"
+      width="100%"
+      [center]="center"
+      [zoom]="zoom"
+    >
+      <!-- Moving Marker -->
+      <map-marker [position]="markerPosition" label="A"></map-marker>
+    </google-map>
+
+  </div>
+
+
+
 </div>
-
-<!-- Status Display -->
-<div class="status" style="margin-top: 10px;">
-  <p>Status: {{ isRunning ? 'Running' : 'Paused' }}</p>
-  <p>Step: {{ progress + 1 }} / {{ routePath.length }}</p>
-  <p>Speed: {{ speed }}s total</p>
-  <p *ngIf="isRunning">Estimated Time to Arrival (ETA): {{ formattedEta }}</p>
-</div>
-
-<!-- Speed Control -->
-<label for="speed">Simulation Duration (3–30 sec):</label>
-<input
-  type="range"
-  id="speed"
-  min="3"
-  max="30"
-  [value]="speed"
-  (input)="handleSpeedInput($event)"
->
