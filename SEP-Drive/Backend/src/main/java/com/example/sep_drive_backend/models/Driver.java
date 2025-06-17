@@ -14,13 +14,14 @@ public class Driver extends User {
     private VehicleClassEnum vehicleClass;
 
     private Boolean active;
-
+    private Double totalTravelledDistance;
     public Driver() {}
 
     public Driver(String username, String firstName, String lastName, String email ,Date birthDate, String password, RoleEnum role, String profilePicture, VehicleClassEnum vehicleClass) {
         super(username, firstName, lastName, email, birthDate, password, role, profilePicture);
         this.active = false;
         this.vehicleClass = vehicleClass;
+        this.totalTravelledDistance = 0;
 
     }
 
@@ -38,5 +39,13 @@ public class Driver extends User {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public double getTotalTravelledDistance() {
+        return totalTravelledDistance;
+    }
+
+    public void setTotalTravelledDistance(double totalTravelledDistance) {
+        this.totalTravelledDistance = totalTravelledDistance;
     }
 }

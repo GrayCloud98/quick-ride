@@ -171,7 +171,7 @@ public class RideRequestService {
             notification.setDriverName(driver.getFirstName() + " " + driver.getLastName());
             notification.setDriverRating(driver.getRating());
             notification.setTotalRides(driver.getTotalRides());
-            notification.setTotalTravelledDistance(0);
+            notification.setTotalTravelledDistance(driver.getTotalTravelledDistance());
             notification.setVehicleClass(driver.getVehicleClass());
 
             return notification;
@@ -297,8 +297,9 @@ public class RideRequestService {
         tripRepository.save(trip);
         walletRepository.save(customerWallet);
         walletRepository.save(driverWallet);
+        driver.setTotalTravelledDistance(driver.getTotalTravelledDistance() + ride.getDistance());
         ride.getCustomer().setActive(false);
-        customerRepository.save(ride.getCustomer());
+       customerRepository.save(ride.getCustomer());
         driver.setActive(false);
         driverRepository.save(driver);
         rideRequestRepository.delete(ride);
