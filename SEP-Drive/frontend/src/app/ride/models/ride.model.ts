@@ -1,6 +1,7 @@
 import {Location} from './location.model';
 
 export interface Ride {
+  id?: number;
   pickup: Location;
   dropoff: Location;
   vehicleClass: VehicleClass;

@@ -9,8 +9,10 @@ import {Ride, VehicleClass} from '../models/ride.model';
 })
 export class RideRequestService {
 
-  private baseUrl= 'http://localhost:8080/api/ride-requests';
-  constructor(private http: HttpClient) {}
+  private baseUrl = 'http://localhost:8080/api/ride-requests';
+
+  constructor(private http: HttpClient) {
+  }
 
   public submitRide(ride: Ride) {
     const rideJson: any = {
@@ -23,8 +25,8 @@ export class RideRequestService {
       destinationLocationName: ride.dropoff.name,
       startAddress: ride.pickup.address,
       destinationAddress: ride.dropoff.address,
-      distance : ride.distance,
-      duration : ride.duration,
+      distance: ride.distance,
+      duration: ride.duration,
       estimatedPrice: ride.estimatedPrice
     };
 

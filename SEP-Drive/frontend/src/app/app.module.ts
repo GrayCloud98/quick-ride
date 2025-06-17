@@ -31,10 +31,12 @@ import { ProfilePageComponent } from './profile-page/profile-page.component';
 import {MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
 import {MatCard, MatCardActions, MatCardContent, MatCardHeader} from '@angular/material/card';
 import { GoogleMapsModule } from '@angular/google-maps';
-import { RideSimulationComponent } from './ride-simulation/ride-simulation.component';
-import { RideRatingDialogComponent } from './ride-rating-dialog/ride-rating-dialog.component';
+import { RideSimulationComponent } from './simulation/ride-simulation/ride-simulation.component';
+import { RideRatingDialogComponent } from './simulation/ride-rating-dialog/ride-rating-dialog.component';
 import { WalletPageComponent } from './profile-page/wallet-page/wallet-page.component';
 import { MatSortModule } from '@angular/material/sort';
+import {SimulationService} from './simulation/simulation.service';
+import {MatSlider, MatSliderModule} from '@angular/material/slider';
 
 
 @NgModule({
@@ -94,11 +96,14 @@ import { MatSortModule } from '@angular/material/sort';
     MatCardContent,
     MatCardActions,
     GoogleMapsModule,
+    MatSlider,
+    MatSliderModule
   ],
 
   providers: [
     provideHttpClient(withInterceptorsFromDi()),
-    provideNativeDateAdapter()
+    provideNativeDateAdapter(),
+    SimulationService
   ],
 
   bootstrap: [AppComponent]

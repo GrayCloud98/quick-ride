@@ -7,48 +7,36 @@ import {RideRequestService} from '../../services/ride-request.service';
 import {Router} from '@angular/router';
 
 interface SortOption {
-  key: keyof Offer,
-  label: string
+key: keyof Offer,
+label: string
 }
 @Component({
-  selector: 'ride-offers-page',
-  standalone: false,
-  templateUrl: './ride-offers-page.component.html',
-  styleUrl: './ride-offers-page.component.scss'
+selector: 'ride-offers-page',
+standalone: false,
+templateUrl: './ride-offers-page.component.html',
+styleUrl: './ride-offers-page.component.scss'
 })
 export class RideOffersPageComponent implements OnInit {
-  accessAllowed: boolean = false;
-  username: string = '';
+accessAllowed: boolean = false;
+username: string = '';
 
-  offers: Offer[] = [];
-  sortOptions: SortOption[] = [
-    { key: 'offerID', label: 'Offer ID' },
-    { key: 'driverName', label: 'Driver Name' },
-    { key: 'driverRating', label: 'Driver Rating' },
-    { key: 'driverVehicle', label: 'Driver Vehicle' },
-    { key: 'ridesCount', label: 'Rides Count' },
-    { key: 'travelledDistance', label: 'Travelled Distance' },
-  ];
-  constructor(private authService: AuthService,
+offers: Offer[] = [];
+sortOptions: SortOption[] = [
+{ key: 'offerID', label: 'Offer ID' },
+{ key: 'driverName', label: 'Driver Name' },
+{ key: 'driverRating', label: 'Driver Rating' },
+{ key: 'driverVehicle', label: 'Driver Vehicle' },
+{ key: 'ridesCount', label: 'Rides Count' },
+{ key: 'travelledDistance', label: 'Travelled Distance' },
+];
+constructor(private authService: AuthService,
               private rideService: RideRequestService,
               private offerService: OfferService,
               private router: Router) {}
 
   acceptOffer(offerID: number) {
-    this.offerService.customerAcceptOffer(offerID).pipe(
-      switchMap(() => this.rideService.getRide())
-    ).subscribe({
-      next: ride => {
-        const { pickup, dropoff } = ride;
-        void this.router.navigate(['/simulation'], {
-          queryParams: {
-            pickupLat: pickup.latitude,
-            pickupLng: pickup.longitude,
-            dropoffLat: dropoff.latitude,
-            dropoffLng: dropoff.longitude
-          }
-        });
-      },
+    this.offerService.customerAcceptOffer(offerID).subscribe({
+      next: () => void this.router.navigate(['/simulation']),
       error: err => console.error(err)
     });
   }

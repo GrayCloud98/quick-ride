@@ -33,22 +33,41 @@ export class NotificationComponent implements OnInit {
 
   private registerCustomerNotificationHandler() {
     this.notificationService.setCustomerCallback((message) => {
-      const isOffer = message.message === 'A driver wants to take your ride!';
-      const action = isOffer ? 'View Offer' : 'Close';
+      let action = 'Close';
+      let route: string | null = null;
+
+      if (message.message === 'You received an Offer for your Request!') {
+        action = 'View Offer';
+        route = '/ride/offer';
+      }
 
       const snackBarRef = this.snackBar.open(message.message, action, { duration: 8000 });
 
-      if (isOffer) {
-        snackBarRef.onAction().subscribe(() => {
-          void this.router.navigate(['/ride/offer']);
-        });
-      }
+      if (route)
+        snackBarRef.onAction().subscribe( () => void this.router.navigate([route]) );
     });
   }
 
   private registerDriverNotificationHandler() {
     this.notificationService.setDriverCallback((message) => {
-      this.snackBar.open(message.message, 'Close', { duration: 8000 });
+      let action = 'Close';
+      let route: string | null = null;
+
+      switch (message.type) {
+        case 'acceptance':
+          action = 'View Simulation';
+          route = '/simulation';
+          break;
+        case 'rejection':
+          action = 'View Requests';
+          route = '/ride/available';
+          break;
+      }
+
+      const snackBarRef = this.snackBar.open(message.message, action, { duration: 8000 });
+
+      if (route)
+        snackBarRef.onAction().subscribe( () => void this.router.navigate([route]) );
     });
   }
 }

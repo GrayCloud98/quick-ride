@@ -6,7 +6,7 @@ public class RideOfferNotification {
     private String driverName;
     private double driverRating;
     private int totalRides;
-    private double totalTravelledDistance;
+    private Double totalTravelledDistance;
     private String message;
     private Long rideOfferId;
     private VehicleClassEnum vehicleClass;

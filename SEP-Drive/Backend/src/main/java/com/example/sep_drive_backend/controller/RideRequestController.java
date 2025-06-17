@@ -1,8 +1,11 @@
 package com.example.sep_drive_backend.controller;
+
 import com.example.sep_drive_backend.dto.*;
+import com.example.sep_drive_backend.models.Driver;
 import com.example.sep_drive_backend.models.JwtTokenProvider;
 import com.example.sep_drive_backend.models.RideOffer;
 import com.example.sep_drive_backend.models.RideRequest;
+import com.example.sep_drive_backend.repository.RideOfferRepository;
 import com.example.sep_drive_backend.services.LoginService;
 import com.example.sep_drive_backend.services.RideRequestService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,8 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -164,5 +170,43 @@ public class RideRequestController {
         return ResponseEntity.ok(active);
     }
 
+
+
+
+    @PostMapping("/ride-request/{id}/simulation")
+    public ResponseEntity<Void> updateSimulationState(@PathVariable Long id,
+                                                      @RequestBody SimulationUpdateDTO dto) {
+        rideRequestService.updateSimulation(id, dto);
+        return ResponseEntity.ok().build();
+    }
+    @GetMapping("/ride-request/{id}/simulation")
+    public ResponseEntity<SimulationUpdateDTO> getSimulationState(@PathVariable Long id) {
+        SimulationUpdateDTO dto = rideRequestService.getSimulationState(id);
+        return ResponseEntity.ok(dto);
+    }
+    @GetMapping("/rides/accepted")
+    public ResponseEntity<AcceptedRideDetailsDTO> getAcceptedRideDetails(HttpServletRequest request) {
+        String token = jwtTokenProvider.resolveToken(request);
+        String username = jwtTokenProvider.getUsername(token);
+
+        AcceptedRideDetailsDTO rideDetails = rideRequestService.getAcceptedRideDetails(username);
+        return ResponseEntity.ok(rideDetails);
+    }
+    @PostMapping("/rate")
+    public ResponseEntity<String> rateRide(@RequestParam Long rideId,
+                                           @RequestParam float rating,
+                                           HttpServletRequest request) {
+        String token = jwtTokenProvider.resolveToken(request);
+        String username = jwtTokenProvider.getUsername(token);
+
+        try {
+            String resultMessage = rideRequestService.rateRide(rideId, rating, username);
+            return ResponseEntity.ok(resultMessage);
+        } catch (NoSuchElementException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+    }
 
 }
