@@ -47,6 +47,8 @@ constructor(private dialog: MatDialog, private rideStateService: RideStateServic
             private simulationService: SimulationService) { }
 
 ngOnInit(): void {
+  this.simulationService.updateID();
+
   this.activatedRoute.queryParams.subscribe(params => {
     const roleParam = params['role'];
     if (roleParam === 'driver' || roleParam === 'customer') {
@@ -73,7 +75,7 @@ ngOnInit(): void {
         this.pollingIntervalId = setInterval(() => {
           this.simulationService.getUpdateSimulation(Number(this.rideId)).subscribe({
             next: update => {
-              console.log('[POLL]', this.role, '| Status:', update.status, '| Speed:', update.simulationSpeed);
+              // console.log('[POLL]', this.role, '| Status:', update.status, '| Speed:', update.simulationSpeed);
 
               this.simulation.currentLat = update.currentLat;
               this.simulation.currentLng = update.currentLng;
@@ -105,9 +107,9 @@ ngOnInit(): void {
                 }
               }
             },
-            error: err => console.error('[POLL ERROR]', err)
+            error: err => {}
           });
-        }, 50);
+        }, 5);
       },
       error: err => console.error("getAcceptedRideDetails failed", err)
     });
@@ -225,7 +227,17 @@ resumeSimulation(): void {
   this.rideCompleted = true;
 
   this.simulation.status = SimulationStatus.COMPLETED;
-  this.simulationService.postUpdateSimulation(this.simulation).subscribe();
+  this.simulationService.postUpdateSimulation(this.simulation).subscribe({
+    error: () => {
+      if (this.intervalId) {
+        clearInterval(this.intervalId);
+      }
+
+      if (this.pollingIntervalId) {
+        clearInterval(this.pollingIntervalId);
+      }
+    }
+  });
 
   if (showRating && this.role === 'driver') {
     this.dialog.open(RideRatingDialogComponent).afterClosed().subscribe(result => {

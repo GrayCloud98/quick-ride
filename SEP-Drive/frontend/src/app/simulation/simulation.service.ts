@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import {Observable} from 'rxjs';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {VehicleClass} from '../ride/models/ride.model';
 import {HttpClient} from '@angular/common/http';
@@ -11,6 +11,8 @@ export class SimulationService {
   private baseUrl = 'http://localhost:8080/api/ride-requests';
   constructor(private http: HttpClient) {
   }
+
+  private simID = new BehaviorSubject<number | null>(null);
 
   public getAcceptedRideDetails(): Observable<Simulation> {
     return this.http.get<any>(this.baseUrl + '/rides/accepted').pipe(
@@ -33,6 +35,7 @@ export class SimulationService {
       }))
     );
   }
+
   public submitRideRating(rideId: number, rating: number, feedback: string) {
     return this.http.post('http://localhost:8080/api/rides/rate', {
       rating,
@@ -60,6 +63,18 @@ export class SimulationService {
         status: update.status,
         simulationSpeed: update.simulationSpeed
       }))
+    );
+  }
+
+  public updateID(){
+    this.getAcceptedRideDetails().subscribe({
+      next: sim => this.simID.next(sim.rideId)
+    })
+  }
+
+  rating(rating: number) {
+    return this.http.post(
+      this.baseUrl + '/rate', null, { params: {rideId: this.simID.value!, rating: rating} }
     );
   }
 }
