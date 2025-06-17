@@ -29,7 +29,6 @@ export class RideHistoryService {
   getTripHistory(): Observable<TripHistoryDTO[]> {
     return this.http.get<TripHistoryDTO[]>(this.apiUrl).pipe(
       map((rides: any[]) => {
-        // Map & filter for unique trips based on id (tripId)
         const seen = new Set();
         return rides
           .map((ride: any) => ({
