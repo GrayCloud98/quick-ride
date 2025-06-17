@@ -5,23 +5,40 @@
     <mat-card appearance="outlined" class="card big">
       <mat-card-content>
         <div class="header field">
-          <mat-icon>person</mat-icon>
+          <mat-icon>play_arrow</mat-icon>
           <span class="label">Status:</span>
           <span class="value bold">{{ isRunning ? 'Running' : 'Paused' }}</span>
         </div>
 
         <div class="header field">
-          <mat-icon>person</mat-icon>
+          <mat-icon>speed</mat-icon>
           <span class="label">Speed:</span>
           <span class="value bold">{{ speed }}s total</span>
         </div>
 
         <div class="header field">
-          <mat-icon>person</mat-icon>
+          <mat-icon>schedule</mat-icon>
           <span class="label">Estimated Time:</span>
           <span class="value bold">{{ formattedEta }}</span>
         </div>
 
+
+        <div class="slider-container">
+          <mat-label>Simulation Duration (3–30 sec)</mat-label>
+          <mat-slider [min]="3" [max]="30" [step]="1" color="primary">
+            <input matSliderThumb [(ngModel)]="speed" />
+          </mat-slider>
+          <div class="slider-value">{{ speed }} sec</div>
+        </div>
+<!--        <label for="speed">Simulation Duration (3–30 sec):</label>-->
+<!--        <input-->
+<!--          type="range"-->
+<!--          id="speed"-->
+<!--          min="3"-->
+<!--          max="30"-->
+<!--          [value]="speed"-->
+<!--          (input)="handleSpeedInput($event)"-->
+<!--        >-->
       </mat-card-content>
     </mat-card>
 
@@ -41,32 +58,23 @@
       </button>
 
     </div>
-
-
-    <!-- Speed Control -->
-    <label for="speed">Simulation Duration (3–30 sec):</label>
-    <input
-      type="range"
-      id="speed"
-      min="3"
-      max="30"
-      [value]="speed"
-      (input)="handleSpeedInput($event)"
-    >
   </div>
 
 
   <div class="right-container">
     <!-- Google Map Container -->
-    <google-map
-      height="100%"
-      width="100%"
-      [center]="center"
-      [zoom]="zoom"
-    >
-      <!-- Moving Marker -->
-      <map-marker [position]="markerPosition" label="A"></map-marker>
-    </google-map>
+
+    <div class="sep-map">
+      <google-map
+        height="100%"
+        width="100%"
+        [center]="center"
+        [zoom]="zoom"
+      >
+        <!-- Moving Marker -->
+        <map-marker [position]="markerPosition" label="A"></map-marker>
+      </google-map>
+    </div>
 
   </div>
 

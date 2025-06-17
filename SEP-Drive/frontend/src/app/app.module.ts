@@ -35,6 +35,7 @@ import { RideSimulationComponent } from './simulation/ride-simulation/ride-simul
 import { RideRatingDialogComponent } from './simulation/ride-rating-dialog/ride-rating-dialog.component';
 import { WalletPageComponent } from './profile-page/wallet-page/wallet-page.component';
 import {SimulationService} from './simulation/simulation.service';
+import {MatSlider, MatSliderModule} from '@angular/material/slider';
 
 
 @NgModule({
@@ -93,6 +94,8 @@ import {SimulationService} from './simulation/simulation.service';
     MatCardContent,
     MatCardActions,
     GoogleMapsModule,
+    MatSlider,
+    MatSliderModule
   ],
 
   providers: [
