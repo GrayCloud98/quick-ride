@@ -5,9 +5,7 @@ import com.example.sep_drive_backend.constants.VehicleClassEnum;
 import com.example.sep_drive_backend.dto.*;
 import com.example.sep_drive_backend.models.*;
 import com.example.sep_drive_backend.repository.*;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 
@@ -27,7 +25,14 @@ public class RideRequestService {
     private final RideRequestRepository rideRequestRepository;
 
     @Autowired
-    public RideRequestService(CustomerRepository customerRepository, DriverRepository driverRepository, NotificationService notificationService, RideOfferRepository rideOfferRepository, RideRequestRepository rideRequestRepository, WalletRepository walletRepository) {
+    public RideRequestService(
+            CustomerRepository customerRepository,
+            DriverRepository driverRepository,
+            NotificationService notificationService,
+            RideOfferRepository rideOfferRepository,
+            RideRequestRepository rideRequestRepository,
+            WalletRepository walletRepository) {
+
         this.customerRepository = customerRepository;
         this.driverRepository = driverRepository;
         this.notificationService = notificationService;
@@ -35,6 +40,7 @@ public class RideRequestService {
         this.rideRequestRepository = rideRequestRepository;
         this.walletRepository = walletRepository;
     }
+
 
 
     public RideRequest createRideRequest(RideRequestDTO dto) {
@@ -230,7 +236,7 @@ public class RideRequestService {
     public void completeRide(Long rideId) {
         RideRequest ride = rideRequestRepository.findById(rideId)
                 .orElseThrow(() -> new RuntimeException("Ride not found"));
-
+        Driver driver = ride.getRideOffer().getDriver();
         if (ride.getStatus() == Ridestatus.COMPLETED)
             return;
 
@@ -254,6 +260,10 @@ public class RideRequestService {
         walletRepository.save(customerWallet);
         walletRepository.save(driverWallet);
         rideRequestRepository.save(ride);
+        ride.getCustomer().setActive(false);
+        customerRepository.save(ride.getCustomer());
+        driver.setActive(false);
+        driverRepository.save(driver);
     }
     public void updateSimulation(Long rideId, SimulationUpdateDTO dto) {
         RideRequest request = rideRequestRepository.findById(rideId)
