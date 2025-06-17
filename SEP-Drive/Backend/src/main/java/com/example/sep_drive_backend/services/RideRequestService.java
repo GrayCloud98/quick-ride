@@ -424,36 +424,49 @@ public class RideRequestService {
                 return "No driver to rate.";
             }
 
+            if (ride.getCustomerRated()) {
+                return "You have already rated this ride.";
+            }
+
             Driver driver = offer.getDriver();
             driver.addRating(rating);
             driverRepository.save(driver);
 
-            ride.setRideOffer(null);
+            ride.setCustomerRated(true);
             rideRequestRepository.save(ride);
-            rideOfferRepository.delete(offer);
-            rideRequestRepository.delete(ride);
+
+            if (ride.getCustomerRated() && ride.getDriverRated()) {
+                ride.setRideOffer(null);
+                rideRequestRepository.save(ride);
+                rideOfferRepository.delete(offer);
+                rideRequestRepository.delete(ride);
+            }
 
             return "Driver rated successfully.";
         }
 
         Optional<Driver> driverOpt = driverRepository.findByUsername(username);
         if (driverOpt.isPresent()) {
+            if (ride.getDriverRated()) {
+                return "You have already rated this ride.";
+            }
+
             Customer customer = ride.getCustomer();
             customer.addRating(rating);
             customerRepository.save(customer);
 
-            ride.setRideOffer(null);
+            ride.setDriverRated(true);
             rideRequestRepository.save(ride);
-            rideOfferRepository.delete(offer);
-            rideRequestRepository.delete(ride);
+
+            if (ride.getCustomerRated() && ride.getDriverRated()) {
+                ride.setRideOffer(null);
+                rideRequestRepository.save(ride);
+                rideOfferRepository.delete(offer);
+                rideRequestRepository.delete(ride);
+            }
 
             return "Customer rated successfully.";
         }
-
-        ride.setRideOffer(null);
-        rideRequestRepository.save(ride);
-        rideOfferRepository.delete(offer);
-        rideRequestRepository.delete(ride);
 
         throw new SecurityException("User not authorized.");
     }

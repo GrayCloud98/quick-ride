@@ -60,6 +60,20 @@ public class RideRequest {
     @Column
     private Double currentLng;
 
+    private boolean customerRated = false;
+    private boolean driverRated = false;
+    public boolean getCustomerRated() {
+        return customerRated;
+    }
+    public void setCustomerRated(boolean customerRated) {
+        this.customerRated = customerRated;
+    }
+    public boolean getDriverRated() {
+        return driverRated;
+    }
+    public void setDriverRated(boolean driverRated) {
+        this.driverRated = driverRated;
+    }
     public RideOffer getRideOffer() {
         return rideOffer;
     }
