@@ -1,6 +1,7 @@
 package com.example.sep_drive_backend.services;
 
 import com.example.sep_drive_backend.constants.Ridestatus;
+import com.example.sep_drive_backend.constants.TripsStatus;
 import com.example.sep_drive_backend.constants.VehicleClassEnum;
 import com.example.sep_drive_backend.dto.*;
 import com.example.sep_drive_backend.models.*;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -16,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class RideRequestService {
-
+    private final TripRepository tripRepository;
     private final WalletRepository walletRepository;
     private final CustomerRepository customerRepository;
     private final DriverRepository driverRepository;
@@ -31,7 +33,8 @@ public class RideRequestService {
             NotificationService notificationService,
             RideOfferRepository rideOfferRepository,
             RideRequestRepository rideRequestRepository,
-            WalletRepository walletRepository) {
+            WalletRepository walletRepository,
+            TripRepository tripRepository) {
 
         this.customerRepository = customerRepository;
         this.driverRepository = driverRepository;
@@ -39,6 +42,7 @@ public class RideRequestService {
         this.rideOfferRepository = rideOfferRepository;
         this.rideRequestRepository = rideRequestRepository;
         this.walletRepository = walletRepository;
+        this.tripRepository = tripRepository;
     }
 
 
@@ -246,35 +250,60 @@ public class RideRequestService {
     public void completeRide(Long rideId) {
         RideRequest ride = rideRequestRepository.findById(rideId)
                 .orElseThrow(() -> new RuntimeException("Ride not found"));
-        Driver driver = ride.getRideOffer().getDriver();
+
         if (ride.getStatus() == Ridestatus.COMPLETED)
             return;
-
-        Wallet customerWallet = ride.getCustomer().getWallet();
 
         RideOffer offer = ride.getRideOffer();
         if (offer == null || offer.getDriver() == null) {
             throw new RuntimeException("RideOffer or Driver not found for this ride");
         }
 
-        Wallet driverWallet = offer.getDriver().getWallet();
+        Driver driver = offer.getDriver();
+        Wallet customerWallet = ride.getCustomer().getWallet();
+        Wallet driverWallet = driver.getWallet();
 
         Double price = ride.getEstimatedPrice();
         Long priceInCents = Math.round(price * 100);
 
+        // Transfer money
         customerWallet.setBalanceCents(customerWallet.getBalanceCents() - priceInCents);
         driverWallet.setBalanceCents(driverWallet.getBalanceCents() + priceInCents);
 
+        // Set ride as completed
         ride.setStatus(Ridestatus.COMPLETED);
 
+        // Construct full names directly
+        String customerFullName = ride.getCustomer().getFirstName() + " " + ride.getCustomer().getLastName();
+        String driverFullName = driver.getFirstName() + " " + driver.getLastName();
+
+        // Create new Trips object
+        Trips trip = new Trips();
+        trip.setCustomer(ride.getCustomer());
+        trip.setDriver(driver);
+        trip.setCustomerFullName(customerFullName);
+        trip.setCustomerUsername(ride.getCustomer().getUsername());
+        trip.setDriverFullName(driverFullName);
+        trip.setDriverUsername(driver.getUsername());
+        trip.setDistanceKm(ride.getDistance());
+        trip.setDurationMin(ride.getDuration());
+        trip.setPriceEuro(ride.getEstimatedPrice());
+        trip.setStatus(TripsStatus.COMPLETED);
+        trip.setProgress(100);
+        trip.setSpeed(0);
+        trip.setEndTime(LocalDateTime.now());
+
+
+        tripRepository.save(trip);
         walletRepository.save(customerWallet);
         walletRepository.save(driverWallet);
-        rideRequestRepository.save(ride);
         ride.getCustomer().setActive(false);
         customerRepository.save(ride.getCustomer());
         driver.setActive(false);
         driverRepository.save(driver);
+        rideRequestRepository.delete(ride);
     }
+
     public void updateSimulation(Long rideId, SimulationUpdateDTO dto) {
         RideRequest request = rideRequestRepository.findById(rideId)
                 .orElseThrow(() -> new NoSuchElementException("Ride not found"));

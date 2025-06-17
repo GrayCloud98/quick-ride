@@ -24,7 +24,7 @@ public class Trips {
 
     private double distanceKm;
 
-    private long durationMin;
+    private Double durationMin;
 
     private double priceEuro;
 
@@ -66,11 +66,11 @@ public class Trips {
         this.distanceKm = distanceKm;
     }
 
-    public long getDurationMin() {
+    public Double getDurationMin() {
         return durationMin;
     }
 
-    public void setDurationMin(long durationMin) {
+    public void setDurationMin(Double durationMin) {
         this.durationMin = durationMin;
     }
 

@@ -70,7 +70,7 @@ public class TripService {
         trip.setStatus(TripsStatus.COMPLETED);
         trip.setEndTime(LocalDateTime.now());
         trip.setDistanceKm(request.getDistanceKm());
-        trip.setDurationMin(request.getDurationMin());
+        trip.setDurationMin((double) request.getDurationMin());
         trip.setPriceEuro(request.getPriceEuro());
         trip.setCustomerRating(request.getCustomerRating());
         trip.setDriverRating(request.getDriverRating());
