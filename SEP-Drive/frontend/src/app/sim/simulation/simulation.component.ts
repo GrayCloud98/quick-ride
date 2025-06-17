@@ -24,7 +24,7 @@ export class SimulationComponent implements AfterViewInit {
   private animationFrameId: number | null = null;
   private path: google.maps.LatLngLiteral[] = [];
   private currentIndex = 0;
-  duration: number = 3;
+  duration: number = 30;
   isRunning = false;
   isPaused = false;
 
@@ -104,13 +104,18 @@ export class SimulationComponent implements AfterViewInit {
 
   private animate(): void {
     const totalSteps = this.path.length;
-    const stepDurationMs = (this.duration * 1000) / totalSteps;
+    const totalFrames = this.duration * 165; // assuming 60 FPS
+    const pointsPerFrame = totalSteps / totalFrames;
+
+    let progress = this.currentIndex;
 
     const step = () => {
       if (!this.isRunning || this.isPaused) return;
 
-      this.pointer.position = this.path[this.currentIndex];
-      this.currentIndex++;
+      this.pointer.position = this.path[Math.floor(progress)];
+
+      progress += pointsPerFrame;
+      this.currentIndex = Math.floor(progress);
 
       if (this.currentIndex >= totalSteps) {
         this.pointer.position = this.path[totalSteps - 1];
@@ -118,7 +123,7 @@ export class SimulationComponent implements AfterViewInit {
         return;
       }
 
-      this.animationFrameId = window.setTimeout(() => requestAnimationFrame(step), stepDurationMs);
+      this.animationFrameId = requestAnimationFrame(step);
     };
 
     requestAnimationFrame(step);
