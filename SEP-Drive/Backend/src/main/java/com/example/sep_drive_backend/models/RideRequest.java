@@ -122,7 +122,7 @@ public class RideRequest {
         this.status = Ridestatus.PLANNED;
         this.currentLat=this.startLatitude;
         this.currentLng=this.startLongitude;
-        this.simulationSpeed=1.0;
+        this.simulationSpeed=3.0;
     }
 
     public Ridestatus getStatus() {
