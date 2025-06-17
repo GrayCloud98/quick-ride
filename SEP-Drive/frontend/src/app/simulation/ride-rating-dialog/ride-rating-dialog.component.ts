@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import {SimulationService} from '../simulation.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-ride-rating-dialog',
@@ -15,7 +16,8 @@ export class RideRatingDialogComponent {
   id: number | null = null;
 
   constructor(public dialogRef: MatDialogRef<RideRatingDialogComponent>,
-              private simulationService:  SimulationService) { }
+              private simulationService:  SimulationService,
+              private router: Router) { }
 
   setRating(value: number): void {
   this.rating = value;
@@ -25,12 +27,10 @@ export class RideRatingDialogComponent {
       rating: this.rating,
       feedback: this.feedback
     });
-    this.simulationService.getAcceptedRideDetails().subscribe({
-      next: simulation => {
-        console.warn('success call 😊');
-        this.simulationService.rating(simulation.rideId, this.rating);
-      },
-      error: error => console.log('error ❤️', error)
-    })
+
+    this.simulationService.rating(this.rating).subscribe({});
+    this.router.navigate(['/']).then(() => {
+      window.location.reload();
+    });
   }
 }

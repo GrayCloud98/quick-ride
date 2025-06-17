@@ -47,6 +47,8 @@ constructor(private dialog: MatDialog, private rideStateService: RideStateServic
             private simulationService: SimulationService) { }
 
 ngOnInit(): void {
+  this.simulationService.updateID();
+
   this.activatedRoute.queryParams.subscribe(params => {
     const roleParam = params['role'];
     if (roleParam === 'driver' || roleParam === 'customer') {
