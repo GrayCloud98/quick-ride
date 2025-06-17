@@ -310,10 +310,6 @@ public class RideRequestService {
         driver.setActive(false);
         driverRepository.save(driver);
 
-        ride.setRideOffer(null);
-        rideRequestRepository.save(ride);
-        rideOfferRepository.delete(offer);
-        rideRequestRepository.delete(ride);
     }
 
     public void updateSimulation(Long rideId, SimulationUpdateDTO dto) {
@@ -420,9 +416,10 @@ public class RideRequestService {
             return "Ride is not completed yet.";
         }
 
+        RideOffer offer = ride.getRideOffer();
+
         Optional<Customer> customerOpt = customerRepository.findByUsername(username);
         if (customerOpt.isPresent()) {
-            RideOffer offer = ride.getRideOffer();
             if (offer == null || offer.getDriver() == null) {
                 return "No driver to rate.";
             }
@@ -430,6 +427,12 @@ public class RideRequestService {
             Driver driver = offer.getDriver();
             driver.addRating(rating);
             driverRepository.save(driver);
+
+            ride.setRideOffer(null);
+            rideRequestRepository.save(ride);
+            rideOfferRepository.delete(offer);
+            rideRequestRepository.delete(ride);
+
             return "Driver rated successfully.";
         }
 
@@ -438,11 +441,23 @@ public class RideRequestService {
             Customer customer = ride.getCustomer();
             customer.addRating(rating);
             customerRepository.save(customer);
+
+            ride.setRideOffer(null);
+            rideRequestRepository.save(ride);
+            rideOfferRepository.delete(offer);
+            rideRequestRepository.delete(ride);
+
             return "Customer rated successfully.";
         }
 
+        ride.setRideOffer(null);
+        rideRequestRepository.save(ride);
+        rideOfferRepository.delete(offer);
+        rideRequestRepository.delete(ride);
+
         throw new SecurityException("User not authorized.");
     }
+
 
 
 }

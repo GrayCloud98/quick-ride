@@ -30,7 +30,6 @@ public class TripeDTO {
         this.customerFullName = customerFullName;
         this.driverUsername = driverUsername;
         this.driverFullName = driverFullName;
-        this.status = TripsStatus.COMPLETED;
     }
 
     public TripeDTO() {
