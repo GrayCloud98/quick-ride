@@ -14,7 +14,7 @@ public class Driver extends User {
     private VehicleClassEnum vehicleClass;
 
     private Boolean active;
-    private Double totalTravelledDistance;
+    private Double totalTravelledDistance=0.0;
     public Driver() {}
 
     public Driver(String username, String firstName, String lastName, String email ,Date birthDate, String password, RoleEnum role, String profilePicture, VehicleClassEnum vehicleClass) {
