@@ -121,9 +121,9 @@ public class RideRequestService {
     }
 
     public List<RidesForDriversDTO> getAllRideRequests() {
-        Ridestatus filterStatus = Ridestatus.PLANNED; // or IN_PROGRESS, etc.
-        return rideRequestRepository.findAll().stream()
-                .filter(ride -> ride.getStatus() == filterStatus)
+        Ridestatus filterStatus = Ridestatus.PLANNED;
+        return rideRequestRepository.findByStatus(filterStatus)
+                .stream()
                 .map(RidesForDriversDTO::new)
                 .collect(Collectors.toList());
     }
@@ -136,20 +136,23 @@ public class RideRequestService {
         Driver driver = driverRepository.findByUsername(driverUsername)
                 .orElseThrow(() -> new NoSuchElementException("Driver with username " + driverUsername + " not found"));
 
+        if (rideRequest.getStatus() != Ridestatus.PLANNED) {
+            throw new IllegalArgumentException("Ride is cancelled or taken by another driver");
+        }
+
         if (driver.getActive()) {
             throw new IllegalStateException("Driver already has an active offer.");
         }
 
+
+
         RideOffer rideOffer = new RideOffer();
         rideOffer.setDriver(driver);
         rideOffer.setRideRequest(rideRequest);
-
         driver.setActive(true);
         driverRepository.save(driver);
         RideOffer savedOffer = rideOfferRepository.save(rideOffer);
-
         notificationService.sendOfferNotification(driver, rideRequest);
-
         return savedOffer;
     }
 
@@ -190,9 +193,10 @@ public class RideRequestService {
         RideOffer rideOffer = rideOfferRepository.findById(rideOfferId)
                 .orElseThrow(() -> new NoSuchElementException("Ride offer with id " + rideOfferId + " not found"));
 
-        rideOfferRepository.delete(rideOffer);
 
         Driver driver = rideOffer.getDriver();
+        rideOfferRepository.delete(rideOffer);
+
         if (driver != null) {
             driver.setActive(false);
             driverRepository.save(driver);
@@ -242,6 +246,9 @@ public class RideRequestService {
         rideRequestRepository.save(rideRequest);
         notificationService.sendAcceptNotification(selectedOffer.getDriver().getUsername());
     }
+
+
+
 
 
 
