@@ -76,9 +76,16 @@ public class RideRequestService {
     }
 
     public RideRequest getActiveRideRequestForCustomer(String username) {
-        return rideRequestRepository.findByCustomerUsernameAndCustomerActiveTrue(username)
+        RideRequest request = rideRequestRepository.findByCustomerUsernameAndCustomerActiveTrue(username)
                 .orElseThrow(() -> new NoSuchElementException("No active ride request found for user: " + username));
+
+        if (request.getStatus() != Ridestatus.PLANNED && request.getStatus() != Ridestatus.IN_PROGRESS) {
+            throw new NoSuchElementException("No active ride request found for user: " + username);
+        }
+
+        return request;
     }
+
 
     public void deleteActiveRideRequest(String username) {
         RideRequest request = rideRequestRepository.findByCustomerUsernameAndCustomerActiveTrue(username)
@@ -110,10 +117,13 @@ public class RideRequestService {
     }
 
     public List<RidesForDriversDTO> getAllRideRequests() {
+        Ridestatus filterStatus = Ridestatus.PLANNED; // or IN_PROGRESS, etc.
         return rideRequestRepository.findAll().stream()
+                .filter(ride -> ride.getStatus() == filterStatus)
                 .map(RidesForDriversDTO::new)
                 .collect(Collectors.toList());
     }
+
 
     public RideOffer createRideOffer(Long rideRequestId, String driverUsername) {
         RideRequest rideRequest = rideRequestRepository.findById(rideRequestId)
