@@ -63,12 +63,59 @@ export class SimulationComponent implements AfterViewInit {
         travelMode: google.maps.TravelMode.DRIVING
       },
       (result, status) => {
-        if (status === google.maps.DirectionsStatus.OK && result)
+        if (status === google.maps.DirectionsStatus.OK && result) {
           directionsRenderer.setDirections(result);
-        else
+          this.animateAlongRoute(result);
+        } else
           console.error('Directions request failed due to ' + status);
       }
     );
+  }
+
+  private animateAlongRoute(result: google.maps.DirectionsResult): void {
+    const path: google.maps.LatLngLiteral[] = [];
+    const legs = result.routes[0].legs;
+    for (const leg of legs) {
+      for (const step of leg.steps) {
+        const stepPath = step.path.map(latlng => ({
+          lat: latlng.lat(),
+          lng: latlng.lng()
+        }));
+        path.push(...stepPath);
+      }
+    }
+
+    const pointer = new google.maps.marker.AdvancedMarkerElement({
+      position: path[0],
+      map: this.map,
+      title: 'Moving pointer',
+      content: this.createPointerElement()
+    });
+
+    let index = 0;
+    const totalSteps = path.length;
+    const durationInSeconds = 30;
+    const totalDurationMs = durationInSeconds * 1000;
+    const startTime = performance.now();
+
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = elapsed / totalDurationMs;
+      const step = Math.floor(progress * totalSteps);
+
+      if (step >= totalSteps) {
+        pointer.position = path[totalSteps - 1];
+        return;
+      }
+
+      if (step > index) {
+        index = step;
+        pointer.position = path[index];
+      }
+
+      requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
   }
 
   private createMarkerContent(label: string): HTMLElement { // TODO APPLY CUSTOM MARKERS OR DELETE
@@ -87,4 +134,15 @@ export class SimulationComponent implements AfterViewInit {
     div.innerText = label;
     return div;
   }
+
+  private createPointerElement(): HTMLElement {
+    const el = document.createElement('div');
+    el.style.width = '20px';
+    el.style.height = '20px';
+    el.style.borderRadius = '50%';
+    el.style.backgroundColor = 'red';
+    el.style.border = '2px solid white';
+    return el;
+  }
+
 }
