@@ -37,6 +37,7 @@ import { WalletPageComponent } from './profile-page/wallet-page/wallet-page.comp
 import { MatSortModule } from '@angular/material/sort';
 import {SimulationService} from './simulation/simulation.service';
 import {MatSlider, MatSliderModule} from '@angular/material/slider';
+import { SimulationComponent } from './sim/simulation/simulation.component';
 
 
 @NgModule({
@@ -48,7 +49,8 @@ import {MatSlider, MatSliderModule} from '@angular/material/slider';
     TwoFaComponent,
     RideSimulationComponent,
     RideRatingDialogComponent,
-    WalletPageComponent
+    WalletPageComponent,
+    SimulationComponent
   ],
   imports: [
     MatSortModule,

@@ -8,6 +8,7 @@ import { WalletPageComponent } from './profile-page/wallet-page/wallet-page.comp
 import { RegisterComponent } from './auth/register/register.component';
 import {UserNotFoundComponent} from './shared/components/user-not-found/user-not-found.component';
 import {RidehistoryComponent} from './shared/components/ridehistory/ridehistory.component';
+import {SimulationComponent} from './sim/simulation/simulation.component';
 
 const routes: Routes = [
   { path: 'ride', loadChildren: () => RideRoutingModule },
@@ -17,7 +18,8 @@ const routes: Routes = [
   { path: 'wallet', component: WalletPageComponent },
   { path: 'user-not-found', component: UserNotFoundComponent },
   { path: 'history', component:RidehistoryComponent},
-  { path: ':username', component: ProfilePageComponent }
+  { path: ':username', component: ProfilePageComponent },
+  { path: 'ride/sim', component: SimulationComponent }
 ];
 
 @NgModule({
