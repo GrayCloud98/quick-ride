@@ -1,5 +1,10 @@
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
 
+interface Point{
+  label: string;
+  title: string;
+  position: { lat: number; lng: number; }
+}
 @Component({
   selector: 'simulation',
   standalone: false,
@@ -10,7 +15,7 @@ export class SimulationComponent implements AfterViewInit {
   @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef;
   map!: google.maps.Map;
 
-  points = [
+  points: Point[] = [
     { label: 'S', title: 'Start (Berlin)', position: { lat: 52.52, lng: 13.405 } },
     { label: 'W1', title: 'Waypoint 1 (Hamburg)', position: { lat: 53.5511, lng: 9.9937 } },
     { label: 'W2', title: 'Waypoint 2 (Leipzig)', position: { lat: 51.3397, lng: 12.3731 } },
@@ -25,6 +30,11 @@ export class SimulationComponent implements AfterViewInit {
     };
     this.map = new google.maps.Map(this.mapContainer.nativeElement, mapOptions);
 
+    this.renderMarkers();
+    this.drawRoute();
+  }
+
+  private renderMarkers(): void {
     this.points.forEach(point => {
       const marker = new google.maps.marker.AdvancedMarkerElement({
         map: this.map,
@@ -33,6 +43,32 @@ export class SimulationComponent implements AfterViewInit {
         // content: this.createMarkerContent(point.label) // TODO APPLY CUSTOM MARKERS OR DELETE
       });
     });
+  }
+
+  private drawRoute(): void {
+    const directionsService = new google.maps.DirectionsService();
+    const directionsRenderer = new google.maps.DirectionsRenderer({ map: this.map, suppressMarkers: true });
+
+    const start = this.points[0].position;
+    const waypoints =
+      this.points.slice(1, this.points.length - 1)
+        .map(p => ({ location: p.position, stopover: true }));
+    const end = this.points[this.points.length - 1].position;
+
+    directionsService.route(
+      {
+        origin: start,
+        destination: end,
+        waypoints: waypoints,
+        travelMode: google.maps.TravelMode.DRIVING
+      },
+      (result, status) => {
+        if (status === google.maps.DirectionsStatus.OK && result)
+          directionsRenderer.setDirections(result);
+        else
+          console.error('Directions request failed due to ' + status);
+      }
+    );
   }
 
   private createMarkerContent(label: string): HTMLElement { // TODO APPLY CUSTOM MARKERS OR DELETE
