@@ -14,13 +14,21 @@ interface Point{
 export class SimulationComponent implements AfterViewInit {
   @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef;
   map!: google.maps.Map;
-
   points: Point[] = [
     { label: 'S', title: 'Start (Berlin)', position: { lat: 52.52, lng: 13.405 } },
     { label: 'W1', title: 'Waypoint 1 (Hamburg)', position: { lat: 53.5511, lng: 9.9937 } },
     { label: 'W2', title: 'Waypoint 2 (Leipzig)', position: { lat: 51.3397, lng: 12.3731 } },
     { label: 'E', title: 'End (Munich)', position: { lat: 48.1351, lng: 11.582 } }
   ];
+  private pointer!: google.maps.marker.AdvancedMarkerElement;
+  private animationFrameId: number | null = null;
+  private path: google.maps.LatLngLiteral[] = [];
+  private animationStartTime: number = 0;
+  private pausedAt: number = 0;
+
+  isRunning = false;
+  isPaused = false;
+
 
   ngAfterViewInit(): void {
     const mapOptions: google.maps.MapOptions = {
@@ -73,7 +81,8 @@ export class SimulationComponent implements AfterViewInit {
   }
 
   private animateAlongRoute(result: google.maps.DirectionsResult): void {
-    const path: google.maps.LatLngLiteral[] = [];
+    this.path = [];
+
     const legs = result.routes[0].legs;
     for (const leg of legs) {
       for (const step of leg.steps) {
@@ -81,42 +90,48 @@ export class SimulationComponent implements AfterViewInit {
           lat: latlng.lat(),
           lng: latlng.lng()
         }));
-        path.push(...stepPath);
+        this.path.push(...stepPath);
       }
     }
 
-    const pointer = new google.maps.marker.AdvancedMarkerElement({
-      position: path[0],
+    // Add pointer marker
+    this.pointer = new google.maps.marker.AdvancedMarkerElement({
+      position: this.path[0],
       map: this.map,
       title: 'Moving pointer',
       content: this.createPointerElement()
     });
+  }
 
+  private animate(): void {
+    const totalSteps = this.path.length;
+    const totalDurationMs = 30 * 1000; // 30 seconds
     let index = 0;
-    const totalSteps = path.length;
-    const durationInSeconds = 30;
-    const totalDurationMs = durationInSeconds * 1000;
-    const startTime = performance.now();
 
-    const animate = (now: number) => {
-      const elapsed = now - startTime;
+    const step = (now: number) => {
+      if (!this.isRunning || this.isPaused) return;
+
+      const elapsed = now - this.animationStartTime;
       const progress = elapsed / totalDurationMs;
-      const step = Math.floor(progress * totalSteps);
+      const currentIndex = Math.floor(progress * totalSteps);
 
-      if (step >= totalSteps) {
-        pointer.position = path[totalSteps - 1];
+      if (currentIndex >= totalSteps) {
+        this.pointer.position = this.path[totalSteps - 1];
+        this.isRunning = false;
         return;
       }
 
-      if (step > index) {
-        index = step;
-        pointer.position = path[index];
+      if (currentIndex > index) {
+        index = currentIndex;
+        this.pointer.position = this.path[index];
       }
 
-      requestAnimationFrame(animate);
+      this.animationFrameId = requestAnimationFrame(step);
     };
-    requestAnimationFrame(animate);
+
+    this.animationFrameId = requestAnimationFrame(step);
   }
+
 
   private createMarkerContent(label: string): HTMLElement { // TODO APPLY CUSTOM MARKERS OR DELETE
     const div = document.createElement('div');
@@ -145,4 +160,42 @@ export class SimulationComponent implements AfterViewInit {
     return el;
   }
 
+  start(): void {
+    if (!this.path.length) return;
+
+    this.isRunning = true;
+    this.isPaused = false;
+    this.animationStartTime = performance.now();
+    this.animate();
+  }
+
+  pause(): void {
+    if (!this.isRunning || this.isPaused) return;
+
+    this.isPaused = true;
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+    this.pausedAt = performance.now();
+  }
+
+  resume(): void {
+    if (!this.isRunning || !this.isPaused) return;
+
+    this.isPaused = false;
+    const pausedDuration = performance.now() - this.pausedAt;
+    this.animationStartTime += pausedDuration;
+    this.animate();
+  }
+
+  end(): void {
+    console.log('Simulation ended.');
+    this.isRunning = false;
+    this.isPaused = false;
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+  }
 }

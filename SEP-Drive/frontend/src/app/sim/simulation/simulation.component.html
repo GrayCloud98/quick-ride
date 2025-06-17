@@ -1,5 +1,14 @@
 <div class="main-container">
-  <div class="left-container"></div>
+  <div class="left-container">
+    <div class="button-container">
+      <button *ngIf="!isRunning" class="btn" mat-fab extended (click)="start()">Start</button>
+      <div *ngIf="isRunning" class="row-btn">
+        <button class="btn" mat-fab extended (click)="resume()" [disabled]="!isPaused">Resume</button>
+        <button class="btn" mat-fab extended (click)="pause()" [disabled]="isPaused">Pause</button>
+      </div>
+      <button class="btn warn" mat-fab extended (click)="end()">End</button>
+    </div>
+  </div>
 
   <div class="right-container">
     <div #mapContainer class="sep-map"></div>

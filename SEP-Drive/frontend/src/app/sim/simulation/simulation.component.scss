@@ -14,3 +14,17 @@
     cursor: pointer;
   }
 }
+
+.button-container {
+  flex-direction: column;
+  gap: 20px;
+
+  .row-btn {
+    display: flex;
+    gap: 10px;
+
+    .btn {
+      flex: 1;
+    }
+  }
+}
