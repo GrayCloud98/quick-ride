@@ -21,7 +21,7 @@ public class Driver extends User {
         super(username, firstName, lastName, email, birthDate, password, role, profilePicture);
         this.active = false;
         this.vehicleClass = vehicleClass;
-        this.totalTravelledDistance = 0;
+        this.totalTravelledDistance = 0.0;
 
     }
 
