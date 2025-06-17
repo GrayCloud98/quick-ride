@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { WalletService, Transaction } from '../../shared/services/wallet.service';
 import { AuthService } from '../../auth/auth.service';
+import { Location} from '@angular/common';
 
 @Component({
   selector: 'app-wallet-page',
@@ -21,7 +22,8 @@ export class WalletPageComponent implements OnInit {
   constructor(
     private router: Router,
     private walletService: WalletService,
-    private authService: AuthService
+    private authService: AuthService,
+    private location: Location
   ) { }
 
   ngOnInit() {
@@ -73,6 +75,6 @@ export class WalletPageComponent implements OnInit {
   }
 
   goToProfile() {
-    this.router.navigate(['/']);
+    this.location.back();
   }
 }

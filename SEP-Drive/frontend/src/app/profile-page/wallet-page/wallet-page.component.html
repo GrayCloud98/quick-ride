@@ -24,26 +24,27 @@
     {{ error }}
   </div>
 
-  <div *ngIf="accessAllowed" class="transaction-history" (click)="toggleHistory()" style="cursor:pointer;">
-    Transaction History
-    <mat-icon>{{ showHistory ? 'expand_less' : 'history' }}</mat-icon>
-  </div>
+<!--  <div *ngIf="accessAllowed"-->
+<!--       class="transaction-history" (click)="toggleHistory()" style="cursor:pointer;">-->
+<!--    Transaction History-->
+<!--    <mat-icon>{{ showHistory ? 'expand_less' : 'history' }}</mat-icon>-->
+<!--  </div>-->
 
-  <div  *ngIf="showHistory">
-    <table style="width:100%; margin-top: 10px;">
-      <tr>
-        <th>Datum</th>
-        <th>Betrag</th>
-      </tr>
-      <tr *ngFor="let tx of transactions">
-        <td>{{ tx.date | date:'short' }}</td>
-        <td>{{ (tx.amountCents / 100) | number:'1.2-2' }} €</td>
-      </tr>
-    </table>
-    <div *ngIf="transactions.length === 0" style="text-align:center; color:#888; margin:16px 0;">
-      Keine Transaktionen gefunden.
-    </div>
-  </div>
+<!--  <div  *ngIf="showHistory">-->
+<!--    <table style="width:100%; margin-top: 10px;">-->
+<!--      <tr>-->
+<!--        <th>Datum</th>-->
+<!--        <th>Betrag</th>-->
+<!--      </tr>-->
+<!--      <tr *ngFor="let tx of transactions">-->
+<!--        <td>{{ tx.date | date:'short' }}</td>-->
+<!--        <td>{{ (tx.amountCents / 100) | number:'1.2-2' }} €</td>-->
+<!--      </tr>-->
+<!--    </table>-->
+<!--    <div *ngIf="transactions.length === 0" style="text-align:center; color:#888; margin:16px 0;">-->
+<!--      Keine Transaktionen gefunden.-->
+<!--    </div>-->
+<!--  </div>-->
   <div *ngIf="!accessAllowed" style="text-align:center; color:#666; margin:16px 0;">
     Drivers cannot top up their credit themselves.
 </div>
