@@ -4,7 +4,6 @@ import com.example.sep_drive_backend.constants.Ridestatus;
 import com.example.sep_drive_backend.constants.VehicleClassEnum;
 import jakarta.persistence.*;
 
-import java.sql.Time;
 import java.time.LocalDateTime;
 
 @Entity
@@ -38,7 +37,7 @@ public class RideRequest {
     private Double distance;
 
     @Column
-    private Double duration;
+    private double duration;
 
     @Column
     private Double estimatedPrice;

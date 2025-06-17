@@ -24,12 +24,12 @@ public class Trips {
 
     private double distanceKm;
 
-    private Double durationMin;
+    private double durationMin;
 
     private double priceEuro;
 
-    private Integer customerRating;  // 1 to 5
-    private Integer driverRating;    // 1 to 5
+    private Integer customerRating = 0;  // 1 to 5
+    private Integer driverRating = 0;    // 1 to 5
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
@@ -66,11 +66,11 @@ public class Trips {
         this.distanceKm = distanceKm;
     }
 
-    public Double getDurationMin() {
+    public double getDurationMin() {
         return durationMin;
     }
 
-    public void setDurationMin(Double durationMin) {
+    public void setDurationMin(double durationMin) {
         this.durationMin = durationMin;
     }
 

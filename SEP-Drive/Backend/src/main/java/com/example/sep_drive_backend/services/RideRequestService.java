@@ -293,7 +293,7 @@ public class RideRequestService {
         trip.setDriverFullName(driverFullName);
         trip.setDriverUsername(driver.getUsername());
         trip.setDistanceKm(ride.getDistance());
-        trip.setDurationMin(ride.getDuration());
+        trip.setDurationMin((double) ride.getDuration());
         trip.setPriceEuro(ride.getEstimatedPrice());
         trip.setStatus(TripsStatus.COMPLETED);
         trip.setProgress(100);

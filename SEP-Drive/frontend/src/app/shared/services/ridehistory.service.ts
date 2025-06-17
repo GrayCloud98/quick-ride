@@ -9,8 +9,8 @@ export interface TripHistoryDTO {
   distance: number;
   duration: string;
   amount: number;
-  customerRating: number;
-  driverRating: number;
+  customerRating?: number;
+  driverRating?: number;
   customerName: string;
   customerUsername: string;
   driverName: string;

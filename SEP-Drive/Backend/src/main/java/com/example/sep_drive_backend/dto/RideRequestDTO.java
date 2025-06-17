@@ -21,7 +21,7 @@ public class RideRequestDTO {
         this.startLocationName = request.getStartLocationName();
         this.DestinationLocationName = request.getDestinationLocationName();
         this.distance = request.getDistance();
-        this.duration = request.getDuration();
+        this.duration = (double) request.getDuration();
         this.estimatedPrice = request.getEstimatedPrice();
     }
 

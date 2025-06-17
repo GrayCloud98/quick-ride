@@ -24,8 +24,8 @@ public class TripeDTO {
         this.distanceKm = distanceKm;
         this.durationMin = durationMin;
         this.priceEuro = priceEuro;
-        this.customerRating = customerRating;
-        this.driverRating = driverRating;
+        this.customerRating = 0;
+        this.driverRating = 0;
         this.customerUsername = customerUsername;
         this.customerFullName = customerFullName;
         this.driverUsername = driverUsername;
