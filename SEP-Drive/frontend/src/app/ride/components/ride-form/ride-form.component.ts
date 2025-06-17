@@ -11,41 +11,41 @@ import { DistanceService } from '../../services/distance.service';
 import {RideStateService} from '../../services/ride-state.service';
 
 enum updateType {
-  pickup,
-  dropoff,
+pickup,
+dropoff,
 }
 
 @Component({
-  selector: 'ride-form',
-  standalone: false,
-  templateUrl: './ride-form.component.html',
-  styleUrl: './ride-form.component.scss',
+selector: 'ride-form',
+standalone: false,
+templateUrl: './ride-form.component.html',
+styleUrl: './ride-form.component.scss',
 })
 export class RideFormComponent implements OnInit {
 
-  username!: string
-  vehicles = Object.values(VehicleClass);
+username!: string
+vehicles = Object.values(VehicleClass);
 
-  pickupPicked: boolean = false;
-  dropoffPicked: boolean = false;
+pickupPicked: boolean = false;
+dropoffPicked: boolean = false;
 
-  protected readonly updateType = updateType;
+protected readonly updateType = updateType;
 
-  pickupControl = new FormControl<Location | string>('', [Validators.required]);
-  dropoffControl = new FormControl<Location | string>('', [Validators.required]);
+pickupControl = new FormControl<Location | string>('', [Validators.required]);
+dropoffControl = new FormControl<Location | string>('', [Validators.required]);
 
-  ride: Ride = {
-    pickup: { latitude: 0, longitude: 0 },
-    dropoff: { latitude: 0, longitude: 0 },
-    vehicleClass: VehicleClass.SMALL,
-    active: false,
-    distance: 0,
-    duration: 0,
-    estimatedPrice: 0
-  };
+ride: Ride = {
+pickup: { latitude: 0, longitude: 0 },
+dropoff: { latitude: 0, longitude: 0 },
+vehicleClass: VehicleClass.SMALL,
+active: false,
+distance: 0,
+duration: 0,
+estimatedPrice: 0
+};
 
 
-  constructor(
+constructor(
     private rideService: RideRequestService,
     private authService: AuthService,
     private router: Router,
