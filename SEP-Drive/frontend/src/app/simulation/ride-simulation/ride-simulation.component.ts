@@ -33,6 +33,9 @@ dropoffLocation: google.maps.LatLngLiteral | null = null;
 rideCompleted = false;
 rideId!: string;
 role: 'driver' | 'customer' = 'driver';
+
+private pollingIntervalId: any;
+
 private map!: google.maps.Map;
 private directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
 private directionsResult: google.maps.DirectionsResult | null = null;
@@ -67,7 +70,7 @@ ngOnInit(): void {
         this.tryStartSimulation();
 
         // Start polling for both roles
-        setInterval(() => {
+        this.pollingIntervalId = setInterval(() => {
           this.simulationService.getUpdateSimulation(Number(this.rideId)).subscribe({
             next: update => {
               console.log('[POLL]', this.role, '| Status:', update.status, '| Speed:', update.simulationSpeed);
@@ -254,5 +257,15 @@ resumeSimulation(): void {
     const minutes = Math.floor(this.eta / 60);
     const seconds = this.eta % 60;
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  }
+
+  ngOnDestroy(): void {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
+
+    if (this.pollingIntervalId) {
+      clearInterval(this.pollingIntervalId);
+    }
   }
 }

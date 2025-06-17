@@ -25,20 +25,16 @@
 
         <div class="slider-container">
           <mat-label>Simulation Duration (3–30 sec)</mat-label>
-          <mat-slider [min]="3" [max]="30" [step]="1" color="primary">
-            <input matSliderThumb [(ngModel)]="speed" />
-          </mat-slider>
-          <div class="slider-value">{{ speed }} sec</div>
         </div>
-<!--        <label for="speed">Simulation Duration (3–30 sec):</label>-->
-<!--        <input-->
-<!--          type="range"-->
-<!--          id="speed"-->
-<!--          min="3"-->
-<!--          max="30"-->
-<!--          [value]="speed"-->
-<!--          (input)="handleSpeedInput($event)"-->
-<!--        >-->
+        <input
+          style="width: 100%"
+          type="range"
+          id="speed"
+          min="3"
+          max="30"
+          [value]="speed"
+          (input)="handleSpeedInput($event)"
+        >
       </mat-card-content>
     </mat-card>
 
