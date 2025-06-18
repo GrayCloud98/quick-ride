@@ -1,10 +1,5 @@
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
 
-interface Point{
-  label: string;
-  title: string;
-  position: { lat: number; lng: number; }
-}
 @Component({
   selector: 'simulation',
   standalone: false,
@@ -14,24 +9,23 @@ interface Point{
 export class SimulationComponent implements AfterViewInit {
   @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef;
   map!: google.maps.Map;
-  points: Point[] = [
-    { label: 'S', title: 'Start (Berlin)', position: { lat: 52.52, lng: 13.405 } },
-    { label: 'W1', title: 'Waypoint 1 (Hamburg)', position: { lat: 53.5511, lng: 9.9937 } },
-    { label: 'W2', title: 'Waypoint 2 (Leipzig)', position: { lat: 51.3397, lng: 12.3731 } },
-    { label: 'E', title: 'End (Munich)', position: { lat: 48.1351, lng: 11.582 } }
+  points: google.maps.LatLngLiteral[] = [
+    { lat: 52.52, lng: 13.405 },     // Start (Berlin)
+    { lat: 53.5511, lng: 9.9937 },   // Waypoint 1 (Hamburg)
+    { lat: 51.3397, lng: 12.3731 },  // Waypoint 2 (Leipzig)
+    { lat: 48.1351, lng: 11.582 }    // End (Munich)
   ];
   private pointer!: google.maps.marker.AdvancedMarkerElement;
   private animationFrameId: number | null = null;
   private path: google.maps.LatLngLiteral[] = [];
-  private currentIndex = 0;
+  private currentIndex: number = 0;
   duration: number = 30;
   isRunning = false;
   isPaused = false;
 
-
   ngAfterViewInit(): void {
     const mapOptions: google.maps.MapOptions = {
-      center: this.points[0].position,
+      center: this.points[0],
       zoom: 6,
       mapId: 'DEMO_MAP_ID'
     };
@@ -42,7 +36,7 @@ export class SimulationComponent implements AfterViewInit {
   }
 
   private renderMarkers(): void {
-    this.points.forEach((point, index) => {
+    this.points.forEach((position, index) => {
       let color = 'blue';
       if (index === 0)
         color = 'darkgreen';
@@ -51,8 +45,8 @@ export class SimulationComponent implements AfterViewInit {
 
       new google.maps.marker.AdvancedMarkerElement({
         map: this.map,
-        position: point.position,
-        title: point.title,
+        position,
+        title: `Point ${index + 1}`,
         content: this.createColoredMarker(color)
       });
     });
@@ -62,11 +56,12 @@ export class SimulationComponent implements AfterViewInit {
     const directionsService = new google.maps.DirectionsService();
     const directionsRenderer = new google.maps.DirectionsRenderer({ map: this.map, suppressMarkers: true });
 
-    const start = this.points[0].position;
-    const waypoints =
-      this.points.slice(1, this.points.length - 1)
-        .map(p => ({ location: p.position, stopover: true }));
-    const end = this.points[this.points.length - 1].position;
+    const start = this.points[0];
+    const end = this.points[this.points.length - 1];
+    const waypoints = this.points.slice(1, this.points.length - 1).map(p => ({
+      location: p,
+      stopover: true
+    }));
 
     directionsService.route(
       {
@@ -79,8 +74,9 @@ export class SimulationComponent implements AfterViewInit {
         if (status === google.maps.DirectionsStatus.OK && result) {
           directionsRenderer.setDirections(result);
           this.animateAlongRoute(result);
-        } else
+        } else {
           console.error('Directions request failed due to ' + status);
+        }
       }
     );
   }
@@ -99,7 +95,6 @@ export class SimulationComponent implements AfterViewInit {
       }
     }
 
-    // Add pointer marker
     this.pointer = new google.maps.marker.AdvancedMarkerElement({
       position: this.path[0],
       map: this.map,
@@ -110,7 +105,7 @@ export class SimulationComponent implements AfterViewInit {
 
   private animate(): void {
     const totalSteps = this.path.length;
-    const totalFrames = this.duration * 165; // assuming 60 FPS
+    const totalFrames = this.duration * 165; // FIXME this assumes a 165Hz monitor
     const pointsPerFrame = totalSteps / totalFrames;
 
     let progress = this.currentIndex;
@@ -119,7 +114,6 @@ export class SimulationComponent implements AfterViewInit {
       if (!this.isRunning || this.isPaused) return;
 
       this.pointer.position = this.path[Math.floor(progress)];
-
       progress += pointsPerFrame;
       this.currentIndex = Math.floor(progress);
 
