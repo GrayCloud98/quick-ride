@@ -133,19 +133,20 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
 
   private animate(): void {
     const totalSteps = this.path.length;
-    const totalFrames = this.duration * 165; // FIXME this assumes a 165Hz monitor
-    const pointsPerFrame = totalSteps / totalFrames;
+    const totalDurationMs = this.duration * 1000; // duration in milliseconds
+    const startTime = performance.now();
+    const startIndex = this.currentIndex;
 
-    let progress = this.currentIndex;
-
-    const step = () => {
+    const step = (currentTime: number) => {
       if (!this.isRunning || this.isPaused) return;
 
-      this.pointer.position = this.path[Math.floor(progress)];
-      progress += pointsPerFrame;
-      this.currentIndex = Math.floor(progress);
+      const elapsed = currentTime - startTime;
+      const progressRatio = elapsed / totalDurationMs;
 
-      if (this.currentIndex >= totalSteps) {
+      this.currentIndex = Math.floor(startIndex + totalSteps * progressRatio);
+      this.pointer.position = this.path[Math.min(this.currentIndex, totalSteps - 1)];
+
+      if (this.currentIndex >= totalSteps - 1) {
         this.pointer.position = this.path[totalSteps - 1];
         this.isRunning = false;
         return;
