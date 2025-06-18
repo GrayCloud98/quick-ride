@@ -38,6 +38,7 @@ import { MatSortModule } from '@angular/material/sort';
 import {SimulationService} from './simulation/simulation.service';
 import {MatSlider, MatSliderModule} from '@angular/material/slider';
 import { SimulationComponent } from './sim/simulation/simulation.component';
+import {SimService} from './sim/sim.service';
 
 
 @NgModule({
@@ -105,7 +106,8 @@ import { SimulationComponent } from './sim/simulation/simulation.component';
   providers: [
     provideHttpClient(withInterceptorsFromDi()),
     provideNativeDateAdapter(),
-    SimulationService
+    SimulationService,
+    SimService
   ],
 
   bootstrap: [AppComponent]
