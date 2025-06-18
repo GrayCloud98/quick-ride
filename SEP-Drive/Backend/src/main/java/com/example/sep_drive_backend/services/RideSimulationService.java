@@ -17,24 +17,27 @@ public class RideSimulationService {
         this.rideSimulationRepository = rideSimulationRepository;
     }
 
-    public RideSimulation startSimulation(Long id) {
+    public RideSimulation startSimulation(Long id, int currentIndex) {
         RideSimulation sim = getSimulationById(id);
         sim.setPaused(false);
         sim.markStarted();
+        sim.setCurrentIndex(currentIndex);
         rideSimulationRepository.save(sim);
         return sim;
     }
 
-    public RideSimulation pauseSimulation(Long id) {
+    public RideSimulation pauseSimulation(Long id, int currentIndex) {
         RideSimulation sim = getSimulationById(id);
         sim.setPaused(true);
+        sim.setCurrentIndex(currentIndex);
         rideSimulationRepository.save(sim);
         return sim;
     }
 
-    public RideSimulation resumeSimulation(Long id) {
+    public RideSimulation resumeSimulation(Long id, int currentIndex) {
         RideSimulation sim = getSimulationById(id);
         sim.setPaused(false);
+        sim.setCurrentIndex(currentIndex);
         rideSimulationRepository.save(sim);
         return sim;
     }

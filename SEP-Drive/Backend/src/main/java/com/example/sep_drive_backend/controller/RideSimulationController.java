@@ -1,6 +1,7 @@
 package com.example.sep_drive_backend.controller;
 
 import com.example.sep_drive_backend.dto.RideSimulationUpdate;
+import com.example.sep_drive_backend.dto.SimulationControlMessage;
 import com.example.sep_drive_backend.models.RideSimulation;
 import com.example.sep_drive_backend.services.RideSimulationService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -25,20 +26,20 @@ public class RideSimulationController {
     }
 
     @MessageMapping("/simulation/start")
-    public void startSimulation(@Payload Long rideSimulationId) {
-        RideSimulation sim = rideSimulationService.startSimulation(rideSimulationId);
-        broadcastUpdate(sim);
-    }
-
-    @MessageMapping("/simulation/pause")
-    public void pauseSimulation(@Payload Long rideSimulationId) {
-        RideSimulation sim = rideSimulationService.pauseSimulation(rideSimulationId);
+    public void startSimulation(@Payload SimulationControlMessage msg) {
+        RideSimulation sim = rideSimulationService.startSimulation(msg.getRideSimulationId(), msg.getCurrentIndex());
         broadcastUpdate(sim);
     }
 
     @MessageMapping("/simulation/resume")
-    public void resumeSimulation(@Payload Long rideSimulationId) {
-        RideSimulation sim = rideSimulationService.resumeSimulation(rideSimulationId);
+    public void resumeSimulation(@Payload SimulationControlMessage msg) {
+        RideSimulation sim = rideSimulationService.resumeSimulation(msg.getRideSimulationId(), msg.getCurrentIndex());
+        broadcastUpdate(sim);
+    }
+
+    @MessageMapping("/simulation/pause")
+    public void pauseSimulation(@Payload SimulationControlMessage msg) {
+        RideSimulation sim = rideSimulationService.pauseSimulation(msg.getRideSimulationId(), msg.getCurrentIndex());
         broadcastUpdate(sim);
     }
 
