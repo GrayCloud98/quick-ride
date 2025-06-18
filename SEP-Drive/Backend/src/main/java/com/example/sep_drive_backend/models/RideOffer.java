@@ -18,6 +18,13 @@ public class RideOffer {
     private RideRequest rideRequest;
 
 
+    public RideSimulation getRideSimulation() {
+        return rideSimulation;
+    }
+
+    public void setRideSimulation(RideSimulation rideSimulation) {
+        this.rideSimulation = rideSimulation;
+    }
 
     @OneToOne
     private RideSimulation rideSimulation;

@@ -249,6 +249,7 @@ public class RideRequestService {
         rideRequest.getCustomer().setRideSimulation(rideSimulation);
         selectedOffer.getDriver().setSimulationStatus(RideStatus.CREATED);
         rideRequest.getCustomer().setSimulationStatus(RideStatus.CREATED);
+        selectedOffer.setRideSimulation(rideSimulation);
         rideSimulationRepository.save(rideSimulation);
         rideOfferRepository.save(selectedOffer);
         rideRequestRepository.save(rideRequest);
