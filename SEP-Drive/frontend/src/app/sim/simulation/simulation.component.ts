@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
 import {Control, SimService, Update} from '../sim.service';
 
 @Component({
@@ -7,47 +7,50 @@ import {Control, SimService, Update} from '../sim.service';
   templateUrl: './simulation.component.html',
   styleUrl: './simulation.component.scss'
 })
-export class SimulationComponent implements AfterViewInit {
+export class SimulationComponent implements AfterViewInit, OnDestroy {
   @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef;
   map!: google.maps.Map;
   pointer!: google.maps.marker.AdvancedMarkerElement;
   animationFrameId: number | null = null;
   path: google.maps.LatLngLiteral[] = [];
 
-  currentIndex = 0; // TODO UPDATE FROM WEBSOCKET
-  points: google.maps.LatLngLiteral[] = [ // TODO UPDATE FROM WEBSOCKET
-    { lat: 52.52, lng: 13.405 },
-    { lat: 53.5511, lng: 9.9937 },
-    { lat: 51.3397, lng: 12.3731 },
-    { lat: 48.1351, lng: 11.582 }
-  ];
-  duration = 30; // TODO UPDATE FROM WEBSOCKET
-  isRunning = false; // TODO UPDATE FROM WEBSOCKET
-  isPaused = false; // TODO UPDATE FROM WEBSOCKET
-
-  private metadataLoaded = false;
+  currentIndex = 0;
+  points: google.maps.LatLngLiteral[] = [];
+  duration = 30;
+  isRunning = false;
+  isPaused = false;
+  metadataLoaded = false;
 
   constructor(private simService: SimService) {}
 
   ngAfterViewInit(): void {
     this.simService.connect();
 
-    this.simService.getSimulationUpdates().subscribe((update: Update) => {
-      this.handleSimulationMetadata(update);
-    });
+    this.simService.getSimulationUpdates().subscribe(
+      (update: Update) => {
+        this.duration = update.duration;
+        this.currentIndex = update.currentIndex;
+        this.points = [ update.startPoint, update.edndPoint ];
+
+        if (update.hasStarted !== this.isRunning || update.paused !== this.isPaused) {
+          if (update.hasStarted && update.paused)
+            this.pause();
+          else if (update.hasStarted && !update.paused)
+            this.resume();
+          this.isRunning = update.hasStarted;
+          this.isPaused = update.paused;
+        }
+
+        if (!this.metadataLoaded) {
+          this.metadataLoaded = true;
+          this.initializeMap();
+        }
+      }
+    );
   }
 
-  private handleSimulationMetadata(update: Update): void {
-    this.duration = update.duration;
-    this.currentIndex = update.currentIndex;
-    this.isRunning = update.hasStarted;
-    this.isPaused = update.paused;
-    this.points = [ update.startPoint, update.edndPoint ];
-
-    if (!this.metadataLoaded) {
-      this.metadataLoaded = true;
-      this.initializeMap();
-    }
+  async ngOnDestroy(): Promise<void> {
+    await this.simService.disconnect();
   }
 
   private initializeMap(): void {
@@ -58,7 +61,6 @@ export class SimulationComponent implements AfterViewInit {
     };
 
     this.map = new google.maps.Map(this.mapContainer.nativeElement, mapOptions);
-
     this.renderMarkers();
     this.drawRoute();
   }
@@ -66,10 +68,8 @@ export class SimulationComponent implements AfterViewInit {
   private renderMarkers(): void {
     this.points.forEach((position, index) => {
       let color = 'blue';
-      if (index === 0)
-        color = 'darkgreen';
-      else if (index === this.points.length - 1)
-        color = 'red';
+      if (index === 0) color = 'darkgreen';
+      else if (index === this.points.length - 1) color = 'red';
 
       new google.maps.marker.AdvancedMarkerElement({
         map: this.map,
@@ -133,19 +133,20 @@ export class SimulationComponent implements AfterViewInit {
 
   private animate(): void {
     const totalSteps = this.path.length;
-    const totalFrames = this.duration * 165; // FIXME this assumes a 165Hz monitor
-    const pointsPerFrame = totalSteps / totalFrames;
+    const totalDurationMs = this.duration * 1000; // duration in milliseconds
+    const startTime = performance.now();
+    const startIndex = this.currentIndex;
 
-    let progress = this.currentIndex;
-
-    const step = () => {
+    const step = (currentTime: number) => {
       if (!this.isRunning || this.isPaused) return;
 
-      this.pointer.position = this.path[Math.floor(progress)];
-      progress += pointsPerFrame;
-      this.currentIndex = Math.floor(progress);
+      const elapsed = currentTime - startTime;
+      const progressRatio = elapsed / totalDurationMs;
 
-      if (this.currentIndex >= totalSteps) {
+      this.currentIndex = Math.floor(startIndex + totalSteps * progressRatio);
+      this.pointer.position = this.path[Math.min(this.currentIndex, totalSteps - 1)];
+
+      if (this.currentIndex >= totalSteps - 1) {
         this.pointer.position = this.path[totalSteps - 1];
         this.isRunning = false;
         return;
@@ -199,11 +200,12 @@ export class SimulationComponent implements AfterViewInit {
     this.simService.control(this.currentIndex, Control.RESUME);
   }
 
-  speed(): void{
+  speed(): void {
     this.simService.control(this.duration, Control.SPEED);
   }
 
   end(): void {
+    // TODO END LOGIC
     console.log('Simulation ended.');
     this.isRunning = false;
     this.isPaused = false;

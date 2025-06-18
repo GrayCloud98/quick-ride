@@ -10,7 +10,7 @@ export interface Update {
   currentIndex: number,
   duration: number,
   startPoint: {lat: number, lng: number},
-  edndPoint: {lat: number, lng: number}
+  edndPoint: {lat: number, lng: number} // FIXME BACKEND TYPO
 }
 export enum Control {
   START = 'start',
@@ -31,7 +31,7 @@ export class SimService {
     this.client = new Client({
       webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
       reconnectDelay: 5000,
-      debug: log => console.log('📝 Debug log:', log)
+      debug: () => {}
     });
 
     this.client.onConnect = () => {
@@ -56,8 +56,13 @@ export class SimService {
     this.client.activate();
   }
 
-  disconnect(): void {
-    this.client.deactivate();
+  async disconnect(): Promise<void> {
+    try {
+      await this.client.deactivate();
+      console.log('🛑 WebSocket disconnected cleanly');
+    } catch (error) {
+      console.error('⚠️ Error during WebSocket disconnection:', error);
+    }
   }
 
   control(input: number, control: Control): void {
@@ -67,9 +72,6 @@ export class SimService {
       payload.duration = input;
     else
       payload.currentIndex = input;
-
-    // TODO DELETE DEBUG
-    console.log("💬 control.client.publish:", {destination: `/app/simulation/${control}`, body: JSON.stringify(payload)});
 
     this.client.publish({
       destination: `/app/simulation/${control}`,
