@@ -19,7 +19,6 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   duration = 30;
   isRunning = false;
   isPaused = false;
-
   metadataLoaded = false;
 
   constructor(private simService: SimService) {}
@@ -62,7 +61,6 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     };
 
     this.map = new google.maps.Map(this.mapContainer.nativeElement, mapOptions);
-
     this.renderMarkers();
     this.drawRoute();
   }
@@ -70,10 +68,8 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   private renderMarkers(): void {
     this.points.forEach((position, index) => {
       let color = 'blue';
-      if (index === 0)
-        color = 'darkgreen';
-      else if (index === this.points.length - 1)
-        color = 'red';
+      if (index === 0) color = 'darkgreen';
+      else if (index === this.points.length - 1) color = 'red';
 
       new google.maps.marker.AdvancedMarkerElement({
         map: this.map,
@@ -203,11 +199,12 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     this.simService.control(this.currentIndex, Control.RESUME);
   }
 
-  speed(): void{
+  speed(): void {
     this.simService.control(this.duration, Control.SPEED);
   }
 
   end(): void {
+    // TODO END LOGIC
     console.log('Simulation ended.');
     this.isRunning = false;
     this.isPaused = false;
