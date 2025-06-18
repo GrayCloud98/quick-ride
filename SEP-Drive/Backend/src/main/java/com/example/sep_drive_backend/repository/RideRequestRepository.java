@@ -1,6 +1,6 @@
 package com.example.sep_drive_backend.repository;
 
-import com.example.sep_drive_backend.constants.Ridestatus;
+import com.example.sep_drive_backend.constants.RideStatus;
 import com.example.sep_drive_backend.models.RideRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -13,5 +13,5 @@ public interface RideRequestRepository extends JpaRepository<RideRequest, Long> 
 
     Optional<RideRequest> findByCustomerUsernameAndCustomerActiveTrue(String username);
 
-    List<RideRequest> findByStatus(Ridestatus status);
+//    List<RideRequest> findByStatus(RideStatus status);
 }

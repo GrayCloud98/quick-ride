@@ -1,5 +1,6 @@
 package com.example.sep_drive_backend.models;
 
+import com.example.sep_drive_backend.constants.RideStatus;
 import com.example.sep_drive_backend.constants.RoleEnum;
 import jakarta.persistence.*;
 
@@ -34,6 +35,11 @@ public abstract class  User {
     private float rating;
     private int numberOfRatings ;
 
+    @Enumerated(EnumType.STRING)
+    private RideStatus simulationStatus;
+
+    @ManyToOne
+    RideSimulation rideSimulation;
     public User() {}
 
     public User(String username, String firstName, String lastName, String email, Date birthDate, String password, RoleEnum role, String profilePicture) {
@@ -48,11 +54,20 @@ public abstract class  User {
         this.totalRides = 0;
         this.rating = 0;
         this.numberOfRatings = 0;
+        this.simulationStatus = null;
     }
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "wallet_id", referencedColumnName = "id", unique = true)
     private Wallet wallet;
+
+    public RideSimulation getRideSimulation() {
+        return rideSimulation;
+    }
+
+    public void setRideSimulation(RideSimulation rideSimulation) {
+        this.rideSimulation = rideSimulation;
+    }
 
     public Wallet getWallet() {
         return wallet;
@@ -116,6 +131,13 @@ public abstract class  User {
         this.id = id;
     }
 
+    public RideStatus getSimulationStatus() {
+        return simulationStatus;
+    }
+
+    public void setSimulationStatus(RideStatus simulationStatus) {
+        this.simulationStatus = simulationStatus;
+    }
 
     public String getUsername() {
         return username;
