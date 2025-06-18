@@ -83,11 +83,11 @@ public class RideRequestController {
         return ResponseEntity.noContent().build();
     }
 
-//    @GetMapping("/all-active-rides")
-//    public ResponseEntity<List<RidesForDriversDTO>> getAllRideRequests() {
-//        List<RidesForDriversDTO> rideRequests = rideRequestService.getAllRideRequests();
-//        return ResponseEntity.ok(rideRequests);
-//    }
+    @GetMapping("/all-active-rides")
+    public ResponseEntity<List<RidesForDriversDTO>> getAllRideRequests() {
+        List<RidesForDriversDTO> rideRequests = rideRequestService.getAllRideRequests();
+        return ResponseEntity.ok(rideRequests);
+    }
 
     @PostMapping("/offer-ride")
     public ResponseEntity<?> offerRide(@RequestParam Long rideRequestId, HttpServletRequest request) {

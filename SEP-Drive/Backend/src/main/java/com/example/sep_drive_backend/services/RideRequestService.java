@@ -112,13 +112,12 @@ public class RideRequestService {
         return customerRepository.findByUsername(username).isPresent();
     }
 
-//    public List<RidesForDriversDTO> getAllRideRequests() {
-//        RideStatus filterStatus = RideStatus.CREATED;
-//        return rideRequestRepository.findByStatus(filterStatus)
-//                .stream()
-//                .map(RidesForDriversDTO::new)
-//                .collect(Collectors.toList());
-//    }
+    public List<RidesForDriversDTO> getAllRideRequests() {
+        return rideRequestRepository.findAll().stream()
+                .map(RidesForDriversDTO::new)
+                .collect(Collectors.toList());
+    }
+
 
 
     public RideOffer createRideOffer(Long rideRequestId, String driverUsername) {
