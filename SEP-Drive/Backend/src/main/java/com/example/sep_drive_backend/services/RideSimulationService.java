@@ -49,6 +49,13 @@ public class RideSimulationService {
         return sim;
     }
 
+    public RideSimulation updateCurrentIndex(Long simulationId, int currentIndex) {
+        RideSimulation sim = getSimulationById(simulationId);
+        sim.setCurrentIndex(currentIndex);
+        rideSimulationRepository.save(sim);
+        return sim;
+    }
+
     public RideSimulation getSimulationById(Long id) {
         Optional<RideSimulation> simOpt = rideSimulationRepository.findById(id);
         if (simOpt.isEmpty()) throw new RuntimeException("Simulation not found");
