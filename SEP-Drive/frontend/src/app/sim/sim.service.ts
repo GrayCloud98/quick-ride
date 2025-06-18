@@ -56,8 +56,13 @@ export class SimService {
     this.client.activate();
   }
 
-  disconnect(): void {
-    this.client.deactivate();
+  async disconnect(): Promise<void> {
+    try {
+      await this.client.deactivate();
+      console.log('🛑 WebSocket disconnected cleanly');
+    } catch (error) {
+      console.error('⚠️ Error during WebSocket disconnection:', error);
+    }
   }
 
   control(input: number, control: Control): void {
