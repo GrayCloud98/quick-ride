@@ -26,6 +26,8 @@
       </div>
       <button class="btn warn" mat-fab extended (click)="end()">End</button>
     </div>
+
+    <button (click)="console.log({currentIndex, points, duration, isRunning, isPaused})">Metadata</button>
   </div>
 
   <div class="right-container map">

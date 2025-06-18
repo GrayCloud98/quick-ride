@@ -3,6 +3,15 @@ import { Client, IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import {Observable, Subject} from 'rxjs';
 
+export interface Update {
+  rideSimulationId: number,
+  paused: boolean,
+  hasStarted: boolean,
+  currentIndex: number,
+  duration: number,
+  startPoint: {lat: number, lng: number},
+  edndPoint: {lat: number, lng: number}
+}
 export enum Control {
   START = 'start',
   PAUSE = 'pause',
@@ -31,6 +40,7 @@ export class SimService {
         const body = JSON.parse(message.body);
         this.simulationUpdateSubject.next(body);
       });
+      this.control(30, Control.SPEED); // FIXME BACKEND DOES NOT RETURN DATA ON CONNECTION, THIS LINE IS TO TRIGGER SENDING DATA
     };
 
     this.client.onStompError = (frame) => {

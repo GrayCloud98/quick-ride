@@ -1,4 +1,5 @@
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
+import {SimService, Update} from '../sim.service';
 
 @Component({
   selector: 'simulation',
@@ -24,12 +25,38 @@ export class SimulationComponent implements AfterViewInit {
   isRunning = false; // TODO UPDATE FROM WEBSOCKET
   isPaused = false; // TODO UPDATE FROM WEBSOCKET
 
+  private metadataLoaded = false;
+
+  constructor(private simService: SimService) {}
+
   ngAfterViewInit(): void {
+    this.simService.connect();
+
+    this.simService.getSimulationUpdates().subscribe((update: Update) => {
+      this.handleSimulationMetadata(update);
+    });
+  }
+
+  private handleSimulationMetadata(update: Update): void {
+    this.duration = update.duration;
+    this.currentIndex = update.currentIndex;
+    this.isRunning = update.hasStarted;
+    this.isPaused = update.paused;
+    this.points = [ update.startPoint, update.edndPoint ];
+
+    if (!this.metadataLoaded) {
+      this.metadataLoaded = true;
+      this.initializeMap();
+    }
+  }
+
+  private initializeMap(): void {
     const mapOptions: google.maps.MapOptions = {
       center: this.points[0],
       zoom: 6,
       mapId: 'DEMO_MAP_ID'
     };
+
     this.map = new google.maps.Map(this.mapContainer.nativeElement, mapOptions);
 
     this.renderMarkers();
@@ -178,4 +205,6 @@ export class SimulationComponent implements AfterViewInit {
       this.animationFrameId = null;
     }
   }
+
+  protected readonly console = console;
 }
