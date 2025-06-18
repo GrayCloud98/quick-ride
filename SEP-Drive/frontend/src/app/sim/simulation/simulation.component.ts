@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
-import {SimService, Update} from '../sim.service';
+import {Control, SimService, Update} from '../sim.service';
 
 @Component({
   selector: 'simulation',
@@ -179,6 +179,7 @@ export class SimulationComponent implements AfterViewInit {
     this.isRunning = true;
     this.isPaused = false;
     this.animate();
+    this.simService.control(this.currentIndex, Control.START);
   }
 
   pause(): void {
@@ -187,6 +188,7 @@ export class SimulationComponent implements AfterViewInit {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;
     }
+    this.simService.control(this.currentIndex, Control.PAUSE);
   }
 
   resume(): void {
@@ -194,6 +196,11 @@ export class SimulationComponent implements AfterViewInit {
 
     this.isPaused = false;
     this.animate();
+    this.simService.control(this.currentIndex, Control.RESUME);
+  }
+
+  speed(): void{
+    this.simService.control(this.duration, Control.SPEED);
   }
 
   end(): void {
