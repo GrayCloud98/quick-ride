@@ -1,6 +1,5 @@
 package com.example.sep_drive_backend.models;
 
-import com.example.sep_drive_backend.constants.Ridestatus;
 import com.example.sep_drive_backend.constants.VehicleClassEnum;
 import jakarta.persistence.*;
 
@@ -50,64 +49,20 @@ public class RideRequest {
         this.createdAt = LocalDateTime.now();
     }
 
-    @OneToOne
-    @JoinColumn(name = "ride_offer_id")
-    private RideOffer rideOffer;
-    @Column
-    private Double currentLat;
 
-    private Double simulationSpeed;
-    @Column
-    private Double currentLng;
 
-    private boolean customerRated = false;
-    private boolean driverRated = false;
-    public boolean getCustomerRated() {
-        return customerRated;
-    }
-    public void setCustomerRated(boolean customerRated) {
-        this.customerRated = customerRated;
-    }
-    public boolean getDriverRated() {
-        return driverRated;
-    }
-    public void setDriverRated(boolean driverRated) {
-        this.driverRated = driverRated;
-    }
-    public RideOffer getRideOffer() {
-        return rideOffer;
-    }
 
-    public void setRideOffer(RideOffer rideOffer) {
-        this.rideOffer = rideOffer;
-    }
 
-    @Enumerated(EnumType.STRING)
-    private Ridestatus status;
+
+
+
+
 
     @Column
     @Enumerated(EnumType.STRING)
     private VehicleClassEnum vehicleClass;
 
-    public Double getSimulationSpeed() {
-        return simulationSpeed;
-    }
-    public void setSimulationSpeed(Double simulationSpeed) {
-        this.simulationSpeed = simulationSpeed;
-    }
-    public Double getCurrentLat() {
-        return currentLat;
-    }
 
-    public void setCurrentLat(Double currentLat) {
-        this.currentLat = currentLat;
-    }
-    public Double getCurrentLng() {
-        return currentLng;
-    }
-    public void setCurrentLng(Double currentLng) {
-        this.currentLng = currentLng;
-    }
     public Customer getCustomer() {
         return customer;
     }
@@ -132,18 +87,8 @@ public class RideRequest {
         this.distance = distance;
         this.duration = duration;
         this.estimatedPrice = estimatedPrice;
-        this.status = Ridestatus.PLANNED;
-        this.currentLat=this.startLatitude;
-        this.currentLng=this.startLongitude;
-        this.simulationSpeed=3.0;
     }
 
-    public Ridestatus getStatus() {
-        return status;
-    }
-    public void setStatus(Ridestatus status) {
-        this.status = status;
-    }
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }

@@ -1,5 +1,6 @@
 package com.example.sep_drive_backend.models;
 
+import com.example.sep_drive_backend.constants.RideStatus;
 import jakarta.persistence.*;
 
 @Entity
@@ -15,6 +16,11 @@ public class RideOffer {
     @ManyToOne
     @JoinColumn(name = "ride_request_id", referencedColumnName = "id", nullable = false)
     private RideRequest rideRequest;
+
+
+
+    @OneToOne
+    private RideSimulation rideSimulation;
 
     public RideOffer() {}
     public RideOffer(Long id, Driver driver, RideRequest rideRequest) {
@@ -46,4 +52,6 @@ public class RideOffer {
     public void setRideRequest(RideRequest rideRequest) {
         this.rideRequest = rideRequest;
     }
+
+
 }

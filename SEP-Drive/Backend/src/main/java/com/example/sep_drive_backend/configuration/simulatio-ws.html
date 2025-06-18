@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ride Simulation WebSocket Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+<h2>WebSocket STOMP Test</h2>
+<p>Status: <span id="status">DISCONNECTED</span></p>
+
+<button id="connectBtn">Connect</button>
+<button id="startBtn" disabled>Start Simulation</button>
+<button id="pauseBtn" disabled>Pause Simulation</button>
+<button id="resumeBtn" disabled>Resume Simulation</button>
+
+<pre id="messages"></pre>
+
+<script>
+    let stompClient = null;
+    const statusEl = document.getElementById('status');
+    const messagesEl = document.getElementById('messages');
+    const connectBtn = document.getElementById('connectBtn');
+    const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resumeBtn = document.getElementById('resumeBtn');
+
+    const simulationId = 1;
+    let currentIndex = 0;
+
+    connectBtn.addEventListener('click', () => {
+        const socket = new SockJS('http://localhost:8080/ws');
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, frame => {
+            statusEl.textContent = 'CONNECTED';
+
+            stompClient.subscribe(`/topic/simulation/${simulationId}`, message => {
+                const body = JSON.parse(message.body);
+                console.log('Received:', body);
+                messagesEl.textContent += `\nUpdate: ${JSON.stringify(body, null, 2)}`;
+            });
+
+            startBtn.disabled = false;
+            pauseBtn.disabled = false;
+            resumeBtn.disabled = false;
+        }, error => {
+            console.error('Connection error', error);
+            statusEl.textContent = 'ERROR';
+        });
+    });
+
+    startBtn.addEventListener('click', () => {
+        currentIndex = 0;
+        stompClient.send("/app/simulation/start", {}, JSON.stringify({
+            rideSimulationId: simulationId,
+            currentIndex: currentIndex
+        }));
+        messagesEl.textContent += `\nSent: Start Simulation ID ${simulationId} with index ${currentIndex}`;
+    });
+
+    pauseBtn.addEventListener('click', () => {
+        currentIndex += 5;
+        stompClient.send("/app/simulation/pause", {}, JSON.stringify({
+            rideSimulationId: simulationId,
+            currentIndex: currentIndex
+        }));
+        messagesEl.textContent += `\nSent: Pause Simulation ID ${simulationId} with index ${currentIndex}`;
+    });
+
+    resumeBtn.addEventListener('click', () => {
+        currentIndex += 2;
+        stompClient.send("/app/simulation/resume", {}, JSON.stringify({
+            rideSimulationId: simulationId,
+            currentIndex: currentIndex
+        }));
+        messagesEl.textContent += `\nSent: Resume Simulation ID ${simulationId} with index ${currentIndex}`;
+    });
+
+</script>
+</body>
+</html>

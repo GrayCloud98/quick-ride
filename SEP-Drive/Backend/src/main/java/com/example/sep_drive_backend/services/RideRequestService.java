@@ -1,8 +1,6 @@
 package com.example.sep_drive_backend.services;
 
-import com.example.sep_drive_backend.constants.Ridestatus;
-import com.example.sep_drive_backend.constants.TripsStatus;
-import com.example.sep_drive_backend.constants.VehicleClassEnum;
+import com.example.sep_drive_backend.constants.RideStatus;
 import com.example.sep_drive_backend.dto.*;
 import com.example.sep_drive_backend.models.*;
 import com.example.sep_drive_backend.repository.*;
@@ -10,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -25,6 +22,7 @@ public class RideRequestService {
     private final NotificationService notificationService;
     private final RideOfferRepository rideOfferRepository;
     private final RideRequestRepository rideRequestRepository;
+    private final RideSimulationRepository rideSimulationRepository;
 
     @Autowired
     public RideRequestService(
@@ -34,7 +32,7 @@ public class RideRequestService {
             RideOfferRepository rideOfferRepository,
             RideRequestRepository rideRequestRepository,
             WalletRepository walletRepository,
-            TripRepository tripRepository) {
+            TripRepository tripRepository, RideSimulationRepository rideSimulationRepository) {
 
         this.customerRepository = customerRepository;
         this.driverRepository = driverRepository;
@@ -43,6 +41,7 @@ public class RideRequestService {
         this.rideRequestRepository = rideRequestRepository;
         this.walletRepository = walletRepository;
         this.tripRepository = tripRepository;
+        this.rideSimulationRepository = rideSimulationRepository;
     }
 
 
@@ -69,11 +68,7 @@ public class RideRequestService {
         request.setDistance(dto.getDistance());
         request.setDuration(dto.getDuration());
         request.setEstimatedPrice(dto.getEstimatedPrice());
-        request.setStatus(Ridestatus.PLANNED);
         customer.setActive(true);
-        request.setCurrentLat(dto.getStartLatitude());
-        request.setCurrentLng(dto.getStartLongitude());
-        request.setSimulationSpeed(1.0);
         customerRepository.save(customer);
         return rideRequestRepository.save(request);
 
@@ -83,9 +78,6 @@ public class RideRequestService {
         RideRequest request = rideRequestRepository.findByCustomerUsernameAndCustomerActiveTrue(username)
                 .orElseThrow(() -> new NoSuchElementException("No active ride request found for user: " + username));
 
-        if (request.getStatus() != Ridestatus.PLANNED && request.getStatus() != Ridestatus.IN_PROGRESS) {
-            throw new NoSuchElementException("No active ride request found for user: " + username);
-        }
 
         return request;
     }
@@ -120,13 +112,13 @@ public class RideRequestService {
         return customerRepository.findByUsername(username).isPresent();
     }
 
-    public List<RidesForDriversDTO> getAllRideRequests() {
-        Ridestatus filterStatus = Ridestatus.PLANNED;
-        return rideRequestRepository.findByStatus(filterStatus)
-                .stream()
-                .map(RidesForDriversDTO::new)
-                .collect(Collectors.toList());
-    }
+//    public List<RidesForDriversDTO> getAllRideRequests() {
+//        RideStatus filterStatus = RideStatus.CREATED;
+//        return rideRequestRepository.findByStatus(filterStatus)
+//                .stream()
+//                .map(RidesForDriversDTO::new)
+//                .collect(Collectors.toList());
+//    }
 
 
     public RideOffer createRideOffer(Long rideRequestId, String driverUsername) {
@@ -136,9 +128,6 @@ public class RideRequestService {
         Driver driver = driverRepository.findByUsername(driverUsername)
                 .orElseThrow(() -> new NoSuchElementException("Driver with username " + driverUsername + " not found"));
 
-        if (rideRequest.getStatus() != Ridestatus.PLANNED) {
-            throw new IllegalArgumentException("Ride is cancelled or taken by another driver");
-        }
 
         if (driver.getActive()) {
             throw new IllegalStateException("Driver already has an active offer.");
@@ -240,235 +229,45 @@ public class RideRequestService {
             }
         }
 
-        rideRequest.setRideOffer(selectedOffer);
-        rideRequest.setStatus(Ridestatus.IN_PROGRESS);
+        RideSimulation rideSimulation = new RideSimulation();
+
+        RideSimulation.Point startPoint = new RideSimulation.Point(
+                rideRequest.getStartLatitude(),
+                rideRequest.getStartLongitude()
+        );
+        rideSimulation.setStartPoint(startPoint);
+
+        RideSimulation.Point endPoint = new RideSimulation.Point(
+                rideRequest.getDestinationLatitude(),
+                rideRequest.getDestinationLongitude()
+        );
+
+        rideSimulation.setEndPoint(endPoint);
+        rideSimulation.setPaused(true);
+        rideSimulation.setDuration(30.0);
+        rideSimulation.setCurrentIndex(0.0);
+        selectedOffer.getDriver().setRideSimulation(rideSimulation);
+        rideRequest.getCustomer().setRideSimulation(rideSimulation);
+        selectedOffer.getDriver().setSimulationStatus(RideStatus.CREATED);
+        rideRequest.getCustomer().setSimulationStatus(RideStatus.CREATED);
+        rideSimulationRepository.save(rideSimulation);
         rideOfferRepository.save(selectedOffer);
         rideRequestRepository.save(rideRequest);
         notificationService.sendAcceptNotification(selectedOffer.getDriver().getUsername());
     }
 
-
-
-
-
-
-
-
-    public void completeRide(Long rideId) {
-        RideRequest ride = rideRequestRepository.findById(rideId)
-                .orElseThrow(() -> new RuntimeException("Ride not found"));
-
-        if (ride.getStatus() == Ridestatus.COMPLETED)
-            return;
-
-        RideOffer offer = ride.getRideOffer();
-        if (offer == null || offer.getDriver() == null) {
-            throw new RuntimeException("RideOffer or Driver not found for this ride");
-        }
-
-        Driver driver = offer.getDriver();
-        Wallet customerWallet = ride.getCustomer().getWallet();
-        Wallet driverWallet = driver.getWallet();
-
-        Double price = ride.getEstimatedPrice();
-        Long priceInCents = Math.round(price * 100);
-
-        // Transfer money
-        customerWallet.setBalanceCents(customerWallet.getBalanceCents() - priceInCents);
-        driverWallet.setBalanceCents(driverWallet.getBalanceCents() + priceInCents);
-
-        // Set ride as completed
-        ride.setStatus(Ridestatus.COMPLETED);
-
-        // Construct full names directly
-        String customerFullName = ride.getCustomer().getFirstName() + " " + ride.getCustomer().getLastName();
-        String driverFullName = driver.getFirstName() + " " + driver.getLastName();
-
-        // Create new Trips object
-        Trips trip = new Trips();
-        trip.setCustomer(ride.getCustomer());
-        trip.setDriver(driver);
-        trip.setCustomerFullName(customerFullName);
-        trip.setCustomerUsername(ride.getCustomer().getUsername());
-        trip.setDriverFullName(driverFullName);
-        trip.setDriverUsername(driver.getUsername());
-        trip.setDistanceKm(ride.getDistance());
-        trip.setDurationMin((double) ride.getDuration());
-        trip.setPriceEuro(ride.getEstimatedPrice());
-        trip.setStatus(TripsStatus.COMPLETED);
-        trip.setProgress(100);
-        trip.setSpeed(0);
-        trip.setEndTime(LocalDateTime.now());
-
-
-        tripRepository.save(trip);
-        walletRepository.save(customerWallet);
-        walletRepository.save(driverWallet);
-        driver.setTotalTravelledDistance(driver.getTotalTravelledDistance() + ride.getDistance());
-        ride.getCustomer().setActive(false);
-       customerRepository.save(ride.getCustomer());
-        driver.setActive(false);
-        driverRepository.save(driver);
-
-    }
-
-    public void updateSimulation(Long rideId, SimulationUpdateDTO dto) {
-        RideRequest request = rideRequestRepository.findById(rideId)
-                .orElseThrow(() -> new NoSuchElementException("Ride not found"));
-        if (dto.getStatus() == Ridestatus.COMPLETED) {
-            completeRide(request.getId());
-        }
-        request.setCurrentLat(dto.getCurrentLat());
-        request.setCurrentLng(dto.getCurrentLng());
-        request.setSimulationSpeed(dto.getSimulationSpeed());
-        request.setStatus(dto.getStatus());
-
-        rideRequestRepository.save(request);
-    }
-    public SimulationUpdateDTO getSimulationState(Long rideId) {
-        RideRequest request = rideRequestRepository.findById(rideId)
-                .orElseThrow(() -> new NoSuchElementException("Ride not found"));
-
-        SimulationUpdateDTO dto = new SimulationUpdateDTO();
-        dto.setCurrentLat(request.getCurrentLat());
-        dto.setCurrentLng(request.getCurrentLng());
-        dto.setSimulationSpeed(request.getSimulationSpeed());
-        dto.setStatus(request.getStatus());
-        return dto;
-    }
-    public AcceptedRideDetailsDTO getAcceptedRideDetails(String username) {
-        if (username == null || username.trim().isEmpty()) {
-            throw new IllegalArgumentException("Username cannot be null or empty");
-        }
-
-        RideRequest ride = null;
-        Optional<Customer> customerOpt = customerRepository.findByUsername(username);
-
-        if (customerOpt.isPresent()) {
-            ride = rideRequestRepository.findByCustomerUsernameAndCustomerActiveTrue(username)
-                    .orElseThrow(() -> new NoSuchElementException("No active ride for this customer"));
-        } else {
-            Optional<Driver> driverOpt = driverRepository.findByUsername(username);
-            if (driverOpt.isPresent()) {
-                Driver driver = driverOpt.get();
-                RideOffer offer = rideOfferRepository.findByDriver(driver)
-                        .orElseThrow(() -> new NoSuchElementException("No offer made by this driver"));
-                ride = offer.getRideRequest();
-                if (ride.getStatus() != Ridestatus.IN_PROGRESS) {
-                    throw new NoSuchElementException("Ride is not accepted yet");
-                }
-            } else {
-                throw new NoSuchElementException("User not found as customer or driver");
-            }
-        }
-
-        // Validate required location fields
-        if (ride.getCurrentLat() == null || ride.getCurrentLng() == null) {
-            throw new IllegalStateException("Ride location data is missing. Simulation may not have started.");
-        }
-
-        AcceptedRideDetailsDTO dto = new AcceptedRideDetailsDTO();
-        dto.setRideId(ride.getId());
-        dto.setStatus(Ridestatus.valueOf(ride.getStatus().name()));
-
-        // Set locations with null checks (though we validated currentLat/Lng above)
-        dto.setStartLat(ride.getStartLatitude() != null ? ride.getStartLatitude() : 0.0);
-        dto.setStartLng(ride.getStartLongitude() != null ? ride.getStartLongitude() : 0.0);
-        dto.setDestLat(ride.getDestinationLatitude() != null ? ride.getDestinationLatitude() : 0.0);
-        dto.setDestLng(ride.getDestinationLongitude() != null ? ride.getDestinationLongitude() : 0.0);
-        dto.setCurrentLat(ride.getCurrentLat());
-        dto.setCurrentLng(ride.getCurrentLng());
-
-        // Set optional fields with null checks
-        dto.setSimulationSpeed(ride.getSimulationSpeed() != null ? ride.getSimulationSpeed() : 1.0);
-        dto.setEstimatedPrice(ride.getEstimatedPrice());
-
-        // Handle customer info
-        if (ride.getCustomer() != null) {
-            dto.setCustomerUsername(ride.getCustomer().getUsername());
-        }
-
-        // Handle driver info if available
-        RideOffer offer = ride.getRideOffer();
-        if (offer != null && offer.getDriver() != null) {
-            Driver driver = offer.getDriver();
-            dto.setDriverUsername(driver.getUsername());
-
-            String fullName = "";
-            if (driver.getFirstName() != null) fullName += driver.getFirstName();
-            if (driver.getLastName() != null) fullName += " " + driver.getLastName();
-            dto.setDriverFullName(fullName.trim());
-
-            if (driver.getVehicleClass() != null) {
-                dto.setVehicleClass(VehicleClassEnum.valueOf(driver.getVehicleClass().name()));
-            }
-
-            dto.setDriverRating((double) driver.getRating());
-        }
-
-        return dto;
-    }
-    public String rateRide(Long rideId, float rating, String username) {
-        RideRequest ride = rideRequestRepository.findById(rideId)
-                .orElseThrow(() -> new NoSuchElementException("Ride not found"));
-
-        if (ride.getStatus() != Ridestatus.COMPLETED) {
-            return "Ride is not completed yet.";
-        }
-
-        RideOffer offer = ride.getRideOffer();
-
-        Optional<Customer> customerOpt = customerRepository.findByUsername(username);
-        if (customerOpt.isPresent()) {
-            if (offer == null || offer.getDriver() == null) {
-                return "No driver to rate.";
-            }
-
-            if (ride.getCustomerRated()) {
-                return "You have already rated this ride.";
-            }
-
-            Driver driver = offer.getDriver();
-            driver.addRating(rating);
-            driverRepository.save(driver);
-
-            ride.setCustomerRated(true);
-            rideRequestRepository.save(ride);
-
-            if (ride.getCustomerRated() && ride.getDriverRated()) {
-                ride.setRideOffer(null);
-                rideRequestRepository.save(ride);
-                rideOfferRepository.delete(offer);
-                rideRequestRepository.delete(ride);
-            }
-
-            return "Driver rated successfully.";
-        }
-
+    public Boolean hasAcceptedOffer(String username) {
         Optional<Driver> driverOpt = driverRepository.findByUsername(username);
-        if (driverOpt.isPresent()) {
-            if (ride.getDriverRated()) {
-                return "You have already rated this ride.";
-            }
-
-            Customer customer = ride.getCustomer();
-            customer.addRating(rating);
-            customerRepository.save(customer);
-
-            ride.setDriverRated(true);
-            rideRequestRepository.save(ride);
-
-            if (ride.getCustomerRated() && ride.getDriverRated()) {
-                ride.setRideOffer(null);
-                rideRequestRepository.save(ride);
-                rideOfferRepository.delete(offer);
-                rideRequestRepository.delete(ride);
-            }
-
-            return "Customer rated successfully.";
+        if (driverOpt.isPresent() && RideStatus.CREATED.equals(driverOpt.get().getSimulationStatus())) {
+            return true;
         }
 
-        throw new SecurityException("User not authorized.");
+        Optional<Customer> customerOpt = customerRepository.findByUsername(username);
+        if (customerOpt.isPresent() && RideStatus.CREATED.equals(customerOpt.get().getSimulationStatus())) {
+            return true;
+        }
+
+        return false;
     }
 
 
