@@ -150,8 +150,8 @@ public class RideRequestController {
     public ResponseEntity<?> acceptOffer(@RequestParam Long rideOfferId, HttpServletRequest request) {
         String username = loginService.extractUsername(request);
         try {
-            rideRequestService.acceptRideOffer(rideOfferId, username);
-            return ResponseEntity.ok().build();
+            Long simulationId = rideRequestService.acceptRideOffer(rideOfferId, username);
+            return ResponseEntity.ok(simulationId);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (SecurityException e) {

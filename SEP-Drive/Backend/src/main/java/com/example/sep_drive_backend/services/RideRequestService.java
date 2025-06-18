@@ -208,7 +208,7 @@ public class RideRequestService {
         driverRepository.save(driver);
     }
 
-    public void acceptRideOffer(Long rideOfferId, String customerUsername) {
+    public Long acceptRideOffer(Long rideOfferId, String customerUsername) {
         RideOffer selectedOffer = rideOfferRepository.findById(rideOfferId)
                 .orElseThrow(() -> new NoSuchElementException("Ride offer with id " + rideOfferId + " not found"));
 
@@ -254,6 +254,8 @@ public class RideRequestService {
         rideOfferRepository.save(selectedOffer);
         rideRequestRepository.save(rideRequest);
         notificationService.sendAcceptNotification(selectedOffer.getDriver().getUsername());
+
+        return rideSimulation.getId();
     }
 
     public Boolean hasAcceptedOffer(String username) {
