@@ -112,13 +112,12 @@ public class RideRequestService {
         return customerRepository.findByUsername(username).isPresent();
     }
 
-//    public List<RidesForDriversDTO> getAllRideRequests() {
-//        RideStatus filterStatus = RideStatus.CREATED;
-//        return rideRequestRepository.findByStatus(filterStatus)
-//                .stream()
-//                .map(RidesForDriversDTO::new)
-//                .collect(Collectors.toList());
-//    }
+    public List<RidesForDriversDTO> getAllRideRequests() {
+        return rideRequestRepository.findAll().stream()
+                .map(RidesForDriversDTO::new)
+                .collect(Collectors.toList());
+    }
+
 
 
     public RideOffer createRideOffer(Long rideRequestId, String driverUsername) {
@@ -208,7 +207,7 @@ public class RideRequestService {
         driverRepository.save(driver);
     }
 
-    public void acceptRideOffer(Long rideOfferId, String customerUsername) {
+    public Long acceptRideOffer(Long rideOfferId, String customerUsername) {
         RideOffer selectedOffer = rideOfferRepository.findById(rideOfferId)
                 .orElseThrow(() -> new NoSuchElementException("Ride offer with id " + rideOfferId + " not found"));
 
@@ -254,6 +253,8 @@ public class RideRequestService {
         rideOfferRepository.save(selectedOffer);
         rideRequestRepository.save(rideRequest);
         notificationService.sendAcceptNotification(selectedOffer.getDriver().getUsername());
+
+        return rideSimulation.getId();
     }
 
     public Boolean hasAcceptedOffer(String username) {

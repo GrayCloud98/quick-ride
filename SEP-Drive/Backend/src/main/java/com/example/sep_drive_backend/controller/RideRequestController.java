@@ -83,11 +83,11 @@ public class RideRequestController {
         return ResponseEntity.noContent().build();
     }
 
-//    @GetMapping("/all-active-rides")
-//    public ResponseEntity<List<RidesForDriversDTO>> getAllRideRequests() {
-//        List<RidesForDriversDTO> rideRequests = rideRequestService.getAllRideRequests();
-//        return ResponseEntity.ok(rideRequests);
-//    }
+    @GetMapping("/all-active-rides")
+    public ResponseEntity<List<RidesForDriversDTO>> getAllRideRequests() {
+        List<RidesForDriversDTO> rideRequests = rideRequestService.getAllRideRequests();
+        return ResponseEntity.ok(rideRequests);
+    }
 
     @PostMapping("/offer-ride")
     public ResponseEntity<?> offerRide(@RequestParam Long rideRequestId, HttpServletRequest request) {
@@ -150,8 +150,8 @@ public class RideRequestController {
     public ResponseEntity<?> acceptOffer(@RequestParam Long rideOfferId, HttpServletRequest request) {
         String username = loginService.extractUsername(request);
         try {
-            rideRequestService.acceptRideOffer(rideOfferId, username);
-            return ResponseEntity.ok().build();
+            Long simulationId = rideRequestService.acceptRideOffer(rideOfferId, username);
+            return ResponseEntity.ok(simulationId);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (SecurityException e) {
