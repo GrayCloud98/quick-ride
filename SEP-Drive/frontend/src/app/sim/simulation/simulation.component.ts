@@ -42,12 +42,18 @@ export class SimulationComponent implements AfterViewInit {
   }
 
   private renderMarkers(): void {
-    this.points.forEach(point => {
-      const marker = new google.maps.marker.AdvancedMarkerElement({
+    this.points.forEach((point, index) => {
+      let color = 'blue';
+      if (index === 0)
+        color = 'darkgreen';
+      else if (index === this.points.length - 1)
+        color = 'red';
+
+      new google.maps.marker.AdvancedMarkerElement({
         map: this.map,
         position: point.position,
         title: point.title,
-        // content: this.createMarkerContent(point.label) // TODO APPLY CUSTOM MARKERS OR DELETE
+        content: this.createColoredMarker(color)
       });
     });
   }
@@ -129,32 +135,19 @@ export class SimulationComponent implements AfterViewInit {
     requestAnimationFrame(step);
   }
 
-
-  private createMarkerContent(label: string): HTMLElement { // TODO APPLY CUSTOM MARKERS OR DELETE
+  private createColoredMarker(color: string): HTMLElement {
     const div = document.createElement('div');
-    div.style.backgroundColor = '#4285F4';
-    div.style.color = '#fff';
-    div.style.borderRadius = '50%';
-    div.style.padding = '8px';
-    div.style.textAlign = 'center';
-    div.style.fontSize = '14px';
-    div.style.width = '32px';
-    div.style.height = '32px';
-    div.style.display = 'flex';
-    div.style.alignItems = 'center';
-    div.style.justifyContent = 'center';
-    div.innerText = label;
+    div.innerHTML = `<svg width="32" height="32" viewBox="0 0 24 24" fill="${color}" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>`;
     return div;
   }
 
   private createPointerElement(): HTMLElement {
-    const el = document.createElement('div');
-    el.style.width = '20px';
-    el.style.height = '20px';
-    el.style.borderRadius = '50%';
-    el.style.backgroundColor = 'red';
-    el.style.border = '2px solid white';
-    return el;
+    const car = document.createElement('car');
+    car.innerText = '🚗';
+    car.style.fontSize = '35px';
+    car.style.position = 'absolute';
+    car.style.transform = 'translate(-50%, -50%)';
+    return car;
   }
 
   start(): void {
