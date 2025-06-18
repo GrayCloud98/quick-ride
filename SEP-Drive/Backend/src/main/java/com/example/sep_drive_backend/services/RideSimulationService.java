@@ -49,7 +49,7 @@ public class RideSimulationService {
         return sim;
     }
 
-    private RideSimulation getSimulationById(Long id) {
+    public RideSimulation getSimulationById(Long id) {
         Optional<RideSimulation> simOpt = rideSimulationRepository.findById(id);
         if (simOpt.isEmpty()) throw new RuntimeException("Simulation not found");
         return simOpt.get();

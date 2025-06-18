@@ -25,6 +25,12 @@ public class RideSimulationController {
         this.messagingTemplate = messagingTemplate;
     }
 
+    @MessageMapping("/simulation/fetch")
+    public void fetchSimulation(@Payload SimulationControlMessage msg) {
+        RideSimulation sim = rideSimulationService.getSimulationById(msg.getRideSimulationId());
+        messagingTemplate.convertAndSend("/topic/simulation/" + sim.getId(), rideSimulationService.toDto(sim));
+    }
+
     @MessageMapping("/simulation/start")
     public void startSimulation(@Payload SimulationControlMessage msg) {
         RideSimulation sim = rideSimulationService.startSimulation(msg.getRideSimulationId(), msg.getCurrentIndex());
