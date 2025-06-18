@@ -9,19 +9,20 @@ import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
 export class SimulationComponent implements AfterViewInit {
   @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef;
   map!: google.maps.Map;
-  points: google.maps.LatLngLiteral[] = [
-    { lat: 52.52, lng: 13.405 },     // Start (Berlin)
-    { lat: 53.5511, lng: 9.9937 },   // Waypoint 1 (Hamburg)
-    { lat: 51.3397, lng: 12.3731 },  // Waypoint 2 (Leipzig)
-    { lat: 48.1351, lng: 11.582 }    // End (Munich)
+  pointer!: google.maps.marker.AdvancedMarkerElement;
+  animationFrameId: number | null = null;
+  path: google.maps.LatLngLiteral[] = [];
+
+  currentIndex = 0; // TODO UPDATE FROM WEBSOCKET
+  points: google.maps.LatLngLiteral[] = [ // TODO UPDATE FROM WEBSOCKET
+    { lat: 52.52, lng: 13.405 },
+    { lat: 53.5511, lng: 9.9937 },
+    { lat: 51.3397, lng: 12.3731 },
+    { lat: 48.1351, lng: 11.582 }
   ];
-  private pointer!: google.maps.marker.AdvancedMarkerElement;
-  private animationFrameId: number | null = null;
-  private path: google.maps.LatLngLiteral[] = [];
-  private currentIndex: number = 0;
-  duration: number = 30;
-  isRunning = false;
-  isPaused = false;
+  duration = 30; // TODO UPDATE FROM WEBSOCKET
+  isRunning = false; // TODO UPDATE FROM WEBSOCKET
+  isPaused = false; // TODO UPDATE FROM WEBSOCKET
 
   ngAfterViewInit(): void {
     const mapOptions: google.maps.MapOptions = {
@@ -96,7 +97,7 @@ export class SimulationComponent implements AfterViewInit {
     }
 
     this.pointer = new google.maps.marker.AdvancedMarkerElement({
-      position: this.path[0],
+      position: this.path[this.currentIndex],
       map: this.map,
       title: 'Moving pointer',
       content: this.createPointerElement()
