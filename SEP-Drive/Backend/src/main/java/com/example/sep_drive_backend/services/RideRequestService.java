@@ -258,4 +258,38 @@ public class RideRequestService {
         }
         return Optional.empty();
     }
+
+    public void rateCustomer(Long rideSimulationId, int rate) {
+        Optional<RideSimulation> rideSimulation = rideSimulationRepository.findById(rideSimulationId);
+        if (rideSimulation.isPresent()) {
+            Optional<Customer> customer = customerRepository.findByUsername(
+                    rideSimulation.get().getCustomer().getUsername());
+            if (customer.isPresent()) {
+                Customer c = customer.get();
+                int oldTotalRides = c.getTotalRides();
+                double oldAverageRating = c.getRating();
+                double newAverageRating = ((oldAverageRating * oldTotalRides) + rate) / (oldTotalRides + 1);
+
+                c.setRating((float) newAverageRating);
+                c.setTotalRides(oldTotalRides + 1);
+            }
+        }
+    }
+
+    public void rateDriver(Long rideSimulationId, int rate) {
+        Optional<RideSimulation> rideSimulation = rideSimulationRepository.findById(rideSimulationId);
+        if (rideSimulation.isPresent()) {
+            Optional<Driver> driver = driverRepository.findByUsername(
+                    rideSimulation.get().getDriver().getUsername());
+            if (driver.isPresent()) {
+                Driver d = driver.get();
+                int oldTotalRides = d.getTotalRides();
+                double oldAverageRating = d.getRating();
+                double newAverageRating = ((oldAverageRating * oldTotalRides) + rate) / (oldTotalRides + 1);
+
+                d.setRating((float) newAverageRating);
+                d.setTotalRides(oldTotalRides + 1);
+            }
+        }
+    }
 }

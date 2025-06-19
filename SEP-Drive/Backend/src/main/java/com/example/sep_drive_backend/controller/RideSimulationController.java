@@ -92,20 +92,7 @@ public class RideSimulationController {
 
         broadcastCompleteUpdate(simulation);
     }
-//
-//    @PostMapping("/simulation/rate/driver")
-//    public void rateDriver(@RequestParam Long rideSimulationId, @RequestParam int rate, HttpServletRequest request){
-//        String customerUsername = loginService.extractUsername(request);
-//        rideSimulationService.rateDriver(rideSimulationId, customerUsername, rate);
-//
-//    }
-//
-//    @PostMapping("/simulation/rate/customer")
-//    public void rateCustomer(@RequestParam Long rideSimulationId, @RequestParam int rate, HttpServletRequest request){
-//        String driverUsername = loginService.extractUsername(request);
-//        rideSimulationService.rateCustomer(rideSimulationId, driverUsername, rate);
-//
-//    }
+
 
     private void broadcastUpdate(RideSimulation sim) {
         RideSimulationUpdate update = rideSimulationService.toDto(sim);

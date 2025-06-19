@@ -175,4 +175,16 @@ public class RideRequestController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/rate/driver")
+    public void rateDriver(@RequestParam Long rideSimulationId, @RequestParam int rate){
+        rideRequestService.rateDriver(rideSimulationId, rate);
+
+    }
+
+    @PostMapping("/rate/customer")
+    public void rateCustomer(@RequestParam Long rideSimulationId, @RequestParam int rate){
+        rideRequestService.rateCustomer(rideSimulationId, rate);
+
+    }
+
 }
