@@ -65,7 +65,7 @@ public class RideSimulationController {
     }
 
     @MessageMapping("/simulation/pause")
-    public void pauseSimulation(SimulationControlMessage msg) {
+    public void pauseSimulation(@Payload SimulationControlMessage msg) {
         RideSimulation sim = rideSimulationService.pauseSimulation(msg.getRideSimulationId());
         sim.setCurrentIndex(msg.getCurrentIndex());
         rideSimulationRepository.save(sim);
