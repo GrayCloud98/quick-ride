@@ -30,7 +30,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
       (update: Update) => {
         this.duration = update.duration;
         this.currentIndex = update.currentIndex;
-        this.points = [ update.startPoint, update.edndPoint ];
+        this.points = [ update.startPoint, update.endPoint ];
 
         if (update.hasStarted !== this.isRunning || update.paused !== this.isPaused) {
           if (update.hasStarted && update.paused)

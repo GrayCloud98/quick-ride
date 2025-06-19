@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Client, IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import {Observable, Subject} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
 
 export interface Update {
   rideSimulationId: number,
@@ -10,9 +11,10 @@ export interface Update {
   currentIndex: number,
   duration: number,
   startPoint: {lat: number, lng: number},
-  edndPoint: {lat: number, lng: number} // FIXME BACKEND TYPO
+  endPoint: {lat: number, lng: number}
 }
 export enum Control {
+  FETCH = 'fetch',
   START = 'start',
   PAUSE = 'pause',
   RESUME = 'resume',
@@ -26,8 +28,9 @@ export class SimService {
   private simulationUpdateSubject = new Subject<any>();
 
   private simulationId = 1; // TODO UPDATE DYNAMICALLY
+  private baseUrl = 'http://localhost:8080/api/ride-requests/';
 
-  constructor() {
+  constructor(private http: HttpClient) {
     this.client = new Client({
       webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
       reconnectDelay: 5000,
@@ -35,12 +38,18 @@ export class SimService {
     });
 
     this.client.onConnect = () => {
+
+      this.http.get<number>(this.baseUrl + '/sim-id').subscribe({
+        next: id => console.log('[SIM ID][SUCCESS]', 'Received simulation ID:', id),
+        error: err => console.warn('[SIM ID][ERROR]', 'Failed to retrieve simulation ID:', err),
+      });
+
       console.log('✅ WebSocket connected');
       this.client.subscribe(`/topic/simulation/${this.simulationId}`, (message: IMessage) => {
         const body = JSON.parse(message.body);
         this.simulationUpdateSubject.next(body);
       });
-      this.control(30, Control.SPEED); // FIXME BACKEND DOES NOT RETURN DATA ON CONNECTION, THIS LINE IS TO TRIGGER SENDING DATA
+      this.control(this.simulationId, Control.FETCH);
     };
 
     this.client.onStompError = (frame) => {
