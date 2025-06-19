@@ -18,7 +18,8 @@ export enum Control {
   START = 'start',
   PAUSE = 'pause',
   RESUME = 'resume',
-  SPEED = 'speed'
+  SPEED = 'speed',
+  COMPLETE = 'complete',
 }
 @Injectable({
   providedIn: 'root'
@@ -27,10 +28,10 @@ export class SimService {
   private client: Client;
   private simulationUpdateSubject = new Subject<any>();
 
-  private simulationId!: number;
+  private simulationId = 1;
   private baseUrl = 'http://localhost:8080/api/ride-requests';
 
-  constructor(private http: HttpClient) {
+  constructor() {  // FIXME COMMENT OUT
     this.client = new Client({
       webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
       reconnectDelay: 5000,
@@ -38,21 +39,12 @@ export class SimService {
     });
 
     this.client.onConnect = () => {
-
-      this.http.get<number>(this.baseUrl + '/sim-id').subscribe({
-        next: id => {
-          console.log('[SIM ID][SUCCESS]', 'Received simulation ID:', id);
-          this.simulationId = id;
-
-          console.log('✅ WebSocket connected');
-          this.client.subscribe(
-            `/topic/simulation/${this.simulationId}`,
-            (message: IMessage) => this.simulationUpdateSubject.next(JSON.parse(message.body))
-          );
-          this.control(this.simulationId, Control.FETCH);
-        },
-        error: err => console.warn('[SIM ID][ERROR]', 'Simulation ID retrieval must be on START:', err),
+      console.log('✅ WebSocket connected');
+      this.client.subscribe(`/topic/simulation/${this.simulationId}`, (message: IMessage) => {
+        const body = JSON.parse(message.body);
+        this.simulationUpdateSubject.next(body);
       });
+      this.control(this.simulationId, Control.FETCH);
     };
 
     this.client.onStompError = (frame) => {
@@ -63,6 +55,41 @@ export class SimService {
       console.warn('🚪 WebSocket closed');
     };
   }
+
+  // FIXME UNCOMMENT TO UPDATE simulationId DYNAMICALLY
+  // constructor(private http: HttpClient) {
+  //   this.client = new Client({
+  //     webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+  //     reconnectDelay: 5000,
+  //     debug: () => {}
+  //   });
+  //
+  //   this.client.onConnect = () => {
+  //
+  //     this.http.get<number>(this.baseUrl + '/sim-id').subscribe({
+  //       next: id => {
+  //         console.log('[SIM ID][SUCCESS]', 'Received simulation ID:', id);
+  //         this.simulationId = id;
+  //
+  //         console.log('✅ WebSocket connected');
+  //         this.client.subscribe(
+  //           `/topic/simulation/${this.simulationId}`,
+  //           (message: IMessage) => this.simulationUpdateSubject.next(JSON.parse(message.body))
+  //         );
+  //         this.control(this.simulationId, Control.FETCH);
+  //       },
+  //       error: err => console.warn('[SIM ID][ERROR]', 'Simulation ID retrieval must be on START:', err),
+  //     });
+  //   };
+  //
+  //   this.client.onStompError = (frame) => {
+  //     console.error('⚠️ STOMP Error:', frame);
+  //   };
+  //
+  //   this.client.onWebSocketClose = () => {
+  //     console.warn('🚪 WebSocket closed');
+  //   };
+  // }
 
   connect(): void {
     this.client.activate();

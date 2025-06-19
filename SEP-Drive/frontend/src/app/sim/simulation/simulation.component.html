@@ -1,7 +1,11 @@
 <div class="main-container">
   <div class="left-container">
 
-    <div class="error alert"> Please ensure your partner has opened the simulation page before starting. </div>
+    <div class="error alert">
+      Please ensure your partner has opened the simulation page before starting.
+      <br><br>
+      Once the simulation starts, do not navigate away or refresh the page.
+    </div>
 
     <mat-card appearance="outlined" class="card big">
       <mat-card-content>
@@ -28,7 +32,7 @@
         <button class="btn" mat-fab extended (click)="resume()" [disabled]="!isPaused">Resume</button>
         <button class="btn" mat-fab extended (click)="pause()" [disabled]="isPaused">Pause</button>
       </div>
-      <button class="btn warn" mat-fab extended (click)="end()">End</button>
+      <button class="btn warn" mat-fab extended (click)="complete()">Complete</button>
     </div>
 
     <button (click)="console.log({currentIndex, points, duration, isRunning, isPaused})">Metadata</button>

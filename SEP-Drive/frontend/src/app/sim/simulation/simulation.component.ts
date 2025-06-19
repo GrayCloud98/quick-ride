@@ -28,6 +28,8 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
 
     this.simService.getSimulationUpdates().subscribe(
       (update: Update) => {
+        console.log("🎁", update); // FIXME DELETE
+
         this.duration = update.duration;
         this.currentIndex = update.currentIndex;
         this.points = [ update.startPoint, update.endPoint ];
@@ -64,11 +66,11 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     };
 
     this.map = new google.maps.Map(this.mapContainer.nativeElement, mapOptions);
-    this.renderMarkers();
+    this.renderPins();
     this.drawRoute();
   }
 
-  private renderMarkers(): void {
+  private renderPins(): void {
     this.points.forEach((position, index) => {
       let color = 'blue';
       if (index === 0) color = 'darkgreen';
@@ -78,7 +80,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
         map: this.map,
         position,
         title: `Point ${index + 1}`,
-        content: this.createColoredMarker(color)
+        content: this.createPin(color)
       });
     });
   }
@@ -130,7 +132,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
       position: this.path[this.currentIndex],
       map: this.map,
       title: 'Moving pointer',
-      content: this.createPointerElement()
+      content: this.createCar()
     });
   }
 
@@ -161,13 +163,13 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     requestAnimationFrame(step);
   }
 
-  private createColoredMarker(color: string): HTMLElement {
-    const div = document.createElement('div');
-    div.innerHTML = `<svg width="32" height="32" viewBox="0 0 24 24" fill="${color}" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>`;
-    return div;
+  private createPin(color: string): HTMLElement {
+    const pin = document.createElement('pin');
+    pin.innerHTML = `<svg width="32" height="32" viewBox="0 0 24 24" fill="${color}" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>`;
+    return pin;
   }
 
-  private createPointerElement(): HTMLElement {
+  private createCar(): HTMLElement {
     const car = document.createElement('car');
     car.innerText = '🚗';
     car.style.fontSize = '35px';
@@ -207,11 +209,8 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     this.simService.control(this.duration, Control.SPEED);
   }
 
-  end(): void {
-    // TODO END LOGIC
-    console.log('Simulation ended.');
-    this.isRunning = false;
-    this.isPaused = false;
+  complete(): void {
+    this.simService.control(this.duration, Control.COMPLETE); // FIXME DOES NOT UPDATE BACKEND/SEND STOMP MESSAGES
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;
