@@ -33,13 +33,12 @@ public abstract class  User {
     private String profilePicture;
     private int totalRides;
     private float rating;
-    private int numberOfRatings ;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "wallet_id", referencedColumnName = "id", unique = true)
+    private Wallet wallet;
 
-    @Enumerated(EnumType.STRING)
-    private RideStatus simulationStatus;
 
-    @ManyToOne
-    RideSimulation rideSimulation;
+
     public User() {}
 
     public User(String username, String firstName, String lastName, String email, Date birthDate, String password, RoleEnum role, String profilePicture) {
@@ -53,21 +52,8 @@ public abstract class  User {
         this.profilePicture = profilePicture;
         this.totalRides = 0;
         this.rating = 0;
-        this.numberOfRatings = 0;
-        this.simulationStatus = null;
     }
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "wallet_id", referencedColumnName = "id", unique = true)
-    private Wallet wallet;
-
-    public RideSimulation getRideSimulation() {
-        return rideSimulation;
-    }
-
-    public void setRideSimulation(RideSimulation rideSimulation) {
-        this.rideSimulation = rideSimulation;
-    }
 
     public Wallet getWallet() {
         return wallet;
@@ -131,14 +117,6 @@ public abstract class  User {
         this.id = id;
     }
 
-    public RideStatus getSimulationStatus() {
-        return simulationStatus;
-    }
-
-    public void setSimulationStatus(RideStatus simulationStatus) {
-        this.simulationStatus = simulationStatus;
-    }
-
     public String getUsername() {
         return username;
     }
@@ -169,17 +147,6 @@ public abstract class  User {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-    public int getNumberOfRatings() {
-        return numberOfRatings;
-    }
-    public void setNumberOfRatings(int numberOfRatings) {
-        this.numberOfRatings = numberOfRatings;
-    }
-    public void addRating(float newRating) {
-        float total = this.rating * this.numberOfRatings;
-        this.numberOfRatings++;
-        this.rating = (total + newRating) / this.numberOfRatings;
     }
 
 }

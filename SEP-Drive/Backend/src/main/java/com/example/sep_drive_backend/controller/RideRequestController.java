@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -102,6 +103,13 @@ public class RideRequestController {
         }
     }
 
+    @GetMapping("/is-driver-active")
+    public ResponseEntity<Boolean> isDriverActive(HttpServletRequest request) {
+        String username = loginService.extractUsername(request);
+        boolean active = rideRequestService.isDriverActive(username);
+        return ResponseEntity.ok(active);
+    }
+
     @DeleteMapping("/reject-offer")
     public ResponseEntity<?> rejectOffer(@RequestParam Long rideOfferId) {
         try {
@@ -150,8 +158,8 @@ public class RideRequestController {
     public ResponseEntity<?> acceptOffer(@RequestParam Long rideOfferId, HttpServletRequest request) {
         String username = loginService.extractUsername(request);
         try {
-            Long simulationId = rideRequestService.acceptRideOffer(rideOfferId, username);
-            return ResponseEntity.ok(simulationId);
+            rideRequestService.acceptRideOffer(rideOfferId, username);
+            return ResponseEntity.ok().build();
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (SecurityException e) {
@@ -159,19 +167,12 @@ public class RideRequestController {
         }
     }
 
-    @GetMapping("/is-driver-active")
-    public ResponseEntity<Boolean> isDriverActive(HttpServletRequest request) {
+    @GetMapping("/sim-id")
+    public ResponseEntity<Long> getSimId(HttpServletRequest request) {
         String username = loginService.extractUsername(request);
-        boolean active = rideRequestService.isDriverActive(username);
-        return ResponseEntity.ok(active);
-    }
-
-
-    @GetMapping("/has-accepted-offer")
-    public ResponseEntity<Boolean> isOfferAccepted(HttpServletRequest request) {
-        String username = loginService.extractUsername(request);
-        Boolean result = rideRequestService.hasAcceptedOffer(username);
-        return ResponseEntity.ok(result);
+        Optional<Long> simId = rideRequestService.getSimId(username);
+        return simId.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 }

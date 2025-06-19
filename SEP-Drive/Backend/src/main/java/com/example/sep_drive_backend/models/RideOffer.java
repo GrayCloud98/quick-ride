@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 public class RideOffer {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne
@@ -17,23 +17,21 @@ public class RideOffer {
     @JoinColumn(name = "ride_request_id", referencedColumnName = "id", nullable = false)
     private RideRequest rideRequest;
 
+    @Column
+    @Enumerated(EnumType.STRING)
+    private RideStatus rideStatus;
 
-    public RideSimulation getRideSimulation() {
-        return rideSimulation;
+    public RideOffer() {
     }
 
-    public void setRideSimulation(RideSimulation rideSimulation) {
-        this.rideSimulation = rideSimulation;
+
+
+    public RideStatus getRideStatus() {
+        return rideStatus;
     }
 
-    @OneToOne
-    private RideSimulation rideSimulation;
-
-    public RideOffer() {}
-    public RideOffer(Long id, Driver driver, RideRequest rideRequest) {
-        this.id = id;
-        this.driver = driver;
-        this.rideRequest = rideRequest;
+    public void setRideStatus(RideStatus rideStatus) {
+        this.rideStatus = rideStatus;
     }
 
     public Long getId() {

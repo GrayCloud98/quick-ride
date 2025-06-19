@@ -54,20 +54,7 @@ public class RideRequestService {
             throw new IllegalStateException("Customer already has an active ride request.");
         }
 
-        RideRequest request = new RideRequest();
-        request.setCustomer(customer);
-        request.setStartAddress(dto.getStartAddress());
-        request.setStartLatitude(dto.getStartLatitude());
-        request.setStartLongitude(dto.getStartLongitude());
-        request.setDestinationAddress(dto.getDestinationAddress());
-        request.setDestinationLatitude(dto.getDestinationLatitude());
-        request.setDestinationLongitude(dto.getDestinationLongitude());
-        request.setVehicleClass(dto.getVehicleClass()); // now uses enum
-        request.setStartLocationName(dto.getStartLocationName());
-        request.setDestinationLocationName(dto.getDestinationLocationName());
-        request.setDistance(dto.getDistance());
-        request.setDuration(dto.getDuration());
-        request.setEstimatedPrice(dto.getEstimatedPrice());
+        RideRequest request = new RideRequest(customer, dto.getStartAddress(), dto.getStartLatitude(), dto.getStartLongitude(), dto.getStartLocationName(), dto.getDestinationLocationName(), dto.getDestinationAddress(), dto.getDestinationLatitude(), dto.getDestinationLongitude(), dto.getDistance(), dto.getDuration(), dto.getEstimatedPrice(), dto.getVehicleClass());
         customer.setActive(true);
         customerRepository.save(customer);
         return rideRequestRepository.save(request);
@@ -128,20 +115,21 @@ public class RideRequestService {
                 .orElseThrow(() -> new NoSuchElementException("Driver with username " + driverUsername + " not found"));
 
 
-        if (driver.getActive()) {
-            throw new IllegalStateException("Driver already has an active offer.");
-        }
+//        if (driver.getActive()) {
+//            throw new IllegalStateException("Driver already has an active offer.");
+//        }
 
 
 
+        driver.setActive(true);
         RideOffer rideOffer = new RideOffer();
         rideOffer.setDriver(driver);
         rideOffer.setRideRequest(rideRequest);
-        driver.setActive(true);
+        rideOffer.setRideStatus(RideStatus.CREATED);
         driverRepository.save(driver);
-        RideOffer savedOffer = rideOfferRepository.save(rideOffer);
+        rideOfferRepository.save(rideOffer);
         notificationService.sendOfferNotification(driver, rideRequest);
-        return savedOffer;
+        return rideOffer;
     }
 
     public boolean isDriverActive(String username) {
@@ -207,7 +195,7 @@ public class RideRequestService {
         driverRepository.save(driver);
     }
 
-    public Long acceptRideOffer(Long rideOfferId, String customerUsername) {
+    public void acceptRideOffer(Long rideOfferId, String customerUsername) {
         RideOffer selectedOffer = rideOfferRepository.findById(rideOfferId)
                 .orElseThrow(() -> new NoSuchElementException("Ride offer with id " + rideOfferId + " not found"));
 
@@ -242,36 +230,32 @@ public class RideRequestService {
         );
 
         rideSimulation.setEndPoint(endPoint);
-        rideSimulation.setPaused(true);
-        rideSimulation.setDuration(30.0);
-        rideSimulation.setCurrentIndex(0.0);
-        selectedOffer.getDriver().setRideSimulation(rideSimulation);
-        rideRequest.getCustomer().setRideSimulation(rideSimulation);
-        selectedOffer.getDriver().setSimulationStatus(RideStatus.CREATED);
-        rideRequest.getCustomer().setSimulationStatus(RideStatus.CREATED);
-        selectedOffer.setRideSimulation(rideSimulation);
+        rideSimulation.setCustomer(rideRequest.getCustomer());
+        rideSimulation.setDriver(selectedOffer.getDriver());
+        rideSimulation.setRideOffer(selectedOffer);
+        rideSimulation.setStartLocationName(rideRequest.getStartLocationName());
+        rideSimulation.setDestinationLocationName(rideRequest.getDestinationLocationName());
+        rideRequest.setRideStatus(RideStatus.IN_PROGRESS);
+        selectedOffer.setRideStatus(RideStatus.IN_PROGRESS);
+        rideSimulation.setRideStatus(RideStatus.CREATED);
         rideSimulationRepository.save(rideSimulation);
         rideOfferRepository.save(selectedOffer);
         rideRequestRepository.save(rideRequest);
+
         notificationService.sendAcceptNotification(selectedOffer.getDriver().getUsername());
 
-        return rideSimulation.getId();
-    }
-
-    public Boolean hasAcceptedOffer(String username) {
-        Optional<Driver> driverOpt = driverRepository.findByUsername(username);
-        if (driverOpt.isPresent() && RideStatus.CREATED.equals(driverOpt.get().getSimulationStatus())) {
-            return true;
-        }
-
-        Optional<Customer> customerOpt = customerRepository.findByUsername(username);
-        if (customerOpt.isPresent() && RideStatus.CREATED.equals(customerOpt.get().getSimulationStatus())) {
-            return true;
-        }
-
-        return false;
     }
 
 
-
+    public Optional<Long> getSimId(String username) {
+        Optional<Customer> customer = customerRepository.findByUsername(username);
+        if (customer.isPresent()) {
+            return rideSimulationRepository.findCurrentCreatedSimulationIdByCustomerUsername(username);
+        }
+        Optional<Driver> driver = driverRepository.findByUsername(username);
+        if (driver.isPresent()) {
+            return rideSimulationRepository.findCurrentCreatedSimulationIdByDriverUsername(username);
+        }
+        return Optional.empty();
+    }
 }

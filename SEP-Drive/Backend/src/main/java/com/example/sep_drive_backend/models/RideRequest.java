@@ -1,5 +1,6 @@
 package com.example.sep_drive_backend.models;
 
+import com.example.sep_drive_backend.constants.RideStatus;
 import com.example.sep_drive_backend.constants.VehicleClassEnum;
 import jakarta.persistence.*;
 
@@ -15,7 +16,7 @@ public class RideRequest {
 
     @ManyToOne
     @JoinColumn(name = "customer_username", referencedColumnName = "username", nullable = false)
-    private Customer customer; // This will be the reference to the Customer entity via 'username'
+    private Customer customer;
 
     @Column
     private String startAddress;
@@ -25,7 +26,7 @@ public class RideRequest {
     @Column (nullable = true)
     private String startLocationName;
     @Column (nullable = true)
-    private String DestinationLocationName;
+    private String destinationLocationName;
 
     @Column
     private String destinationAddress;
@@ -44,24 +45,51 @@ public class RideRequest {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-
-
-
-
-
-
-
-
+    @Column
+    @Enumerated(EnumType.STRING)
+    private RideStatus rideStatus;
 
     @Column
     @Enumerated(EnumType.STRING)
     private VehicleClassEnum vehicleClass;
 
+
+    public RideRequest() {
+    }
+
+    public RideRequest(Customer customer, String startAddress, Double startLatitude, Double startLongitude, String startLocationName, String destinationLocationName, String destinationAddress, Double destinationLatitude, Double destinationLongitude, Double distance, double duration, Double estimatedPrice, VehicleClassEnum vehicleClass) {
+        this.customer = customer;
+        this.startAddress = startAddress;
+        this.startLatitude = startLatitude;
+        this.startLongitude = startLongitude;
+        this.startLocationName = startLocationName;
+        this.destinationLocationName = destinationLocationName;
+        this.destinationAddress = destinationAddress;
+        this.destinationLatitude = destinationLatitude;
+        this.destinationLongitude = destinationLongitude;
+        this.distance = distance;
+        this.duration = duration;
+        this.estimatedPrice = estimatedPrice;
+        this.vehicleClass = vehicleClass;
+        this.rideStatus = RideStatus.CREATED;
+    }
+
+    public RideStatus getRideStatus() {
+        return rideStatus;
+    }
+
+    public void setRideStatus(RideStatus rideStatus) {
+        this.rideStatus = rideStatus;
+    }
+
+    public void setDuration(double duration) {
+        this.duration = duration;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 
     public Customer getCustomer() {
         return customer;
@@ -71,23 +99,6 @@ public class RideRequest {
         this.customer = customer;
     }
 
-    public RideRequest() {}
-    public RideRequest(Long id, String startAddress, String startLocationName, String destinationLocationName, String destinationAddress, Double startLatitude, Double startLongitude, Double destinationLatitude, Double destinationLongitude, VehicleClassEnum vehicleClass, Customer customer , Double distance, Double duration, Double estimatedPrice) {
-        this.id = id;
-        this.startAddress = startAddress;
-        this.destinationAddress = destinationAddress;
-        this.startLatitude = startLatitude;
-        this.startLongitude = startLongitude;
-        this.destinationLatitude = destinationLatitude;
-        this.destinationLongitude = destinationLongitude;
-        this.vehicleClass = vehicleClass;
-        this.customer = customer;
-        this.startLocationName = startLocationName;
-        this.DestinationLocationName = destinationLocationName;
-        this.distance = distance;
-        this.duration = duration;
-        this.estimatedPrice = estimatedPrice;
-    }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
@@ -106,11 +117,11 @@ public class RideRequest {
     }
 
     public String getDestinationLocationName() {
-        return DestinationLocationName;
+        return destinationLocationName;
     }
 
     public void setDestinationLocationName(String destinationLocationName) {
-        DestinationLocationName = destinationLocationName;
+        this.destinationLocationName = destinationLocationName;
     }
 
 

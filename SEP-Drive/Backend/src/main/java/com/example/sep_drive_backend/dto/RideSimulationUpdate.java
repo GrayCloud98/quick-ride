@@ -1,19 +1,43 @@
 package com.example.sep_drive_backend.dto;
 
+import com.example.sep_drive_backend.constants.RideStatus;
 import com.example.sep_drive_backend.models.RideSimulation;
-
-import java.util.List;
 
 public class RideSimulationUpdate {
 
     private Long rideSimulationId;
     private boolean paused;
     private boolean hasStarted;
-    private double currentIndex;
     private double duration; // seconds
     private RideSimulation.Point startPoint;
-    private RideSimulation.Point edndPoint;
+    private RideSimulation.Point endPoint;
+    private RideStatus rideStatus;
+    private String startLocationName;
+    private String destinationLocationName;
 
+    public String getStartLocationName() {
+        return startLocationName;
+    }
+
+    public void setStartLocationName(String startLocationName) {
+        this.startLocationName = startLocationName;
+    }
+
+    public String getDestinationLocationName() {
+        return destinationLocationName;
+    }
+
+    public void setDestinationLocationName(String destinationLocationName) {
+        this.destinationLocationName = destinationLocationName;
+    }
+
+    public RideStatus getRideStatus() {
+        return rideStatus;
+    }
+
+    public void setRideStatus(RideStatus rideStatus) {
+        this.rideStatus = rideStatus;
+    }
 
     public Long getRideSimulationId() {
         return rideSimulationId;
@@ -39,14 +63,6 @@ public class RideSimulationUpdate {
         this.hasStarted = hasStarted;
     }
 
-    public double getCurrentIndex() {
-        return currentIndex;
-    }
-
-    public void setCurrentIndex(double currentIndex) {
-        this.currentIndex = currentIndex;
-    }
-
     public double getDuration() {
         return duration;
     }
@@ -63,11 +79,11 @@ public class RideSimulationUpdate {
         this.startPoint = startPoint;
     }
 
-    public RideSimulation.Point getEdndPoint() {
-        return edndPoint;
+    public RideSimulation.Point getEndPoint() {
+        return endPoint;
     }
 
-    public void setEdndPoint(RideSimulation.Point edndPoint) {
-        this.edndPoint = edndPoint;
+    public void setEndPoint(RideSimulation.Point endPoint) {
+        this.endPoint = endPoint;
     }
 }
