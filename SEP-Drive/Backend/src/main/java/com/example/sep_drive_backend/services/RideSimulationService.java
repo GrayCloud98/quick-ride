@@ -22,6 +22,7 @@ public class RideSimulationService {
     private final CustomerRepository customerRepository;
     private final WalletService walletService;
 
+
     @Autowired
     public RideSimulationService(RideSimulationRepository rideSimulationRepository, DriverRepository driverRepository, CustomerRepository customerRepository, WalletService walletService) {
         this.rideSimulationRepository = rideSimulationRepository;
@@ -79,6 +80,7 @@ public class RideSimulationService {
         dto.setDuration(sim.getDuration());
         dto.setStartLocationName(sim.getStartLocationName());
         dto.setDestinationLocationName(sim.getDestinationLocationName());
+        dto.setCurrentIndex(sim.getCurrentIndex());
         dto.setStartPoint(sim.getStartPoint());
         dto.setRideStatus(sim.getRideStatus());
         dto.setEndPoint(sim.getEndPoint());
@@ -94,6 +96,7 @@ public class RideSimulationService {
         dto.setStartPoint(sim.getStartPoint());
         dto.setEndPoint(sim.getEndPoint());
         dto.setStartLocationName(sim.getStartLocationName());
+        dto.setCurrentIndex(sim.getCurrentIndex());
         dto.setDestinationLocationName(sim.getDestinationLocationName());
         dto.setRideStatus(RideStatus.COMPLETED);
         return dto;

@@ -12,9 +12,11 @@ public class RideSimulation {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+
     private double duration = 30.0;
     private boolean paused = true;
     private boolean hasStarted = false;
+    private int currentIndex = 0;
 
     @Embedded
     @AttributeOverrides({
@@ -176,6 +178,14 @@ public class RideSimulation {
 
     public void setEndPoint(Point endPoint) {
         this.endPoint = endPoint;
+    }
+
+    public int getCurrentIndex() {
+        return currentIndex;
+    }
+
+    public void setCurrentIndex(int currentIndex) {
+        this.currentIndex = currentIndex;
     }
 
     @Embeddable

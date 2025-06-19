@@ -2,6 +2,7 @@ package com.example.sep_drive_backend.controller;
 
 import com.example.sep_drive_backend.constants.RideStatus;
 import com.example.sep_drive_backend.dto.RideSimulationUpdate;
+import com.example.sep_drive_backend.dto.SimulationControlMessage;
 import com.example.sep_drive_backend.models.Customer;
 import com.example.sep_drive_backend.models.Driver;
 import com.example.sep_drive_backend.models.RideSimulation;
@@ -42,26 +43,32 @@ public class RideSimulationController {
     }
 
     @MessageMapping("/simulation/fetch")
-    public void fetchSimulation(@Payload Long simId) {
-        RideSimulation sim = rideSimulationService.getSimulationById(simId);
+    public void fetchSimulation(@Payload SimulationControlMessage msg) {
+        RideSimulation sim = rideSimulationService.getSimulationById(msg.getRideSimulationId());
         messagingTemplate.convertAndSend("/topic/simulation/" + sim.getId(), rideSimulationService.toDto(sim));
     }
 
     @MessageMapping("/simulation/start")
-    public void startSimulation(@Payload Long simId) {
-        RideSimulation sim = rideSimulationService.startSimulation(simId);
+    public void startSimulation(@Payload SimulationControlMessage msg) {
+        RideSimulation sim = rideSimulationService.startSimulation(msg.getRideSimulationId());
+        sim.setCurrentIndex(msg.getCurrentIndex());
+        rideSimulationRepository.save(sim);
         broadcastUpdate(sim);
     }
 
     @MessageMapping("/simulation/resume")
-    public void resumeSimulation(@Payload Long simId) {
-        RideSimulation sim = rideSimulationService.resumeSimulation(simId);
+    public void resumeSimulation(@Payload SimulationControlMessage msg) {
+        RideSimulation sim = rideSimulationService.resumeSimulation(msg.getRideSimulationId());
+        sim.setCurrentIndex(msg.getCurrentIndex());
+        rideSimulationRepository.save(sim);
         broadcastUpdate(sim);
     }
 
     @MessageMapping("/simulation/pause")
-    public void pauseSimulation(@Payload Long simId) {
-        RideSimulation sim = rideSimulationService.pauseSimulation(simId);
+    public void pauseSimulation(SimulationControlMessage msg) {
+        RideSimulation sim = rideSimulationService.pauseSimulation(msg.getRideSimulationId());
+        sim.setCurrentIndex(msg.getCurrentIndex());
+        rideSimulationRepository.save(sim);
         broadcastUpdate(sim);
     }
 
@@ -72,8 +79,8 @@ public class RideSimulationController {
     }
 
     @MessageMapping("/simulation/complete")
-    public void completeSimulation(@Payload Long simId) {
-        Optional<RideSimulation> optionalSim = rideSimulationRepository.findById(simId);
+    public void completeSimulation(@Payload SimulationControlMessage msg) {
+        Optional<RideSimulation> optionalSim = rideSimulationRepository.findById(msg.getRideSimulationId());
         if (optionalSim.isEmpty()) {
             return;
         }
@@ -82,6 +89,7 @@ public class RideSimulationController {
         simulation.setRideStatus(RideStatus.COMPLETED);
         simulation.getRideOffer().setRideStatus(RideStatus.COMPLETED);
         simulation.getRideOffer().getRideRequest().setRideStatus(RideStatus.COMPLETED);
+        simulation.setPaused(true);
         simulation.markEnded();
 
         long priceCents = Math.round(simulation.getRideOffer().getRideRequest().getEstimatedPrice() * 100);

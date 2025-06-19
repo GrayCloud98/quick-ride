@@ -5,15 +5,25 @@ import com.example.sep_drive_backend.models.RideSimulation;
 
 public class RideSimulationUpdate {
 
+
     private Long rideSimulationId;
     private boolean paused;
     private boolean hasStarted;
-    private double duration; // seconds
+    private double duration;
     private RideSimulation.Point startPoint;
     private RideSimulation.Point endPoint;
     private RideStatus rideStatus;
     private String startLocationName;
     private String destinationLocationName;
+    private int currentIndex;
+
+    public int getCurrentIndex() {
+        return currentIndex;
+    }
+
+    public void setCurrentIndex(int currentIndex) {
+        this.currentIndex = currentIndex;
+    }
 
     public String getStartLocationName() {
         return startLocationName;
