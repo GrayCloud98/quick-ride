@@ -73,36 +73,25 @@ public class RideSimulationController {
         broadcastUpdate(sim);
     }
 
-//    @PostMapping("/simulation/complete")
-//    public ResponseEntity<String> completeSimulation(HttpServletRequest request) {
-//        String username = loginService.extractUsername(request);
-//
-//        Optional<RideSimulation> sim = customerRepository.findByUsername(username)
-//                .flatMap(c -> rideSimulationRepository.findCurrentInProgressSimulationByCustomerUsername(c.getUsername()));
-//
-//        if (sim.isEmpty()) {
-//            sim = driverRepository.findByUsername(username)
-//                    .flatMap(d -> rideSimulationRepository.findCurrentInProgressSimulationByDriverUsername(d.getUsername()));
-//        }
-//
-//        if (sim.isEmpty()) {
-//            return ResponseEntity.notFound().build();
-//        }
-//
-//        RideSimulation simulation = sim.get();
-//
-//        simulation.setRideStatus(RideStatus.COMPLETED);
-//        simulation.getRideOffer().setRideStatus(RideStatus.COMPLETED);
-//        simulation.getRideOffer().getRideRequest().setRideStatus(RideStatus.COMPLETED);
-//        simulation.markEnded();
-//        broadcastCompleteUpdate(simulation);
-//
-//        rideSimulationRepository.save(simulation);
-//        rideOfferRepository.save(simulation.getRideOffer());
-//        rideRequestRepository.save(simulation.getRideOffer().getRideRequest());
-//
-//        return ResponseEntity.ok("no sim in progress found");
-//    }
+    @MessageMapping("/simulation/complete")
+    public void completeSimulation(@Payload Long simId) {
+        Optional<RideSimulation> optionalSim = rideSimulationRepository.findById(simId);
+        if (optionalSim.isEmpty()) {
+            return;
+        }
+
+        RideSimulation simulation = optionalSim.get();
+        simulation.setRideStatus(RideStatus.COMPLETED);
+        simulation.getRideOffer().setRideStatus(RideStatus.COMPLETED);
+        simulation.getRideOffer().getRideRequest().setRideStatus(RideStatus.COMPLETED);
+        simulation.markEnded();
+
+        rideSimulationRepository.save(simulation);
+        rideOfferRepository.save(simulation.getRideOffer());
+        rideRequestRepository.save(simulation.getRideOffer().getRideRequest());
+
+        broadcastCompleteUpdate(simulation);
+    }
 //
 //    @PostMapping("/simulation/rate/driver")
 //    public void rateDriver(@RequestParam Long rideSimulationId, @RequestParam int rate, HttpServletRequest request){

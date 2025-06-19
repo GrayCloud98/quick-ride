@@ -115,9 +115,9 @@ public class RideRequestService {
                 .orElseThrow(() -> new NoSuchElementException("Driver with username " + driverUsername + " not found"));
 
 
-//        if (driver.getActive()) {
-//            throw new IllegalStateException("Driver already has an active offer.");
-//        }
+        if (driver.getActive()) {
+            throw new IllegalStateException("Driver already has an active offer.");
+        }
 
 
 

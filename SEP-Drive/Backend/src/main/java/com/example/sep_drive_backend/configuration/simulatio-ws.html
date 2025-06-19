@@ -73,19 +73,8 @@
     });
 
     completeBtn.addEventListener('click', () => {
-        fetch('http://localhost:8080/simulation/complete', {
-            method: 'POST',
-            credentials: 'include'
-        })
-            .then(response => response.text())
-            .then(data => {
-                console.log('Complete response:', data);
-                messagesEl.textContent += `\nPOST /simulation/complete: ${data}`;
-            })
-            .catch(err => {
-                console.error('Error:', err);
-                messagesEl.textContent += `\nPOST /simulation/complete ERROR: ${err}`;
-            });
+        stompClient.send("/app/simulation/complete", {}, JSON.stringify(simulationId));
+        messagesEl.textContent += `\nSent: Complete Simulation ID ${simulationId}`;
     });
 </script>
 </body>
