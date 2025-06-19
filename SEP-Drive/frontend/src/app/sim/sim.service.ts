@@ -28,7 +28,7 @@ export class SimService {
   private simulationUpdateSubject = new Subject<any>();
 
   private simulationId = 1; // TODO UPDATE DYNAMICALLY
-  private baseUrl = 'http://localhost:8080/api/ride-requests/';
+  private baseUrl = 'http://localhost:8080/api/ride-requests';
 
   constructor(private http: HttpClient) {
     this.client = new Client({
