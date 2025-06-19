@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Ride Simulation WebSocket & Complete Test</title>
+    <title>Ride Simulation + Ratings Test</title>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 </head>
 <body>
-<h2>WebSocket STOMP + Complete Test</h2>
+<h2>Ride Simulation WebSocket & Ratings Test</h2>
 <p>Status: <span id="status">DISCONNECTED</span></p>
 
 <button id="connectBtn">Connect</button>
@@ -16,19 +16,40 @@
 <button id="resumeBtn" disabled>Resume Simulation</button>
 <button id="completeBtn" disabled>Complete Simulation</button>
 
+<hr>
+
+<h3>Rate Driver & Customer</h3>
+<label for="driverRating">Driver Rating (1-5):</label>
+<input id="driverRating" type="number" min="1" max="5" value="5">
+<button id="rateDriverBtn">Rate Driver</button>
+
+<br><br>
+
+<label for="customerRating">Customer Rating (1-5):</label>
+<input id="customerRating" type="number" min="1" max="5" value="5">
+<button id="rateCustomerBtn">Rate Customer</button>
+
 <pre id="messages"></pre>
 
 <script>
     let stompClient = null;
     const statusEl = document.getElementById('status');
     const messagesEl = document.getElementById('messages');
+
     const connectBtn = document.getElementById('connectBtn');
     const startBtn = document.getElementById('startBtn');
     const pauseBtn = document.getElementById('pauseBtn');
     const resumeBtn = document.getElementById('resumeBtn');
     const completeBtn = document.getElementById('completeBtn');
 
-    const simulationId = 1;
+    const rateDriverBtn = document.getElementById('rateDriverBtn');
+    const rateCustomerBtn = document.getElementById('rateCustomerBtn');
+
+    const driverRatingInput = document.getElementById('driverRating');
+    const customerRatingInput = document.getElementById('customerRating');
+
+    const simulationId = 1; // adjust if needed
+
     let currentIndex = 0;
 
     connectBtn.addEventListener('click', () => {
@@ -76,6 +97,35 @@
         stompClient.send("/app/simulation/complete", {}, JSON.stringify(simulationId));
         messagesEl.textContent += `\nSent: Complete Simulation ID ${simulationId}`;
     });
+
+    rateDriverBtn.addEventListener('click', () => {
+        const rate = parseInt(driverRatingInput.value);
+        fetch(`http://localhost:8080/api/ride-requests/rate/driver?rideSimulationId=${simulationId}&rate=${rate}`, {
+            method: 'POST'
+        })
+            .then(res => {
+                if (res.ok) {
+                    messagesEl.textContent += `\n Rated Driver ${rate} for Simulation ID ${simulationId}`;
+                } else {
+                    messagesEl.textContent += `\n Failed to rate driver: ${res.status}`;
+                }
+            });
+    });
+
+    rateCustomerBtn.addEventListener('click', () => {
+        const rate = parseInt(customerRatingInput.value);
+        fetch(`http://localhost:8080/api/ride-requests/rate/customer?rideSimulationId=${simulationId}&rate=${rate}`, {
+            method: 'POST'
+        })
+            .then(res => {
+                if (res.ok) {
+                    messagesEl.textContent += `\n Rated Customer ${rate} for Simulation ID ${simulationId}`;
+                } else {
+                    messagesEl.textContent += `\n Failed to rate customer: ${res.status}`;
+                }
+            });
+    });
+
 </script>
 </body>
 </html>

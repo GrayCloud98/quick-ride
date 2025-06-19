@@ -9,14 +9,10 @@ import com.example.sep_drive_backend.repository.*;
 import com.example.sep_drive_backend.services.LoginService;
 import com.example.sep_drive_backend.services.RideSimulationService;
 import com.example.sep_drive_backend.services.WalletService;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Optional;
 
@@ -93,6 +89,20 @@ public class RideSimulationController {
         String customerUsername = simulation.getCustomer().getUsername();
         Long driverUserId = simulation.getDriver().getId();
         walletService.transfer(customerUsername, driverUserId, priceCents);
+
+
+        Customer customer = simulation.getCustomer();
+        int customerOldTotalRides = customer.getTotalRides();
+        customer.setTotalRides(customerOldTotalRides + 1);
+        customer.setActive(false);
+        customerRepository.save(customer);
+        Driver driver = simulation.getDriver();
+        int driverOldTotalRides = driver.getTotalRides();
+        driver.setTotalRides(driverOldTotalRides + 1);
+        Double oldTotalTravelledDistance = driver.getTotalTravelledDistance();
+        driver.setTotalTravelledDistance(oldTotalTravelledDistance + simulation.getRideOffer().getRideRequest().getDistance());
+        driver.setActive(false);
+        driverRepository.save(driver);
 
         rideSimulationRepository.save(simulation);
         rideOfferRepository.save(simulation.getRideOffer());

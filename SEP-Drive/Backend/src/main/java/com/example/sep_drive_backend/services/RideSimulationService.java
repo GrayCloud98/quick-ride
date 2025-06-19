@@ -73,7 +73,7 @@ public class RideSimulationService {
         dto.setStartLocationName(sim.getStartLocationName());
         dto.setDestinationLocationName(sim.getDestinationLocationName());
         dto.setStartPoint(sim.getStartPoint());
-        sim.setRideStatus(sim.getRideStatus());
+        dto.setRideStatus(sim.getRideStatus());
         dto.setEndPoint(sim.getEndPoint());
         return dto;
     }

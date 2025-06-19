@@ -265,13 +265,14 @@ public class RideRequestService {
             Optional<Customer> customer = customerRepository.findByUsername(
                     rideSimulation.get().getCustomer().getUsername());
             if (customer.isPresent()) {
+
                 Customer c = customer.get();
-                int oldTotalRides = c.getTotalRides();
-                double oldAverageRating = c.getRating();
-                double newAverageRating = ((oldAverageRating * oldTotalRides) + rate) / (oldTotalRides + 1);
+                double lastAverageRating = c.getRating();
+                double totalRides = c.getTotalRides();
+                double previousTotalRides = totalRides - 1;
+                double newAverageRating = ((lastAverageRating * previousTotalRides) + rate) / totalRides;
 
                 c.setRating((float) newAverageRating);
-                c.setTotalRides(oldTotalRides + 1);
                 customerRepository.save(c);
             }
         }
@@ -284,13 +285,12 @@ public class RideRequestService {
                     rideSimulation.get().getDriver().getUsername());
             if (driver.isPresent()) {
                 Driver d = driver.get();
-                int oldTotalRides = d.getTotalRides();
-                double oldAverageRating = d.getRating();
-                double newAverageRating = ((oldAverageRating * oldTotalRides) + rate) / (oldTotalRides + 1);
+                double lastAverageRating = d.getRating();
+                double totalRides = d.getTotalRides();
+                double previousTotalRides = d.getTotalRides() - 1;
+                double newAverageRating = ((lastAverageRating * previousTotalRides) + rate) / totalRides;
 
                 d.setRating((float) newAverageRating);
-                d.setTotalRides(oldTotalRides + 1);
-                d.setTotalTravelledDistance(rideSimulation.get().getRideOffer().getRideRequest().getDistance());
                 driverRepository.save(d);
             }
         }
