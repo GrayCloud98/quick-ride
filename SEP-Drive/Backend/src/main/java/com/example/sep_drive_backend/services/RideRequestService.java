@@ -296,4 +296,11 @@ public class RideRequestService {
             }
         }
     }
+    public List<RideHistoryDto> getRideHistory(String username){
+          RideHistoryDto rideHistoryDto = new RideHistoryDto();
+          Optional<Customer> customer = customerRepository.findByUsername(username);
+          //get ride requests for this customer where status is completed, AND do the same for offer and simulation
+        //assign the attributes to the dto, stream the dto's
+        return (List<RideHistoryDto>) rideHistoryDto;
+    }
 }
