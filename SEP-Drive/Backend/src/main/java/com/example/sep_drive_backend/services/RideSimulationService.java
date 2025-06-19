@@ -7,6 +7,7 @@ import com.example.sep_drive_backend.models.RideSimulation;
 import com.example.sep_drive_backend.repository.CustomerRepository;
 import com.example.sep_drive_backend.repository.DriverRepository;
 import com.example.sep_drive_backend.repository.RideSimulationRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,12 +20,14 @@ public class RideSimulationService {
     private final RideSimulationRepository rideSimulationRepository;
     private final DriverRepository driverRepository;
     private final CustomerRepository customerRepository;
+    private final WalletService walletService;
 
     @Autowired
-    public RideSimulationService(RideSimulationRepository rideSimulationRepository, DriverRepository driverRepository, CustomerRepository customerRepository) {
+    public RideSimulationService(RideSimulationRepository rideSimulationRepository, DriverRepository driverRepository, CustomerRepository customerRepository, WalletService walletService) {
         this.rideSimulationRepository = rideSimulationRepository;
         this.driverRepository = driverRepository;
         this.customerRepository = customerRepository;
+        this.walletService = walletService;
     }
 
     public RideSimulation startSimulation(Long id) {
@@ -57,6 +60,10 @@ public class RideSimulationService {
         return sim;
     }
 
+    @Transactional
+    public void transferFees(String customerUsername, Long driverId, long priceCents) {
+        walletService.transfer(customerUsername, driverId, priceCents);
+    }
 
     public RideSimulation getSimulationById(Long id) {
         Optional<RideSimulation> simOpt = rideSimulationRepository.findById(id);

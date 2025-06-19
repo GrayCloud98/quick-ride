@@ -28,10 +28,9 @@ public class RideSimulationController {
     private final LoginService loginService;
     private final CustomerRepository customerRepository;
     private final DriverRepository driverRepository;
-    private final WalletService walletService;
 
     public RideSimulationController(RideSimulationService rideSimulationService,
-                                    SimpMessagingTemplate messagingTemplate, RideSimulationRepository rideSimulationRepository, RideOfferRepository rideOfferRepository, RideRequestRepository rideRequestRepository, LoginService loginService, CustomerRepository customerRepository, DriverRepository driverRepository, DriverRepository driverRepository1, WalletService walletService) {
+                                    SimpMessagingTemplate messagingTemplate, RideSimulationRepository rideSimulationRepository, RideOfferRepository rideOfferRepository, RideRequestRepository rideRequestRepository, LoginService loginService, CustomerRepository customerRepository, DriverRepository driverRepository) {
         this.rideSimulationService = rideSimulationService;
         this.messagingTemplate = messagingTemplate;
         this.rideSimulationRepository = rideSimulationRepository;
@@ -40,7 +39,6 @@ public class RideSimulationController {
         this.loginService = loginService;
         this.customerRepository = customerRepository;
         this.driverRepository = driverRepository;
-        this.walletService = walletService;
     }
 
     @MessageMapping("/simulation/fetch")
@@ -73,7 +71,6 @@ public class RideSimulationController {
         broadcastUpdate(sim);
     }
 
-    @Transactional
     @MessageMapping("/simulation/complete")
     public void completeSimulation(@Payload Long simId) {
         Optional<RideSimulation> optionalSim = rideSimulationRepository.findById(simId);
@@ -90,7 +87,8 @@ public class RideSimulationController {
         long priceCents = Math.round(simulation.getRideOffer().getRideRequest().getEstimatedPrice() * 100);
         String customerUsername = simulation.getCustomer().getUsername();
         Long driverUserId = simulation.getDriver().getId();
-        walletService.transfer(customerUsername, driverUserId, priceCents);
+        rideSimulationService.transferFees(customerUsername, driverUserId, priceCents);
+
 
 
         Customer customer = simulation.getCustomer();
