@@ -9,6 +9,7 @@ import com.example.sep_drive_backend.repository.*;
 import com.example.sep_drive_backend.services.LoginService;
 import com.example.sep_drive_backend.services.RideSimulationService;
 import com.example.sep_drive_backend.services.WalletService;
+import jakarta.transaction.Transactional;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -72,6 +73,7 @@ public class RideSimulationController {
         broadcastUpdate(sim);
     }
 
+    @Transactional
     @MessageMapping("/simulation/complete")
     public void completeSimulation(@Payload Long simId) {
         Optional<RideSimulation> optionalSim = rideSimulationRepository.findById(simId);
