@@ -32,7 +32,16 @@
         <button class="btn" mat-fab extended (click)="resume()" [disabled]="!isPaused">Resume</button>
         <button class="btn" mat-fab extended (click)="pause()" [disabled]="isPaused">Pause</button>
       </div>
-      <button class="btn warn" mat-fab extended (click)="complete()">Complete</button>
+      <button class="btn warn" mat-fab extended (click)="complete()">Complete</button>      <!--[routerLink]="['/summary']" -->
+    </div>
+
+    <!--TODO DELETE -->
+    <div class="row-btn centered-box">
+      <button (click)="rate(1)">1</button>
+      <button (click)="rate(2)">2</button>
+      <button (click)="rate(3)">3</button>
+      <button (click)="rate(4)">4</button>
+      <button (click)="rate(5)">5</button>
     </div>
 
     <button (click)="console.log({currentIndex, points, duration, isRunning, isPaused})">Metadata</button>

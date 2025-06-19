@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Client, IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import {Observable, Subject} from 'rxjs';
-import {HttpClient} from '@angular/common/http';
+import {Observable, Subject, switchMap} from 'rxjs';
+import {HttpClient, HttpParams} from '@angular/common/http';
+import {AuthService} from '../auth/auth.service';
 
 export interface Update {
   rideSimulationId: number,
@@ -31,7 +32,8 @@ export class SimService {
   private simulationId = 1;
   private baseUrl = 'http://localhost:8080/api/ride-requests';
 
-  constructor() {  // FIXME COMMENT OUT
+  constructor(private http: HttpClient,
+              private authService: AuthService) {  // FIXME COMMENT OUT
     this.client = new Client({
       webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
       reconnectDelay: 5000,
@@ -120,5 +122,20 @@ export class SimService {
 
   getSimulationUpdates(): Observable<any> {
     return this.simulationUpdateSubject.asObservable();
+  }
+
+  rate(rate: number): Observable<any> {
+    const params = new HttpParams()
+      .set('rideSimulationId', this.simulationId.toString())
+      .set('rate', rate.toString());
+
+    return this.authService.isCustomer().pipe(
+      switchMap(isCustomer => {
+        const suffix = isCustomer ? '/rate/driver' : '/rate/customer';
+        const url = this.baseUrl + suffix;
+        console.warn('💰', rate, url, { params }); // TODO DELETE
+        return this.http.post(url, null, { params });
+      })
+    );
   }
 }

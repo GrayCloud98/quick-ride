@@ -218,4 +218,11 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   }
 
   protected readonly console = console;
+
+  rate(rate: number) {
+    this.simService.rate(rate).subscribe({
+      next: res => console.warn('rate ✅', res),
+      error: err => console.error('rate ❌', err)
+    });
+  }
 }
