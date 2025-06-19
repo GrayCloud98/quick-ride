@@ -27,7 +27,7 @@ export class SimService {
   private client: Client;
   private simulationUpdateSubject = new Subject<any>();
 
-  private simulationId = 1; // TODO UPDATE DYNAMICALLY
+  private simulationId!: number;
   private baseUrl = 'http://localhost:8080/api/ride-requests';
 
   constructor(private http: HttpClient) {
@@ -40,16 +40,19 @@ export class SimService {
     this.client.onConnect = () => {
 
       this.http.get<number>(this.baseUrl + '/sim-id').subscribe({
-        next: id => console.log('[SIM ID][SUCCESS]', 'Received simulation ID:', id),
-        error: err => console.warn('[SIM ID][ERROR]', 'Failed to retrieve simulation ID:', err),
-      });
+        next: id => {
+          console.log('[SIM ID][SUCCESS]', 'Received simulation ID:', id);
+          this.simulationId = id;
 
-      console.log('✅ WebSocket connected');
-      this.client.subscribe(`/topic/simulation/${this.simulationId}`, (message: IMessage) => {
-        const body = JSON.parse(message.body);
-        this.simulationUpdateSubject.next(body);
+          console.log('✅ WebSocket connected');
+          this.client.subscribe(
+            `/topic/simulation/${this.simulationId}`,
+            (message: IMessage) => this.simulationUpdateSubject.next(JSON.parse(message.body))
+          );
+          this.control(this.simulationId, Control.FETCH);
+        },
+        error: err => console.warn('[SIM ID][ERROR]', 'Simulation ID retrieval must be on START:', err),
       });
-      this.control(this.simulationId, Control.FETCH);
     };
 
     this.client.onStompError = (frame) => {
