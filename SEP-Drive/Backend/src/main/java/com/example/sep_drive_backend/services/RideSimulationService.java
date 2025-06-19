@@ -58,31 +58,6 @@ public class RideSimulationService {
     }
 
 
-
-    public void rateDriver(Long rideSimulationId, String customerUsername, int rate) {
-        RideSimulation sim = rideSimulationRepository.findById(rideSimulationId)
-                .orElseThrow(() -> new RuntimeException("RideSimulation not found"));
-
-        if (!sim.getCustomer().getUsername().equals(customerUsername)) {
-            throw new RuntimeException("You are not the customer for this simulation");
-        }
-
-        sim.getDriver().setRating(sim.getDriver().getRating() + rate);
-        driverRepository.save(sim.getDriver());
-    }
-
-    public void rateCustomer(Long rideSimulationId, String driverUsername, int rate) {
-        RideSimulation sim = rideSimulationRepository.findById(rideSimulationId)
-                .orElseThrow(() -> new RuntimeException("RideSimulation not found"));
-
-        if (!sim.getDriver().getUsername().equals(driverUsername)) {
-            throw new RuntimeException("You are not the Driver for this simulation");
-        }
-
-        sim.getCustomer().setRating(sim.getCustomer().getRating() + rate);
-        customerRepository.save(sim.getCustomer());
-    }
-
     public RideSimulation getSimulationById(Long id) {
         Optional<RideSimulation> simOpt = rideSimulationRepository.findById(id);
         if (simOpt.isEmpty()) throw new RuntimeException("Simulation not found");

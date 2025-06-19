@@ -8,6 +8,7 @@ import com.example.sep_drive_backend.models.RideSimulation;
 import com.example.sep_drive_backend.repository.*;
 import com.example.sep_drive_backend.services.LoginService;
 import com.example.sep_drive_backend.services.RideSimulationService;
+import com.example.sep_drive_backend.services.WalletService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -30,9 +31,10 @@ public class RideSimulationController {
     private final LoginService loginService;
     private final CustomerRepository customerRepository;
     private final DriverRepository driverRepository;
+    private final WalletService walletService;
 
     public RideSimulationController(RideSimulationService rideSimulationService,
-                                    SimpMessagingTemplate messagingTemplate, RideSimulationRepository rideSimulationRepository, RideOfferRepository rideOfferRepository, RideRequestRepository rideRequestRepository, LoginService loginService, CustomerRepository customerRepository, DriverRepository driverRepository, DriverRepository driverRepository1) {
+                                    SimpMessagingTemplate messagingTemplate, RideSimulationRepository rideSimulationRepository, RideOfferRepository rideOfferRepository, RideRequestRepository rideRequestRepository, LoginService loginService, CustomerRepository customerRepository, DriverRepository driverRepository, DriverRepository driverRepository1, WalletService walletService) {
         this.rideSimulationService = rideSimulationService;
         this.messagingTemplate = messagingTemplate;
         this.rideSimulationRepository = rideSimulationRepository;
@@ -41,6 +43,7 @@ public class RideSimulationController {
         this.loginService = loginService;
         this.customerRepository = customerRepository;
         this.driverRepository = driverRepository;
+        this.walletService = walletService;
     }
 
     @MessageMapping("/simulation/fetch")
@@ -85,6 +88,11 @@ public class RideSimulationController {
         simulation.getRideOffer().setRideStatus(RideStatus.COMPLETED);
         simulation.getRideOffer().getRideRequest().setRideStatus(RideStatus.COMPLETED);
         simulation.markEnded();
+
+        long priceCents = Math.round(simulation.getRideOffer().getRideRequest().getEstimatedPrice() * 100);
+        String customerUsername = simulation.getCustomer().getUsername();
+        Long driverUserId = simulation.getDriver().getId();
+        walletService.transfer(customerUsername, driverUserId, priceCents);
 
         rideSimulationRepository.save(simulation);
         rideOfferRepository.save(simulation.getRideOffer());
