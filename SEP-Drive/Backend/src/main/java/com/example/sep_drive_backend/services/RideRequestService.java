@@ -272,6 +272,7 @@ public class RideRequestService {
 
                 c.setRating((float) newAverageRating);
                 c.setTotalRides(oldTotalRides + 1);
+                customerRepository.save(c);
             }
         }
     }
@@ -289,6 +290,8 @@ public class RideRequestService {
 
                 d.setRating((float) newAverageRating);
                 d.setTotalRides(oldTotalRides + 1);
+                d.setTotalTravelledDistance(rideSimulation.get().getRideOffer().getRideRequest().getDistance());
+                driverRepository.save(d);
             }
         }
     }
