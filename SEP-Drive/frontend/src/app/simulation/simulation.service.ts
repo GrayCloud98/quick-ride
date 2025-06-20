@@ -145,7 +145,6 @@ export class SimulationService {
       switchMap(isCustomer => {
         const suffix = isCustomer ? '/rate/driver' : '/rate/customer';
         const url = this.baseUrl + suffix;
-        console.warn('💰', rate, url, { params }); // TODO DELETE
         return this.http.post(url, null, { params });
       })
     );

@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {MatDialogRef} from '@angular/material/dialog';
+import {SimulationService} from '../simulation.service';
+import {AuthService} from '../../auth/auth.service';
 
 @Component({
   selector: 'rating-popup',
@@ -7,12 +9,21 @@ import {MatDialogRef} from '@angular/material/dialog';
   templateUrl: './rating-popup.component.html',
   styleUrl: './rating-popup.component.scss'
 })
-export class RatingPopupComponent {
-  constructor(private dialogRef: MatDialogRef<RatingPopupComponent>) {}
+export class RatingPopupComponent implements OnInit {
+  constructor(private authService: AuthService,
+              private simService: SimulationService,
+              private dialogRef: MatDialogRef<RatingPopupComponent>) {}
 
+  partner!: string;
   stars = Array(5).fill(0);
   rating = 0;
   hoverRating = 0;
+
+  ngOnInit(){
+    this.authService.isCustomer().subscribe({
+      next: isCustomer => isCustomer ? this.partner = 'Driver' : this.partner = 'Customer'
+    })
+  }
 
   onMouseEnter(index: number) {
     this.hoverRating = index;
@@ -27,6 +38,9 @@ export class RatingPopupComponent {
   }
 
   onSubmit() {
-    this.dialogRef.close(this.rating);
+    this.simService.rate(this.rating).subscribe({
+      next: () => this.dialogRef.close(this.rating),
+      error: err => console.error('Rating failed:', err)
+    });
   }
 }
