@@ -1,13 +1,13 @@
 import {AfterViewInit, Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
-import {Control, SimService, Update} from '../sim.service';
+import {Control, SimulationService, Update} from '../simulation.service';
 
 @Component({
-  selector: 'view-page',
+  selector: 'simulation-page',
   standalone: false,
-  templateUrl: './view-page.component.html',
-  styleUrl: './view-page.component.scss'
+  templateUrl: './simulation.component.html',
+  styleUrl: './simulation.component.scss'
 })
-export class ViewPageComponent implements AfterViewInit, OnDestroy {
+export class SimulationComponent implements AfterViewInit, OnDestroy {
   @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef;
   map!: google.maps.Map;
   pointer!: google.maps.marker.AdvancedMarkerElement;
@@ -24,7 +24,7 @@ export class ViewPageComponent implements AfterViewInit, OnDestroy {
   private pins: google.maps.marker.AdvancedMarkerElement[] = [];
   private directionsRenderer?: google.maps.DirectionsRenderer;
 
-  constructor(private simService: SimService) {}
+  constructor(private simService: SimulationService) {}
 
   ngAfterViewInit(): void {
     this.simService.connect();

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ViewPageComponent } from './view-page.component';
+import { SimulationComponent } from './simulation.component';
 
 describe('SimulationComponent', () => {
-  let component: ViewPageComponent;
-  let fixture: ComponentFixture<ViewPageComponent>;
+  let component: SimulationComponent;
+  let fixture: ComponentFixture<SimulationComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ViewPageComponent]
+      declarations: [SimulationComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ViewPageComponent);
+    fixture = TestBed.createComponent(SimulationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

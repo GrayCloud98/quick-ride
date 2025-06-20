@@ -34,8 +34,8 @@ import { GoogleMapsModule } from '@angular/google-maps';
 import { WalletPageComponent } from './profile-page/wallet-page/wallet-page.component';
 import { MatSortModule } from '@angular/material/sort';
 import {MatSlider, MatSliderModule} from '@angular/material/slider';
-import { ViewPageComponent } from './simulation/view-page/view-page.component';
-import {SimService} from './simulation/sim.service';
+import { SimulationComponent } from './simulation/simulation-page/simulation.component';
+import {SimulationService} from './simulation/simulation.service';
 
 
 @NgModule({
@@ -46,7 +46,7 @@ import {SimService} from './simulation/sim.service';
     RegisterComponent,
     TwoFaComponent,
     WalletPageComponent,
-    ViewPageComponent
+    SimulationComponent
   ],
   imports: [
     MatSortModule,
@@ -101,7 +101,7 @@ import {SimService} from './simulation/sim.service';
   providers: [
     provideHttpClient(withInterceptorsFromDi()),
     provideNativeDateAdapter(),
-    SimService
+    SimulationService
   ],
 
   bootstrap: [AppComponent]

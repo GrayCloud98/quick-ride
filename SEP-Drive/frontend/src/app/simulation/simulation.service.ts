@@ -25,7 +25,7 @@ export enum Control {
 @Injectable({
   providedIn: 'root'
 })
-export class SimService {
+export class SimulationService {
   private client: Client;
   private simulationUpdateSubject = new Subject<any>();
 
