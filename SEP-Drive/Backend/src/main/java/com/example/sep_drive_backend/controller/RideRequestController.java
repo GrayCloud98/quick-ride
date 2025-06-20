@@ -170,7 +170,7 @@ public class RideRequestController {
     @GetMapping("/sim-id")
     public ResponseEntity<Long> getSimId(HttpServletRequest request) {
         String username = loginService.extractUsername(request);
-        Optional<Long> simId = rideRequestService.getSimId(username);
+        Optional<Long> simId = rideRequestService.getInProgressOrCreatedSimId(username);
         return simId.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -193,5 +193,13 @@ public class RideRequestController {
         List<RideHistoryDTO> history = rideRequestService.getUserRideHistory(username);
         return ResponseEntity.ok(history);
     }
+
+    @GetMapping("/has-active-sim")
+    public ResponseEntity<Boolean> hasActiveSim(HttpServletRequest request) {
+        String username = loginService.extractUsername(request);
+        boolean hasActiveSim = rideRequestService.hasActiveSim(username);
+        return ResponseEntity.ok(hasActiveSim);
+    }
+
 
 }
