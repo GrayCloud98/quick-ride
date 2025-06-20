@@ -46,7 +46,7 @@ export class SimService {
         const body = JSON.parse(message.body);
         this.simulationUpdateSubject.next(body);
       });
-      this.control(this.simulationId, Control.FETCH);
+      this.control(Control.FETCH);
     };
 
     this.client.onStompError = (frame) => {
@@ -105,8 +105,20 @@ export class SimService {
       console.error('⚠️ Error during WebSocket disconnection:', error);
     }
   }
+  //  FETCH = 'fetch',
+  //   START = 'start',
+  //   PAUSE = 'pause',
+  //   RESUME = 'resume',
+  //   SPEED = 'speed',
+  //   COMPLETE = 'complete',
 
-  control(input: number, control: Control): void {
+  /*
+  * input:
+  * START, PAUSE, RESUME = currentIndex
+  * SPEED = duration
+  * FETCH, COMPLETE = *leave empty*
+  * */
+  control(control: Control, input?: number): void {
     const payload: any = { rideSimulationId: this.simulationId };
 
     if (control === Control.SPEED)

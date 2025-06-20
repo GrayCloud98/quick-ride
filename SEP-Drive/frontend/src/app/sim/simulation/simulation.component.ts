@@ -195,7 +195,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     this.isRunning = true;
     this.isPaused = false;
     this.animate();
-    this.simService.control(this.currentIndex, Control.START);
+    this.simService.control(Control.START, this.currentIndex);
   }
 
   pause(): void {
@@ -204,7 +204,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;
     }
-    this.simService.control(this.currentIndex, Control.PAUSE);
+    this.simService.control(Control.PAUSE, this.currentIndex);
   }
 
   resume(): void {
@@ -212,15 +212,15 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
 
     this.isPaused = false;
     this.animate();
-    this.simService.control(this.currentIndex, Control.RESUME);
+    this.simService.control(Control.RESUME, this.currentIndex);
   }
 
   speed(): void {
-    this.simService.control(this.duration, Control.SPEED);
+    this.simService.control(Control.SPEED, this.duration);
   }
 
   complete(): void {
-    this.simService.control(this.duration, Control.COMPLETE); // FIXME DOES NOT UPDATE BACKEND/SEND STOMP MESSAGES
+    this.simService.control(Control.COMPLETE);
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;
