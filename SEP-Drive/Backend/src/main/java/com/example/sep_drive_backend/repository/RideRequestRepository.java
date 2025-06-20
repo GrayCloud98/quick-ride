@@ -11,7 +11,10 @@ import java.util.Optional;
 @Repository
 public interface RideRequestRepository extends JpaRepository<RideRequest, Long> {
 
-    Optional<RideRequest> findByCustomerUsernameAndCustomerActiveTrue(String username);
 
-//    List<RideRequest> findByStatus(RideStatus status);
+    List<RideRequest> findByCustomerUsernameAndRideStatus(String username, RideStatus status);
+    boolean existsByCustomerUsernameAndRideStatusIn(String username, List<RideStatus> statuses);
+    Optional<RideRequest> findFirstByCustomerUsernameAndRideStatus(String username, RideStatus status);
+    List<RideRequest> findAllByRideStatus(RideStatus status);
+
 }
