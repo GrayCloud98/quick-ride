@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+
+
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/ride-requests")
@@ -33,6 +35,19 @@ public class RideRequestController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    /*
+STATUS OVERVIEW:
+CREATED: when a ride request, offer, or sim are created
+IN prog: when offer is accepted, the offer & ride request have the status in prog., and a sim is created with the status Created -> only becomes in prog. after the sim has started
+COMPLETED:when sim is completed, all the prev. get the status completed
+
+ACTIVE:
+CUSTOMER: is active when they create a ride request, till it's deleted or completed
+DRIVER: is active when they create an offer, till it's completed, rejected, or cancelled
+ */
+
+
+    //create ride request for customer if they're not active (i.e. they don't have a Created/In progress ride requests) && they have more in wallet the ride's estimated price
     @PostMapping
     public ResponseEntity<RideRequest> createRideRequest(
             @RequestBody RideRequestDTO dto, HttpServletRequest request) {
@@ -47,6 +62,8 @@ public class RideRequestController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
+
+    //checks if customer has a CREATED ride request
     @GetMapping("/has-active")
     public ResponseEntity<Boolean> hasActiveRideRequest(HttpServletRequest request) {
 
@@ -55,6 +72,7 @@ public class RideRequestController {
         boolean hasActive = rideRequestService.hasActiveRideRequest(username);
         return ResponseEntity.ok(hasActive);
     }
+
     @GetMapping("/is-customer")
     public ResponseEntity<Boolean> isCustomer (HttpServletRequest request) {
 
@@ -65,7 +83,7 @@ public class RideRequestController {
         return ResponseEntity.ok(isCustomer);
     }
 
-
+    //returns the customer's created ride request
     @GetMapping
     public ResponseEntity<RideRequestDTO> getActiveRideRequest(HttpServletRequest request) {
 
@@ -74,7 +92,7 @@ public class RideRequestController {
         RideRequest RideRequest = rideRequestService.getActiveRideRequestForCustomer(username);
         return ResponseEntity.ok(new RideRequestDTO(RideRequest));
     }
-
+    //delete the customer's ride request (only if it has the status CREATED)
     @DeleteMapping
     public ResponseEntity<Void> deleteActiveRideRequest(HttpServletRequest request) {
 
@@ -84,12 +102,14 @@ public class RideRequestController {
         return ResponseEntity.noContent().build();
     }
 
+    //returns all ride requests with the status CREATED
     @GetMapping("/all-active-rides")
     public ResponseEntity<List<RidesForDriversDTO>> getAllRideRequests() {
         List<RidesForDriversDTO> rideRequests = rideRequestService.getAllRideRequests();
         return ResponseEntity.ok(rideRequests);
     }
 
+    //create offers for the request if the driver is inactive(i.e. doesn't have in_prog or created offers) && the ride request has the status CREATED
     @PostMapping("/offer-ride")
     public ResponseEntity<?> offerRide(@RequestParam Long rideRequestId, HttpServletRequest request) {
         String username = loginService.extractUsername(request);
@@ -103,6 +123,7 @@ public class RideRequestController {
         }
     }
 
+    //returns true for active drivers (driver has created/in prog. offers)
     @GetMapping("/is-driver-active")
     public ResponseEntity<Boolean> isDriverActive(HttpServletRequest request) {
         String username = loginService.extractUsername(request);
@@ -110,6 +131,7 @@ public class RideRequestController {
         return ResponseEntity.ok(active);
     }
 
+    //this just deletes the offer and notify & deactivate driver, but should probably add a check that the offer has the status created (not previously accepted by customer)
     @DeleteMapping("/reject-offer")
     public ResponseEntity<?> rejectOffer(@RequestParam Long rideOfferId) {
         try {
@@ -120,6 +142,7 @@ public class RideRequestController {
         }
     }
 
+    // cancel/delete the offer only if it has the status created(not accepted by customer)
     @DeleteMapping("/cancel-offer")
     public ResponseEntity<?> cancelOffer(HttpServletRequest request) {
         String username = loginService.extractUsername(request);
@@ -131,6 +154,7 @@ public class RideRequestController {
         }
     }
 
+    // this might be broken now idk what it does
     @GetMapping("/offer-request-id")
     public ResponseEntity<?> getDriverOfferRideRequestId(HttpServletRequest request) {
         String username = loginService.extractUsername(request);
@@ -142,6 +166,7 @@ public class RideRequestController {
         }
     }
 
+    // returns offers to customer if their current active ride request has the status CREATED
     @GetMapping("/offers")
     public ResponseEntity<?> getOffersForCustomer(HttpServletRequest request) {
         String username = loginService.extractUsername(request);
@@ -154,6 +179,7 @@ public class RideRequestController {
         }
     }
 
+    //set the ride request and offer to the status in prog., create a sim with the status CREATED
     @PostMapping("/accept-offer")
     public ResponseEntity<?> acceptOffer(@RequestParam Long rideOfferId, HttpServletRequest request) {
         String username = loginService.extractUsername(request);
@@ -167,6 +193,15 @@ public class RideRequestController {
         }
     }
 
+    //check if user has an accepted offer/ a sim with the status created or in prog.
+    @GetMapping("/has-active-sim")
+    public ResponseEntity<Boolean> hasActiveSim(HttpServletRequest request) {
+        String username = loginService.extractUsername(request);
+        boolean hasActiveSim = rideRequestService.hasActiveSim(username);
+        return ResponseEntity.ok(hasActiveSim);
+    }
+
+    //returns the user's active sim's id (only Created or in prog.)
     @GetMapping("/sim-id")
     public ResponseEntity<Long> getSimId(HttpServletRequest request) {
         String username = loginService.extractUsername(request);
@@ -175,31 +210,24 @@ public class RideRequestController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    //to rate the driver of the ride
     @PostMapping("/rate/driver")
     public void rateDriver(@RequestParam Long rideSimulationId, @RequestParam int rate){
         rideRequestService.rateDriver(rideSimulationId, rate);
 
     }
-
+    //to rate the customer (from driver)
     @PostMapping("/rate/customer")
     public void rateCustomer(@RequestParam Long rideSimulationId, @RequestParam int rate){
         rideRequestService.rateCustomer(rideSimulationId, rate);
 
     }
 
+    //returns the users COMPLETED rides list (check RideHistoryDTO)
     @GetMapping("/history")
     public ResponseEntity<List<RideHistoryDTO>> getRideHistory(HttpServletRequest request) {
         String username = loginService.extractUsername(request);
         List<RideHistoryDTO> history = rideRequestService.getUserRideHistory(username);
         return ResponseEntity.ok(history);
     }
-
-    @GetMapping("/has-active-sim")
-    public ResponseEntity<Boolean> hasActiveSim(HttpServletRequest request) {
-        String username = loginService.extractUsername(request);
-        boolean hasActiveSim = rideRequestService.hasActiveSim(username);
-        return ResponseEntity.ok(hasActiveSim);
-    }
-
-
 }

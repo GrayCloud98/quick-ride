@@ -90,10 +90,10 @@ public class RideRequestService {
     }
 
     public RideRequest getActiveRideRequestForCustomer(String username) {
-        return rideRequestRepository.findFirstByCustomerUsernameAndRideStatusIn(
+        return rideRequestRepository.findFirstByCustomerUsernameAndRideStatus(
                 username,
-                List.of(RideStatus.CREATED, RideStatus.IN_PROGRESS)
-        ).orElseThrow(() -> new NoSuchElementException("No active ride request found for user: " + username));
+                RideStatus.CREATED
+        ).orElseThrow(() -> new NoSuchElementException("No active ride request with status CREATED found for user: " + username));
     }
 
     public void deleteActiveRideRequest(String username) {
