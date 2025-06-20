@@ -248,14 +248,12 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   }
 
   openRating() {
-    const dialogRef = this.dialog.open(RatingPopupComponent, {
-      disableClose: true,
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result === 'submitted') { // use result rating-popup.component.ts.(onSubmit)
-        console.log('User submitted the form.');
-      }
-    });
+    this.dialog.open(RatingPopupComponent, { disableClose: true })
+      .afterClosed()
+      .subscribe(rating => {
+        if (rating) {
+          console.log('User selected rating:', rating);
+        }
+      });
   }
 }

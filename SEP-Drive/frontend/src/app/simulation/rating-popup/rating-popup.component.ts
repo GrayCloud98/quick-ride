@@ -10,7 +10,23 @@ import {MatDialogRef} from '@angular/material/dialog';
 export class RatingPopupComponent {
   constructor(private dialogRef: MatDialogRef<RatingPopupComponent>) {}
 
+  stars = Array(5).fill(0);
+  rating = 0;
+  hoverRating = 0;
+
+  onMouseEnter(index: number) {
+    this.hoverRating = index;
+  }
+
+  onMouseLeave() {
+    this.hoverRating = 0;
+  }
+
+  onStarClick(index: number) {
+    this.rating = index;
+  }
+
   onSubmit() {
-    this.dialogRef.close('submitted'); // add a result here
+    this.dialogRef.close(this.rating);
   }
 }
