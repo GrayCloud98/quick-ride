@@ -329,22 +329,20 @@ public class RideRequestService {
 
     //get sim id created or In_progress, completed sim id not possible yet
     public Optional<Long> getInProgressOrCreatedSimId(String username) {
+        List<RideStatus> activeStatuses = List.of(RideStatus.CREATED, RideStatus.IN_PROGRESS);
+
         Optional<Customer> customer = customerRepository.findByUsername(username);
         if (customer.isPresent()) {
             return rideSimulationRepository
-                    .findFirstIdByCustomerUsernameAndRideStatusIn(
-                            username,
-                            List.of(RideStatus.CREATED, RideStatus.IN_PROGRESS)
-                    );
+                    .findFirstByCustomerUsernameAndRideStatusIn(username, activeStatuses)
+                    .map(RideSimulation::getId);
         }
 
         Optional<Driver> driver = driverRepository.findByUsername(username);
         if (driver.isPresent()) {
             return rideSimulationRepository
-                    .findFirstIdByDriverUsernameAndRideStatusIn(
-                            username,
-                            List.of(RideStatus.CREATED, RideStatus.IN_PROGRESS)
-                    );
+                    .findFirstByDriverUsernameAndRideStatusIn(username, activeStatuses)
+                    .map(RideSimulation::getId);
         }
 
         return Optional.empty();

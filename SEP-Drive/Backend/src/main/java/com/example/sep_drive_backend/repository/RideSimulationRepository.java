@@ -12,9 +12,8 @@ import java.util.Optional;
 public interface RideSimulationRepository extends JpaRepository<RideSimulation, Long> {
 
 
-    Optional<Long> findFirstIdByCustomerUsernameAndRideStatusIn(String username, List<RideStatus> statuses);
-
-    Optional<Long> findFirstIdByDriverUsernameAndRideStatusIn(String username, List<RideStatus> statuses);
+    Optional<RideSimulation> findFirstByCustomerUsernameAndRideStatusIn(String username, List<RideStatus> statuses);
+    Optional<RideSimulation> findFirstByDriverUsernameAndRideStatusIn(String username, List<RideStatus> statuses);
 
     boolean existsByCustomerUsernameAndRideStatusIsOrCustomerUsernameAndRideStatusIs(
             String username1, RideStatus status1,
