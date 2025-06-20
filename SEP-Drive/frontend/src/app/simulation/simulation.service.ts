@@ -20,7 +20,7 @@ export enum Control {
   PAUSE = 'pause',
   RESUME = 'resume',
   SPEED = 'speed',
-  COMPLETE = 'complete',
+  COMPLETE = 'complete'
 }
 @Injectable({
   providedIn: 'root'
@@ -33,7 +33,8 @@ export class SimulationService {
   private baseUrl = 'http://localhost:8080/api/ride-requests';
 
   constructor(private http: HttpClient,
-              private authService: AuthService) {  // FIXME COMMENT OUT
+              private authService: AuthService) {
+
     this.client = new Client({
       webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
       reconnectDelay: 5000,
@@ -41,12 +42,17 @@ export class SimulationService {
     });
 
     this.client.onConnect = () => {
-      console.log('✅ WebSocket connected');
-      this.client.subscribe(`/topic/simulation/${this.simulationId}`, (message: IMessage) => {
-        const body = JSON.parse(message.body);
-        this.simulationUpdateSubject.next(body);
+      this.http.get<number>(this.baseUrl + '/sim-id').subscribe({
+        next: id => {
+          this.simulationId = id;
+          this.client.subscribe(
+            `/topic/simulation/${this.simulationId}`,
+            (message: IMessage) => this.simulationUpdateSubject.next(JSON.parse(message.body))
+          );
+          this.control(Control.FETCH);
+        },
+        error: err => console.error('Fetching simulationId failed', err),
       });
-      this.control(Control.FETCH);
     };
 
     this.client.onStompError = (frame) => {
@@ -57,41 +63,6 @@ export class SimulationService {
       console.warn('🚪 WebSocket closed');
     };
   }
-
-  // FIXME UNCOMMENT TO UPDATE simulationId DYNAMICALLY
-  // constructor(private http: HttpClient) {
-  //   this.client = new Client({
-  //     webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
-  //     reconnectDelay: 5000,
-  //     debug: () => {}
-  //   });
-  //
-  //   this.client.onConnect = () => {
-  //
-  //     this.http.get<number>(this.baseUrl + '/sim-id').subscribe({
-  //       next: id => {
-  //         console.log('[SIM ID][SUCCESS]', 'Received simulation ID:', id);
-  //         this.simulationId = id;
-  //
-  //         console.log('✅ WebSocket connected');
-  //         this.client.subscribe(
-  //           `/topic/simulation/${this.simulationId}`,
-  //           (message: IMessage) => this.simulationUpdateSubject.next(JSON.parse(message.body))
-  //         );
-  //         this.control(this.simulationId, Control.FETCH);
-  //       },
-  //       error: err => console.warn('[SIM ID][ERROR]', 'Simulation ID retrieval must be on START:', err),
-  //     });
-  //   };
-  //
-  //   this.client.onStompError = (frame) => {
-  //     console.error('⚠️ STOMP Error:', frame);
-  //   };
-  //
-  //   this.client.onWebSocketClose = () => {
-  //     console.warn('🚪 WebSocket closed');
-  //   };
-  // }
 
   connect(): void {
     this.client.activate();
@@ -105,19 +76,12 @@ export class SimulationService {
       console.error('⚠️ Error during WebSocket disconnection:', error);
     }
   }
-  //  FETCH = 'fetch',
-  //   START = 'start',
-  //   PAUSE = 'pause',
-  //   RESUME = 'resume',
-  //   SPEED = 'speed',
-  //   COMPLETE = 'complete',
 
-  /*
-  * input:
+ /* input:
   * START, PAUSE, RESUME = currentIndex
   * SPEED = duration
   * FETCH, COMPLETE = *leave empty*
-  * */
+  */
   control(control: Control, input?: number): void {
     const payload: any = { rideSimulationId: this.simulationId };
 
@@ -142,11 +106,13 @@ export class SimulationService {
       .set('rate', rate.toString());
 
     return this.authService.isCustomer().pipe(
-      switchMap(isCustomer => {
-        const suffix = isCustomer ? '/rate/driver' : '/rate/customer';
-        const url = this.baseUrl + suffix;
-        return this.http.post(url, null, { params });
-      })
+      switchMap(
+        isCustomer => {
+          const suffix = isCustomer ? '/rate/driver' : '/rate/customer';
+          const url = this.baseUrl + suffix;
+          return this.http.post(url, null, { params });
+        }
+      )
     );
   }
 }

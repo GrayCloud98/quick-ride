@@ -15,7 +15,7 @@
 </div>
 
 <div mat-dialog-actions>
-  <button mat-button color="primary" (click)="onSubmit()" [disabled]="rating === 0">
+  <button mat-button color="primary" (click)="onSubmit()" [disabled]="rating === 0" [routerLink]="['/']">
     Submit
   </button>
 </div>

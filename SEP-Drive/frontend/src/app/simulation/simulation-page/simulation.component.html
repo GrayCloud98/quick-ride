@@ -1,12 +1,5 @@
 <div class="main-container">
   <div class="left-container">
-
-    <div class="error alert">
-      Please ensure your partner has opened the simulation page before starting.
-      <br><br>
-      Once the simulation starts, do not navigate away or refresh the page.
-    </div>
-
     <mat-card appearance="outlined" class="card big">
       <mat-card-content>
         <div class="header field">
@@ -43,11 +36,11 @@
       <button (click)="rate(4)">4</button>
       <button (click)="rate(5)">5</button>
     </div>
-    <button (click)="addStopover()"> Test add point</button>
-    <button (click)="openRating()"> Test Popup</button>
-    <!--end delete-->
 
+    <button (click)="openRating()">Test Popup</button>
+    <button (click)="addStopover()">Test add point</button>
     <button (click)="console.log({currentIndex, points, duration, isRunning, isPaused})">Metadata</button>
+    <!--end delete-->
   </div>
 
   <div class="right-container map">
