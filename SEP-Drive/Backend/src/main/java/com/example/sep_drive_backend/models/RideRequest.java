@@ -45,6 +45,9 @@ public class RideRequest {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    private int customerRating;
+    private int driverRating;
+
     @Column
     @Enumerated(EnumType.STRING)
     private RideStatus rideStatus;
@@ -53,6 +56,20 @@ public class RideRequest {
     @Enumerated(EnumType.STRING)
     private VehicleClassEnum vehicleClass;
 
+    private LocalDateTime endedAt;
+
+    public LocalDateTime getEndedAt() {
+        return endedAt;
+    }
+
+    public void markEnded() {
+        this.endedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onEnd() {
+        this.endedAt = LocalDateTime.now();
+    }
 
     public RideRequest() {
     }
@@ -72,6 +89,22 @@ public class RideRequest {
         this.estimatedPrice = estimatedPrice;
         this.vehicleClass = vehicleClass;
         this.rideStatus = RideStatus.CREATED;
+    }
+
+    public int getCustomerRating() {
+        return customerRating;
+    }
+
+    public void setCustomerRating(int customerRating) {
+        this.customerRating = customerRating;
+    }
+
+    public int getDriverRating() {
+        return driverRating;
+    }
+
+    public void setDriverRating(int driverRating) {
+        this.driverRating = driverRating;
     }
 
     public RideStatus getRideStatus() {

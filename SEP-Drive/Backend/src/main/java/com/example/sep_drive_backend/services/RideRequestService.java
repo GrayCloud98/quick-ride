@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class RideRequestService {
-    private final TripRepository tripRepository;
     private final WalletRepository walletRepository;
     private final CustomerRepository customerRepository;
     private final DriverRepository driverRepository;
@@ -32,7 +31,7 @@ public class RideRequestService {
             RideOfferRepository rideOfferRepository,
             RideRequestRepository rideRequestRepository,
             WalletRepository walletRepository,
-            TripRepository tripRepository, RideSimulationRepository rideSimulationRepository) {
+            RideSimulationRepository rideSimulationRepository) {
 
         this.customerRepository = customerRepository;
         this.driverRepository = driverRepository;
@@ -40,7 +39,6 @@ public class RideRequestService {
         this.rideOfferRepository = rideOfferRepository;
         this.rideRequestRepository = rideRequestRepository;
         this.walletRepository = walletRepository;
-        this.tripRepository = tripRepository;
         this.rideSimulationRepository = rideSimulationRepository;
     }
 
@@ -262,6 +260,7 @@ public class RideRequestService {
 
     public void rateCustomer(Long rideSimulationId, int rate) {
         Optional<RideSimulation> rideSimulation = rideSimulationRepository.findById(rideSimulationId);
+        rideSimulation.get().getRideOffer().getRideRequest().setCustomerRating(rate);
         if (rideSimulation.isPresent()) {
             Optional<Customer> customer = customerRepository.findByUsername(
                     rideSimulation.get().getCustomer().getUsername());
@@ -281,6 +280,7 @@ public class RideRequestService {
 
     public void rateDriver(Long rideSimulationId, int rate) {
         Optional<RideSimulation> rideSimulation = rideSimulationRepository.findById(rideSimulationId);
+        rideSimulation.get().getRideOffer().getRideRequest().setDriverRating(rate);
         if (rideSimulation.isPresent()) {
             Optional<Driver> driver = driverRepository.findByUsername(
                     rideSimulation.get().getDriver().getUsername());
@@ -296,11 +296,62 @@ public class RideRequestService {
             }
         }
     }
-    public List<RideHistoryDto> getRideHistory(String username){
-          RideHistoryDto rideHistoryDto = new RideHistoryDto();
-          Optional<Customer> customer = customerRepository.findByUsername(username);
-          //get ride requests for this customer where status is completed, AND do the same for offer and simulation
-        //assign the attributes to the dto, stream the dto's
-        return (List<RideHistoryDto>) rideHistoryDto;
+    public List<RideHistoryDTO> getUserRideHistory(String username) {
+        Optional<Driver> driverOpt = driverRepository.findByUsername(username);
+        if (driverOpt.isPresent()) {
+            List<RideOffer> completedOffers = rideOfferRepository
+                    .findByDriverUsernameAndRideStatus(username, RideStatus.COMPLETED);
+
+            return completedOffers.stream().map(offer -> {
+                RideHistoryDTO dto = new RideHistoryDTO();
+                dto.setRideId(offer.getRideRequest().getId());
+                dto.setDistance(offer.getRideRequest().getDistance());
+                dto.setDuration(offer.getRideRequest().getDuration());
+                dto.setCustomerName(offer.getRideRequest().getCustomer().getFirstName() + " " + offer.getRideRequest().getCustomer().getLastName());
+                dto.setCustomerUsername(offer.getRideRequest().getCustomer().getUsername());
+                dto.setFees(offer.getRideRequest().getEstimatedPrice());
+                dto.setEndTime(offer.getRideRequest().getEndedAt());
+                dto.setDriverRating(offer.getRideRequest().getDriverRating());
+                dto.setCustomerRating(offer.getRideRequest().getCustomerRating());
+                dto.setDriverUsername(offer.getDriver().getUsername());
+                dto.setDriverName(offer.getDriver().getFirstName() + " " + offer.getDriver().getLastName());
+                return dto;
+            }).collect(Collectors.toList());
+
+        }
+
+        Optional<Customer> customerOpt = customerRepository.findByUsername(username);
+        if (customerOpt.isPresent()) {
+            List<RideRequest> completedRequests = rideRequestRepository
+                    .findByCustomerUsernameAndRideStatus(username, RideStatus.COMPLETED);
+
+            return completedRequests.stream().map(request -> {
+                RideHistoryDTO dto = new RideHistoryDTO();
+                dto.setRideId(request.getId());
+                dto.setDistance(request.getDistance());
+                dto.setDuration(request.getDuration());
+                dto.setCustomerName(request.getCustomer().getFirstName() + " " + request.getCustomer().getLastName());
+                dto.setCustomerUsername(request.getCustomer().getUsername());
+                dto.setFees(request.getEstimatedPrice());
+                dto.setEndTime(request.getEndedAt());
+                dto.setDriverRating(request.getDriverRating());
+                dto.setCustomerRating(request.getCustomerRating());
+
+                Optional<RideOffer> offerOpt = rideOfferRepository.findByRideRequestId(request.getId());
+                if (offerOpt.isPresent()) {
+                    Driver driver = offerOpt.get().getDriver();
+                    dto.setDriverUsername(driver.getUsername());
+                    dto.setDriverName(driver.getFirstName() + " " + driver.getLastName());
+                } else {
+                    dto.setDriverUsername(null);
+                    dto.setDriverName(null);
+                }
+
+                return dto;
+            }).collect(Collectors.toList());
+        }
+
+        throw new RuntimeException("User not found: " + username);
+
     }
 }

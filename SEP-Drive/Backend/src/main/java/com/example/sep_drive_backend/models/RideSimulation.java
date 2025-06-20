@@ -50,16 +50,6 @@ public class RideSimulation {
 
     private String startLocationName;
     private String destinationLocationName;
-    private LocalDateTime endedAt;
-
-    public void markEnded() {
-        this.endedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onEnd() {
-        this.endedAt = LocalDateTime.now();
-    }
 
 
     public RideSimulation() {

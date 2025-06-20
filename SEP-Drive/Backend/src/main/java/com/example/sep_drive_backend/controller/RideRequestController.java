@@ -187,4 +187,12 @@ public class RideRequestController {
 
     }
 
+    @GetMapping("/history")
+    public ResponseEntity<List<RideHistoryDTO>> getRideHistory(HttpServletRequest request) {
+        String username = loginService.extractUsername(request);
+        List<RideHistoryDTO> history = rideRequestService.getUserRideHistory(username);
+        return ResponseEntity.ok(history);
+    }
+
+
 }
