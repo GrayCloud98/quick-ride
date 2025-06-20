@@ -21,6 +21,9 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   isPaused = false;
   metadataLoaded = false;
 
+  private pins: google.maps.marker.AdvancedMarkerElement[] = [];
+  private directionsRenderer?: google.maps.DirectionsRenderer;
+
   constructor(private simService: SimService) {}
 
   ngAfterViewInit(): void {
@@ -71,23 +74,29 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   }
 
   private renderPins(): void {
+    this.pins.forEach(marker => marker.map = null);
+    this.pins = [];
+
     this.points.forEach((position, index) => {
       let color = 'blue';
       if (index === 0) color = 'darkgreen';
       else if (index === this.points.length - 1) color = 'red';
 
-      new google.maps.marker.AdvancedMarkerElement({
+      const marker = new google.maps.marker.AdvancedMarkerElement({
         map: this.map,
         position,
         title: `Point ${index + 1}`,
         content: this.createPin(color)
       });
+      this.pins.push(marker);
     });
   }
 
   private drawRoute(): void {
+    if (this.directionsRenderer) this.directionsRenderer.setMap(null);
+
     const directionsService = new google.maps.DirectionsService();
-    const directionsRenderer = new google.maps.DirectionsRenderer({ map: this.map, suppressMarkers: true });
+    this.directionsRenderer = new google.maps.DirectionsRenderer({ map: this.map, suppressMarkers: true });
 
     const start = this.points[0];
     const end = this.points[this.points.length - 1];
@@ -105,7 +114,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
       },
       (result, status) => {
         if (status === google.maps.DirectionsStatus.OK && result) {
-          directionsRenderer.setDirections(result);
+          this.directionsRenderer!.setDirections(result);
           this.animateAlongRoute(result);
         } else {
           console.error('Directions request failed due to ' + status);
@@ -113,6 +122,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
       }
     );
   }
+
 
   private animateAlongRoute(result: google.maps.DirectionsResult): void {
     this.path = [];
@@ -224,5 +234,13 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
       next: res => console.warn('rate ✅', res),
       error: err => console.error('rate ❌', err)
     });
+  }
+
+  addStopover() {
+    const newPoint = { lat: 53.5511, lng: 9.9937 };
+    this.points.splice(1, 0, newPoint);
+
+    this.renderPins();
+    this.drawRoute();
   }
 }
