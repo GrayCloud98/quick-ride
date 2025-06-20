@@ -20,5 +20,4 @@ public interface RideOfferRepository extends JpaRepository<RideOffer, Long> {
     Optional<RideOffer> findFirstByDriverAndRideStatus(Driver driver, RideStatus rideStatus);
 
 
-
 }

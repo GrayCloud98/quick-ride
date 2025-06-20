@@ -57,6 +57,14 @@ public class RideRequestService {
             throw new IllegalStateException("Customer already has an active or in-progress ride request.");
         }
 
+        long estimatedPriceCents = Math.round(dto.getEstimatedPrice() * 100);
+        long walletBalanceCents = customer.getWallet().getBalanceCents();
+
+        if (walletBalanceCents < estimatedPriceCents) {
+            throw new IllegalStateException("Customer does not have enough funds for this ride. " +
+                    "Available: " + (walletBalanceCents / 100.0) + "€, Required: " + dto.getEstimatedPrice() + "€");
+        }
+
         RideRequest request = new RideRequest(
                 customer,
                 dto.getStartAddress(),
