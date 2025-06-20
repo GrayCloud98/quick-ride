@@ -2,12 +2,12 @@ import {AfterViewInit, Component, ElementRef, OnDestroy, ViewChild} from '@angul
 import {Control, SimService, Update} from '../sim.service';
 
 @Component({
-  selector: 'simulation',
+  selector: 'view-page',
   standalone: false,
-  templateUrl: './simulation.component.html',
-  styleUrl: './simulation.component.scss'
+  templateUrl: './view-page.component.html',
+  styleUrl: './view-page.component.scss'
 })
-export class SimulationComponent implements AfterViewInit, OnDestroy {
+export class ViewPageComponent implements AfterViewInit, OnDestroy {
   @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef;
   map!: google.maps.Map;
   pointer!: google.maps.marker.AdvancedMarkerElement;

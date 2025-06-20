@@ -31,14 +31,11 @@ import { ProfilePageComponent } from './profile-page/profile-page.component';
 import {MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
 import {MatCard, MatCardActions, MatCardContent, MatCardHeader} from '@angular/material/card';
 import { GoogleMapsModule } from '@angular/google-maps';
-import { RideSimulationComponent } from './simulation/ride-simulation/ride-simulation.component';
-import { RideRatingDialogComponent } from './simulation/ride-rating-dialog/ride-rating-dialog.component';
 import { WalletPageComponent } from './profile-page/wallet-page/wallet-page.component';
 import { MatSortModule } from '@angular/material/sort';
-import {SimulationService} from './simulation/simulation.service';
 import {MatSlider, MatSliderModule} from '@angular/material/slider';
-import { SimulationComponent } from './sim/simulation/simulation.component';
-import {SimService} from './sim/sim.service';
+import { ViewPageComponent } from './simulation/view-page/view-page.component';
+import {SimService} from './simulation/sim.service';
 
 
 @NgModule({
@@ -48,10 +45,8 @@ import {SimService} from './sim/sim.service';
     AppComponent,
     RegisterComponent,
     TwoFaComponent,
-    RideSimulationComponent,
-    RideRatingDialogComponent,
     WalletPageComponent,
-    SimulationComponent
+    ViewPageComponent
   ],
   imports: [
     MatSortModule,
@@ -106,7 +101,6 @@ import {SimService} from './sim/sim.service';
   providers: [
     provideHttpClient(withInterceptorsFromDi()),
     provideNativeDateAdapter(),
-    SimulationService,
     SimService
   ],
 

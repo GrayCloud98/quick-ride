@@ -7,13 +7,13 @@ import { WalletPageComponent } from './profile-page/wallet-page/wallet-page.comp
 import { RegisterComponent } from './auth/register/register.component';
 import {UserNotFoundComponent} from './shared/components/user-not-found/user-not-found.component';
 import {RidehistoryComponent} from './shared/components/ridehistory/ridehistory.component';
-import {SimulationComponent} from './sim/simulation/simulation.component';
+import {ViewPageComponent} from './simulation/view-page/view-page.component';
 
 const routes: Routes = [
   { path: 'ride', loadChildren: () => RideRoutingModule },
   { path: 'register', component: RegisterComponent },
   { path: 'two-factor', component: TwoFaComponent },
-  { path: 'simulation', component: SimulationComponent },
+  { path: 'simulation', component: ViewPageComponent },
   { path: 'wallet', component: WalletPageComponent },
   { path: 'user-not-found', component: UserNotFoundComponent },
   { path: 'history', component:RidehistoryComponent},

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RideSimulationComponent } from './ride-simulation.component';
+import { ViewPageComponent } from './view-page.component';
 
-describe('RideSimulationComponent', () => {
-  let component: RideSimulationComponent;
-  let fixture: ComponentFixture<RideSimulationComponent>;
+describe('SimulationComponent', () => {
+  let component: ViewPageComponent;
+  let fixture: ComponentFixture<ViewPageComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [RideSimulationComponent]
+      declarations: [ViewPageComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(RideSimulationComponent);
+    fixture = TestBed.createComponent(ViewPageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
