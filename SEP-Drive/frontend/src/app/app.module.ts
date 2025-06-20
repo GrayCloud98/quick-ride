@@ -36,6 +36,7 @@ import { MatSortModule } from '@angular/material/sort';
 import {MatSlider, MatSliderModule} from '@angular/material/slider';
 import { SimulationComponent } from './simulation/simulation-page/simulation.component';
 import {SimulationService} from './simulation/simulation.service';
+import { RatingPopupComponent } from './simulation/rating-popup/rating-popup.component';
 
 
 @NgModule({
@@ -46,7 +47,8 @@ import {SimulationService} from './simulation/simulation.service';
     RegisterComponent,
     TwoFaComponent,
     WalletPageComponent,
-    SimulationComponent
+    SimulationComponent,
+    RatingPopupComponent
   ],
   imports: [
     MatSortModule,

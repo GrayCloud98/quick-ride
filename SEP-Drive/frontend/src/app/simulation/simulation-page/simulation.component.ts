@@ -1,5 +1,7 @@
 import {AfterViewInit, Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
 import {Control, SimulationService, Update} from '../simulation.service';
+import {MatDialog} from '@angular/material/dialog';
+import {RatingPopupComponent} from '../rating-popup/rating-popup.component';
 
 @Component({
   selector: 'simulation-page',
@@ -24,7 +26,8 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   private pins: google.maps.marker.AdvancedMarkerElement[] = [];
   private directionsRenderer?: google.maps.DirectionsRenderer;
 
-  constructor(private simService: SimulationService) {}
+  constructor(private dialog: MatDialog,
+              private simService: SimulationService) {}
 
   ngAfterViewInit(): void {
     this.simService.connect();
@@ -242,5 +245,17 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
 
     this.renderPins();
     this.drawRoute();
+  }
+
+  openRating() {
+    const dialogRef = this.dialog.open(RatingPopupComponent, {
+      disableClose: true,
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === 'submitted') { // use result rating-popup.component.ts.(onSubmit)
+        console.log('User submitted the form.');
+      }
+    });
   }
 }
