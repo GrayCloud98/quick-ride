@@ -31,16 +31,26 @@
     (locationSelected)="onLocationSelected($event, updateType.dropoff)">
   </select-location>
 
-  <div class="form-label">Select a vehicle class:</div>
-  <mat-radio-group [(ngModel)]="ride.vehicleClass" name="vehicleClass" (change)="updateDistanceInfo()">
-    <mat-radio-button *ngFor="let car of vehicles" [value]="car">
-      {{ car }}
+  <div class="label">Select a vehicle class:</div>
+  <mat-radio-group
+    [(ngModel)]="ride.vehicleClass"
+    name="vehicleClass"
+    (change)="updateDistanceInfo()"
+    class="radio-group"
+  >
+    <mat-radio-button
+      *ngFor="let car of vehicles"
+      [value]="car"
+      class="radio"
+    >
+      <span class="value">{{ car }}</span>
     </mat-radio-button>
   </mat-radio-group>
+  <br>
 
   <div class="button-container">
-    <button mat-fab extended class="full-width" (click)="submit()" [disabled]="isFormInvalid">
-      Submit Ride Request
+    <button mat-fab extended class="btn" (click)="submit()" [disabled]="isFormInvalid">
+      Submit Request
     </button>
   </div>
 
