@@ -17,7 +17,8 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   path: google.maps.LatLngLiteral[] = [];
 
   currentIndex = 0;
-  points: google.maps.LatLngLiteral[] = [];
+  // points: google.maps.LatLngLiteral[] = []; // todo uncomment
+  points: google.maps.LatLngLiteral[] = [ { lat: 52.52, lng: 13.405 }, { lat: 53.5511, lng: 9.9937 }, { lat: 51.3397, lng: 12.3731 }, { lat: 48.1351, lng: 11.582 } ]; // todo delete
   duration = 30;
   isRunning = false;
   isPaused = false;
@@ -33,7 +34,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.simService.connect();
-
+    this.initializeMap(); // todo delete
     this.simService.getSimulationUpdates().subscribe(
       (update: Update) => {
         console.log("🎁", update);
@@ -239,15 +240,31 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     this.openRating();
   }
 
-  addStopover() {
-    const newPoint = { lat: 53.5511, lng: 9.9937 };
-    this.points.splice(1, 0, newPoint);
-
-    this.renderPins();
-    this.drawRoute();
-  }
-
   openRating() {
     this.dialog.open(RatingPopupComponent, { disableClose: true }).afterClosed().subscribe();
+  }
+
+  addStopover(newStopoverIndex: number) {
+    const newStopover = { lat: 50.9375, lng: 6.9603, passed: false };
+    const currentPosition = { lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true };
+
+    // Deep copy of this.points with passed = false
+    let updatedPoints = this.points.map(point => ({ ...point, passed: false }));
+
+    // Mark the first point as passed (assuming it's the start)
+    updatedPoints[0].passed = true;
+    let nextStopoverIndex = 1;
+
+    // Insert currentPosition and newStopover if index is valid
+    if (newStopoverIndex === nextStopoverIndex)
+      updatedPoints.splice(newStopoverIndex, 0, currentPosition, newStopover);
+    else
+      updatedPoints.splice(newStopoverIndex, 0, newStopover);
+
+
+    this.points = updatedPoints;
+    this.renderPins();
+    this.drawRoute();
+    console.log(updatedPoints);
   }
 }
