@@ -13,6 +13,9 @@ export interface Update {
   duration: number,
   startPoint: {lat: number, lng: number},
   endPoint: {lat: number, lng: number}
+  startLocationName: string,
+  destinationLocationName: string,
+  rideStatus: 'CREATED' | 'IN_PROGRESS' | 'COMPLETED'
 }
 export enum Control {
   FETCH = 'fetch',
@@ -55,13 +58,9 @@ export class SimulationService {
       });
     };
 
-    this.client.onStompError = (frame) => {
-      console.error('⚠️ STOMP Error:', frame);
-    };
+    this.client.onStompError = (frame) => console.error('⚠️ STOMP Error:', frame)
 
-    this.client.onWebSocketClose = () => {
-      console.warn('🚪 WebSocket closed');
-    };
+    this.client.onWebSocketClose = () => console.warn('🚪 WebSocket closed')
   }
 
   connect(): void {
@@ -71,7 +70,6 @@ export class SimulationService {
   async disconnect(): Promise<void> {
     try {
       await this.client.deactivate();
-      console.log('🛑 WebSocket disconnected cleanly');
     } catch (error) {
       console.error('⚠️ Error during WebSocket disconnection:', error);
     }

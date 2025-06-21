@@ -22,7 +22,7 @@
     <div class="header field">
       <mat-icon>star</mat-icon>
       <span class="label">Customer Rating:</span>
-      <span class="value">{{ request.customerRating }} </span>
+      <span class="value">{{ request.customerRating | number:'1.2-2' }} </span>
     </div>
 
     <div class="header field">

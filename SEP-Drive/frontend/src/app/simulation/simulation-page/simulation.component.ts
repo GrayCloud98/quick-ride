@@ -23,6 +23,8 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   isPaused = false;
   metadataLoaded = false;
 
+  hasCompleted = false;
+
   private pins: google.maps.marker.AdvancedMarkerElement[] = [];
   private directionsRenderer?: google.maps.DirectionsRenderer;
 
@@ -34,11 +36,16 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
 
     this.simService.getSimulationUpdates().subscribe(
       (update: Update) => {
-        console.log("🎁", update); // FIXME DELETE
+        console.log("🎁", update);
 
         this.duration = update.duration;
         this.currentIndex = update.currentIndex;
         this.points = [ update.startPoint, update.endPoint ];
+
+        if (update.rideStatus === 'COMPLETED' && !this.hasCompleted) {
+          this.complete();
+          return;
+        }
 
         if (update.hasStarted !== this.isRunning || update.paused !== this.isPaused) {
 
@@ -125,7 +132,6 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
       }
     );
   }
-
 
   private animateAlongRoute(result: google.maps.DirectionsResult): void {
     this.path = [];
@@ -223,20 +229,15 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   }
 
   complete(): void {
+    if (this.hasCompleted) return;
+    this.hasCompleted = true;
+
     this.simService.control(Control.COMPLETE);
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;
     }
-  }
-
-  protected readonly console = console;
-
-  rate(rate: number) {
-    this.simService.rate(rate).subscribe({
-      next: res => console.warn('rate ✅', res),
-      error: err => console.error('rate ❌', err)
-    });
+    this.openRating();
   }
 
   addStopover() {
@@ -248,12 +249,6 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   }
 
   openRating() {
-    this.dialog.open(RatingPopupComponent, { disableClose: true })
-      .afterClosed()
-      .subscribe(rating => {
-        if (rating) {
-          console.log('User selected rating:', rating);
-        }
-      });
+    this.dialog.open(RatingPopupComponent, { disableClose: true }).afterClosed().subscribe();
   }
 }
