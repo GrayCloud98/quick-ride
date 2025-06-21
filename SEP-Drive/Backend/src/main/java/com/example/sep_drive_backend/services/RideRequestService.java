@@ -409,8 +409,8 @@ public class RideRequestService {
                         dto.setCustomerUsername(request.getCustomer().getUsername());
                         dto.setFees(request.getEstimatedPrice());
                         dto.setEndTime(request.getEndedAt());
-                        dto.setDriverRating(request.getDriverRating());
-                        dto.setCustomerRating(request.getCustomerRating());
+                        dto.setDriverRating(request.getCustomerRating());
+                        dto.setCustomerRating(request.getDriverRating());
                         dto.setDriverUsername(offer.getDriver().getUsername());
                         dto.setDriverName(offer.getDriver().getFirstName() + " " + offer.getDriver().getLastName());
                         return dto;
@@ -434,8 +434,8 @@ public class RideRequestService {
                         dto.setCustomerUsername(request.getCustomer().getUsername());
                         dto.setFees(request.getEstimatedPrice());
                         dto.setEndTime(request.getEndedAt());
-                        dto.setDriverRating(request.getDriverRating());
-                        dto.setCustomerRating(request.getCustomerRating());
+                        dto.setDriverRating(request.getCustomerRating());
+                        dto.setCustomerRating(request.getDriverRating());
 
                         Optional<RideOffer> offerOpt = rideOfferRepository.findByRideRequestId(request.getId());
                         if (offerOpt.isPresent() && offerOpt.get().getRideStatus() == RideStatus.COMPLETED) {
