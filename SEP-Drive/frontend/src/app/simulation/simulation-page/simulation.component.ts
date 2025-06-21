@@ -3,6 +3,14 @@ import {Control, SimulationService, Update} from '../simulation.service';
 import {MatDialog} from '@angular/material/dialog';
 import {RatingPopupComponent} from '../rating-popup/rating-popup.component';
 
+interface Point{
+  lat: number,
+  lng: number,
+  index: number,
+  passed: boolean,
+  name?: string,
+  address?: string
+}
 @Component({
   selector: 'simulation-page',
   standalone: false,
@@ -18,13 +26,14 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
 
   currentIndex = 0;
   // points: google.maps.LatLngLiteral[] = []; // todo uncomment
-  points: google.maps.LatLngLiteral[] = [ { lat: 52.52, lng: 13.405 }, { lat: 53.5511, lng: 9.9937 }, { lat: 51.3397, lng: 12.3731 }, { lat: 48.1351, lng: 11.582 } ]; // todo delete
-  duration = 30;
+  points: Point[] = [ { lat: 52.52, lng: 13.405, passed: true, index: 0 }, { lat: 53.5511, lng: 9.9937, passed: false, index: 0 }, { lat: 51.3397, lng: 12.3731, passed: false, index: 0 }, { lat: 48.1351, lng: 11.582, passed: false, index: 0 } ];  duration = 30;
   isRunning = false;
   isPaused = false;
   metadataLoaded = false;
 
   hasCompleted = false;
+
+  nextStopoverIndex = 1;
 
   private pins: google.maps.marker.AdvancedMarkerElement[] = [];
   private directionsRenderer?: google.maps.DirectionsRenderer;
@@ -41,7 +50,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
 
         this.duration = update.duration;
         this.currentIndex = update.currentIndex;
-        this.points = [ update.startPoint, update.endPoint ];
+        // this.points = [ update.startPoint, update.endPoint ]; //todo uncomment
 
         if (update.rideStatus === 'COMPLETED' && !this.hasCompleted) {
           this.complete();
@@ -148,6 +157,8 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
       }
     }
 
+    this.assignStopoverIndices();
+
     this.pointer = new google.maps.marker.AdvancedMarkerElement({
       position: this.path[this.currentIndex],
       map: this.map,
@@ -158,7 +169,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
 
   private animate(): void {
     const totalSteps = this.path.length;
-    const totalDurationMs = this.duration * 1000; // duration in milliseconds
+    const totalDurationMs = this.duration * 1000;
     const startTime = performance.now();
     const startIndex = this.currentIndex;
 
@@ -170,6 +181,15 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
 
       this.currentIndex = Math.floor(startIndex + totalSteps * progressRatio);
       this.pointer.position = this.path[Math.min(this.currentIndex, totalSteps - 1)];
+
+      this.points.forEach(
+        point => {
+          if (!point.passed && this.currentIndex >= point.index) {
+            point.passed = true;
+            this.nextStopoverIndex += 1;
+          }
+        }
+      );
 
       if (this.currentIndex >= totalSteps - 1) {
         this.pointer.position = this.path[totalSteps - 1];
@@ -245,26 +265,37 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   }
 
   addStopover(newStopoverIndex: number) {
-    const newStopover = { lat: 50.9375, lng: 6.9603, passed: false };
-    const currentPosition = { lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true };
+    const newStopover: Point = {
+      lat: 50.9375, lng: 6.9603, passed: false,
+      index: 0
+    }; // todo dynamic newStopover
+    const currentPoint: Point = {
+      lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex
+    };
 
-    // Deep copy of this.points with passed = false
-    let updatedPoints = this.points.map(point => ({ ...point, passed: false }));
-
-    // Mark the first point as passed (assuming it's the start)
-    updatedPoints[0].passed = true;
-    let nextStopoverIndex = 1;
-
-    // Insert currentPosition and newStopover if index is valid
-    if (newStopoverIndex === nextStopoverIndex)
-      updatedPoints.splice(newStopoverIndex, 0, currentPosition, newStopover);
+    if (newStopoverIndex === this.nextStopoverIndex)
+      this.points.splice(newStopoverIndex, 0, currentPoint, newStopover);
     else
-      updatedPoints.splice(newStopoverIndex, 0, newStopover);
+      this.points.splice(newStopoverIndex, 0, newStopover);
 
-
-    this.points = updatedPoints;
     this.renderPins();
     this.drawRoute();
-    console.log(updatedPoints);
+  }
+
+  protected readonly console = console; // todo delete me
+
+  assignStopoverIndices() {
+    this.points.forEach(point => {
+      let closestIndex = 0;
+      let minDist = Number.MAX_VALUE;
+      this.path.forEach((p, i) => {
+        const dist = Math.hypot(p.lat - point.lat, p.lng - point.lng);
+        if (dist < minDist) {
+          minDist = dist;
+          closestIndex = i;
+        }
+      });
+      point.index = closestIndex;
+    });
   }
 }
