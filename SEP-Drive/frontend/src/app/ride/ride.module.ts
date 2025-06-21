@@ -57,7 +57,9 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     OfferService
   ],
   exports: [
-    NotificationComponent
+    NotificationComponent,
+    SelectLocationComponent,
+    LocationCardComponent
   ]
 })
 export class RideModule {

@@ -9,39 +9,39 @@ import {OfferState} from '../../models/offer.model';
 import {DistanceService} from '../../services/distance.service';
 
 interface SortOption {
-key: keyof Request,
-label: string
+  key: keyof Request,
+  label: string
 }
 @Component({
-selector: 'requests-list',
-standalone: false,
-templateUrl: './available-rides-page.component.html',
-styleUrl: './available-rides-page.component.scss'
+  selector: 'requests-list',
+  standalone: false,
+  templateUrl: './available-rides-page.component.html',
+  styleUrl: './available-rides-page.component.scss'
 })
 export class AvailableRidesPageComponent implements OnInit {
-accessAllowed: boolean = false;
-username: string = '';
+  accessAllowed: boolean = false;
+  username: string = '';
 
-currentPositionControl = new FormControl<Location | string>('', [Validators.required]);
-currentPosition!: Location;
-positionSet = false;
+  currentPositionControl = new FormControl<Location | string>('', [Validators.required]);
+  currentPosition!: Location;
+  positionSet = false;
 
-allActiveRequests: Request[] = [];
-sortOptions: SortOption[] = [
-{ key: 'driverToPickupDistance', label: 'Distance to Pickup' },
-{ key: 'desiredVehicleClass', label: 'Requested Vehicle Type' },
-{ key: 'customerName', label: 'Customer Name' },
-{ key: 'customerRating', label: 'Customer Rating' },
-{ key: 'createdAt', label: 'Request Time' },
-{ key: 'requestID', label: 'Request ID' },
-];
+  allActiveRequests: Request[] = [];
+  sortOptions: SortOption[] = [
+  { key: 'driverToPickupDistance', label: 'Distance to Pickup' },
+  { key: 'desiredVehicleClass', label: 'Requested Vehicle Type' },
+  { key: 'customerName', label: 'Customer Name' },
+  { key: 'customerRating', label: 'Customer Rating' },
+  { key: 'createdAt', label: 'Request Time' },
+  { key: 'requestID', label: 'Request ID' },
+  ];
 
-offerState = OfferState.NONE;
-requestIdOfOffer: number | null = null;
+  offerState = OfferState.NONE;
+  requestIdOfOffer: number | null = null;
 
-constructor(private offerService: OfferService,
-              private authService: AuthService,
-              private distanceService: DistanceService,) {
+  constructor(private offerService: OfferService,
+                private authService: AuthService,
+                private distanceService: DistanceService,) {
   }
 
   onLocationSelected(pos: Location) {

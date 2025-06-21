@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 
 import {Observable, of} from 'rxjs';
@@ -15,12 +15,16 @@ import {Location} from '../../models/location.model';
   templateUrl: './select-location.component.html',
   styleUrls: ['./select-location.component.scss']
 })
-export class SelectLocationComponent implements OnInit {
+export class SelectLocationComponent implements OnInit, OnChanges {
   @Input() label: string = '';
   @Input() placeholder: string = '';
   @Input() control!: FormControl;
   @Input() geoLocationButton: boolean = false;
   @Output() locationSelected = new EventEmitter<Location>();
+
+  @Input() min?: number;
+  @Input() max?: number;
+  @Input() current?: number;
 
   manualMode = false;
   latitude = new FormControl<number | null>(null, [
@@ -41,6 +45,11 @@ export class SelectLocationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.isDisabled)
+      this.control.disable();
+    else
+      this.control.enable();
+
     this.filteredLocations = this.control.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged(),
@@ -48,6 +57,7 @@ export class SelectLocationComponent implements OnInit {
       switchMap(query => this.onSearch(query))
     );
   }
+
 
   onSearch(query: string): Observable<Location[]> {
     if (!query.trim()) return of([]);
@@ -86,5 +96,22 @@ export class SelectLocationComponent implements OnInit {
       this.locationSelected.emit(loc);
       this.manualMode = false;
     }
+  }
+
+  ngOnChanges(): void {
+    if (this.control) {
+      if (this.isDisabled)
+        this.control.disable({ emitEvent: false });
+      else
+        this.control.enable({ emitEvent: false });
+    }
+  }
+
+
+  get isDisabled(): boolean {
+    if (this.current == null || this.min == null || this.max == null) {
+      return false;
+    }
+    return this.current < this.min || this.current > this.max;
   }
 }
