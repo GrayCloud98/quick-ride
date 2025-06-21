@@ -21,35 +21,25 @@ export interface TripHistoryDTO {
   providedIn: 'root'
 })
 export class RideHistoryService {
-  private apiUrl = 'http://localhost:8080/api/trips/history';
+  private apiUrl = 'http://localhost:8080/api/ride-requests/history';
 
-  constructor(private http: HttpClient) {
-  }
+  constructor(private http: HttpClient) {}
 
   getTripHistory(): Observable<TripHistoryDTO[]> {
     return this.http.get<TripHistoryDTO[]>(this.apiUrl).pipe(
-      map((rides: any[]) => {
-        const seen = new Set();
-        return rides
-          .map((ride: any) => ({
-            id: ride.tripId,
-            date: ride.endTime,
-            distance: ride.distanceKm,
-            duration: ride.durationMin,
-            amount: ride.priceEuro,
-            customerRating: ride.customerRating,
-            driverRating: ride.driverRating,
-            customerName: ride.customerFullName,
-            customerUsername: ride.customerUsername,
-            driverName: ride.driverFullName,
-            driverUsername: ride.driverUsername
-          }))
-          .filter(ride => {
-            if (seen.has(ride.distance)) return false;
-            seen.add(ride.distance);
-            return true;
-          });
-      })
+      map((rides: any[]) => rides.map((ride: any) => ({
+        id: ride.rideId,
+        date: ride.endTime,
+        distance: ride.distance,
+        duration: ride.duration,
+        amount: ride.fees,
+        customerRating: ride.customerRating,
+        driverRating: ride.driverRating,
+        customerName: ride.customerName,
+        customerUsername: ride.customerUsername,
+        driverName: ride.driverName,
+        driverUsername: ride.driverUsername
+      })))
     );
   }
 }
