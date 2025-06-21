@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Client, IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import {Observable, Subject, switchMap} from 'rxjs';
+import {BehaviorSubject, Observable, Subject, switchMap} from 'rxjs';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {AuthService} from '../auth/auth.service';
 
@@ -112,5 +112,19 @@ export class SimulationService {
         }
       )
     );
+  }
+
+  private activeSimulationStatus = new BehaviorSubject<boolean>(false);
+  public activeSimulationStatus$ = this.activeSimulationStatus.asObservable();
+
+  public userHasActiveSimulation(): Observable<boolean> {
+    return this.http.get<boolean>(`${this.baseUrl}/has-active-sim`);
+  }
+
+  updateActiveSimulationStatus(): void {
+    this.userHasActiveSimulation().subscribe({
+      next: status => this.activeSimulationStatus.next(status),
+      error: err => console.error(err)
+    });
   }
 }
