@@ -2,14 +2,16 @@ import {AfterViewInit, Component, ElementRef, OnDestroy, ViewChild} from '@angul
 import {Control, SimulationService, Update} from '../simulation.service';
 import {MatDialog} from '@angular/material/dialog';
 import {RatingPopupComponent} from '../rating-popup/rating-popup.component';
+import {FormControl, Validators} from '@angular/forms';
+import {Location} from '../../ride/models/location.model';
 
 interface Point{
+  name?: string,
+  address?: string,
   lat: number,
   lng: number,
   index: number,
-  passed: boolean,
-  name?: string,
-  address?: string
+  passed: boolean
 }
 @Component({
   selector: 'simulation-page',
@@ -113,7 +115,10 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   }
 
   private drawRoute(): void {
-    if (this.directionsRenderer) this.directionsRenderer.setMap(null);
+    if (this.directionsRenderer) {
+      this.directionsRenderer.setMap(null);
+      this.pointer.map = null;
+    }
 
     const directionsService = new google.maps.DirectionsService();
     this.directionsRenderer = new google.maps.DirectionsRenderer({ map: this.map, suppressMarkers: true });
@@ -264,11 +269,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     this.dialog.open(RatingPopupComponent, { disableClose: true }).afterClosed().subscribe();
   }
 
-  addStopover(newStopoverIndex: number) {
-    const newStopover: Point = {
-      lat: 50.9375, lng: 6.9603, passed: false,
-      index: 0
-    }; // todo dynamic newStopover
+  addStopover(newStopoverIndex: number, newStopover: Point) {
     const currentPoint: Point = {
       lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex
     };
@@ -297,5 +298,12 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
       });
       point.index = closestIndex;
     });
+  }
+
+  newStopoverControl = new FormControl<Location | string>('', [Validators.required]);
+  onLocationSelected(loc: Location) {
+    this.newStopoverControl.setValue(loc);
+    let newPoint: Point = { address: loc.address, index: 0, lat: loc.latitude, lng: loc.longitude, name: loc.name, passed: false }
+    this.addStopover(2, newPoint);
   }
 }

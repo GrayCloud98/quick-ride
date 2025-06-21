@@ -1,5 +1,14 @@
 <div class="main-container">
   <div class="left-container">
+    <select-location
+      [label]="'I want to stop by ...'"
+      [placeholder]="'Train Station'"
+      [control]="newStopoverControl"
+      [geoLocationButton]="true"
+      (locationSelected)="onLocationSelected($event)"
+    >
+    </select-location>
+
     <mat-card appearance="outlined" class="card big">
       <mat-card-content>
         <div class="header field">
@@ -29,8 +38,6 @@
     </div>
 
     <!--TODO DELETE -->
-    <button (click)="addStopover(2)">addStopover curr + new</button>
-    <button (click)="addStopover(3)">addStopover new</button>
     <button (click)="console.log(points)">points</button>
     <!--end delete-->
   </div>
