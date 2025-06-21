@@ -45,21 +45,17 @@
         </mat-card-content>
       </mat-card>
 
-      <div class="button-container">
+      <div class="button-container gap">
         <button *ngIf="!isRunning" class="btn" mat-fab extended (click)="start()">Start</button>
-        <div *ngIf="isRunning" class="button-container">
-          <button *ngIf="isPaused" class="btn" mat-fab extended (click)="resume()">Resume</button>
-          <button *ngIf="!isPaused" class="btn" mat-fab extended (click)="pause()">Pause</button>
-          <button *ngIf="isRunning" class="btn warn" mat-fab extended (click)="complete()" [disabled]="!isPaused">Complete</button>
-        </div>
+        <button *ngIf="isRunning && isPaused" class="btn" mat-fab extended (click)="resume()">Resume</button>
+        <button *ngIf="isRunning && !isPaused" class="btn" mat-fab extended (click)="pause()">Pause</button>
+        <button *ngIf="isRunning" class="btn warn" mat-fab extended (click)="complete()" [disabled]="!isPaused">Complete</button>
       </div>
 
       <!--TODO DELETE -->
       <button (click)="console.log(points)">points</button>
       <!--end delete-->
     </div>
-
-    __________
 
     <div class="scroll">
       <div *ngFor="let point of points; let i = index">

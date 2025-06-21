@@ -20,6 +20,20 @@
   gap: 20px;
 }
 
+.stopover-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stopover-index-field {
+  flex: 0 0 70px;
+}
+
+.stopover-location-select {
+  flex: 1;
+}
+
 .left-container {
   display: flex;
   flex-direction: column;
@@ -34,6 +48,7 @@
   }
 
   .scroll {
+    border-top: 1px solid #e0e0e0;
     scrollbar-width: none;
     display: flex;
     flex-direction: column;
@@ -41,20 +56,6 @@
     flex: 1 1 auto;
     overflow-y: auto;
     min-height: 0;
-    padding: 20px;
+    padding: 20px 20px 36px 20px;
   }
-}
-
-.stopover-row {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.stopover-index-field {
-  flex: 0 0 70px;
-}
-
-.stopover-location-select {
-  flex: 1;
 }
