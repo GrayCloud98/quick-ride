@@ -172,7 +172,6 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
 
       if (this.currentIndex >= totalSteps - 1) {
         this.pointer.position = this.path[totalSteps - 1];
-        this.isRunning = false;
         return;
       }
 

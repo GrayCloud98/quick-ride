@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {MatDialogRef} from '@angular/material/dialog';
 import {SimulationService} from '../simulation.service';
 import {AuthService} from '../../auth/auth.service';
+import {RideRequestService} from '../../ride/services/ride-request.service';
 
 @Component({
   selector: 'rating-popup',
@@ -11,6 +12,7 @@ import {AuthService} from '../../auth/auth.service';
 })
 export class RatingPopupComponent implements OnInit {
   constructor(private authService: AuthService,
+              private rideService: RideRequestService,
               private simService: SimulationService,
               private dialogRef: MatDialogRef<RatingPopupComponent>) {}
 
@@ -39,7 +41,11 @@ export class RatingPopupComponent implements OnInit {
 
   onSubmit() {
     this.simService.rate(this.rating).subscribe({
-      next: () => this.dialogRef.close(this.rating),
+      next: () => {
+        this.dialogRef.close(this.rating)
+        this.rideService.updateActiveRideStatus();
+        this.simService.updateActiveSimulationStatus();
+      },
       error: err => console.error('Rating failed:', err)
     });
   }

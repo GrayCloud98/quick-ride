@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 
 import { NotificationService } from '../../services/notification.service';
 import { AuthService } from '../../../auth/auth.service';
+import {SimulationService} from '../../../simulation/simulation.service';
+import {RideRequestService} from '../../services/ride-request.service';
 
 @Component({
   selector: 'app-notification',
@@ -13,7 +15,9 @@ import { AuthService } from '../../../auth/auth.service';
 export class NotificationComponent implements OnInit {
   constructor(
     private authService: AuthService,
-    private notificationService: NotificationService,
+    private rideService: RideRequestService,
+    private notiService: NotificationService,
+    private simService: SimulationService,
     private router: Router,
     private snackBar: MatSnackBar
   ) {}
@@ -28,11 +32,11 @@ export class NotificationComponent implements OnInit {
   }
 
   private subscribeToNotifications(username: string) {
-    this.notificationService.subscribe(username);
+    this.notiService.subscribe(username);
   }
 
   private registerCustomerNotificationHandler() {
-    this.notificationService.setCustomerCallback((message) => {
+    this.notiService.setCustomerCallback((message) => {
       let action = 'Close';
       let route: string | null = null;
 
@@ -49,14 +53,15 @@ export class NotificationComponent implements OnInit {
   }
 
   private registerDriverNotificationHandler() {
-    this.notificationService.setDriverCallback((message) => {
+    this.notiService.setDriverCallback((message) => {
       let action = 'Close';
       let route: string | null = null;
 
       switch (message.type) {
         case 'acceptance':
-          action = 'View Simulation';
-          route = '/simulation';
+          this.rideService.updateActiveRideStatus();
+          this.simService.updateActiveSimulationStatus();
+          void this.router.navigate(['/simulation']);
           break;
         case 'rejection':
           action = 'View Requests';

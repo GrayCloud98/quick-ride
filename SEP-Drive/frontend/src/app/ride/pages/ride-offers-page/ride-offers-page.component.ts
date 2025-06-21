@@ -5,6 +5,7 @@ import {Offer} from '../../models/offer.model';
 import {filter, switchMap, tap} from 'rxjs';
 import {RideRequestService} from '../../services/ride-request.service';
 import {Router} from '@angular/router';
+import {SimulationService} from '../../../simulation/simulation.service';
 
 interface SortOption {
 key: keyof Offer,
@@ -32,11 +33,16 @@ sortOptions: SortOption[] = [
 constructor(private authService: AuthService,
               private rideService: RideRequestService,
               private offerService: OfferService,
+              private simService: SimulationService,
               private router: Router) {}
 
   acceptOffer(offerID: number) {
     this.offerService.customerAcceptOffer(offerID).subscribe({
-      next: () => void this.router.navigate(['/simulation']),
+      next: () => {
+        this.rideService.updateActiveRideStatus();
+        this.simService.updateActiveSimulationStatus();
+        void this.router.navigate(['/simulation'])
+      },
       error: err => console.error(err)
     });
   }
