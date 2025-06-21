@@ -18,19 +18,24 @@
 .button-container {
   flex-direction: column;
   gap: 20px;
-
-  .row-btn {
-    display: flex;
-    gap: 10px;
-
-    .btn {
-      flex: 1;
-    }
-  }
 }
 
 .left-container {
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.stopover-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem; // Adjust spacing as needed
+}
+
+.stopover-index-field {
+  flex: 0 0 70px;
+}
+
+.stopover-location-select {
+  flex: 1;
 }
