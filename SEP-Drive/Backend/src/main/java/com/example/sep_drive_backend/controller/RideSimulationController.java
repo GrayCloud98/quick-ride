@@ -78,6 +78,7 @@ public class RideSimulationController {
         broadcastUpdate(sim);
     }
 
+    @Transactional
     @MessageMapping("/simulation/complete")
     public void completeSimulation(@Payload SimulationControlMessage msg) {
         Optional<RideSimulation> optionalSim = rideSimulationRepository.findById(msg.getRideSimulationId());
@@ -86,6 +87,10 @@ public class RideSimulationController {
         }
 
         RideSimulation simulation = optionalSim.get();
+        if (simulation.getRideStatus() == RideStatus.COMPLETED) {
+            return;
+        }
+
         simulation.setRideStatus(RideStatus.COMPLETED);
         simulation.getRideOffer().setRideStatus(RideStatus.COMPLETED);
         simulation.getRideOffer().getRideRequest().setRideStatus(RideStatus.COMPLETED);
