@@ -1,67 +1,73 @@
 <div class="main-container">
-  <div class="left-container scroll">
+  <div class="left-container">
 
-    <div class="stopover-row">
-      <mat-form-field appearance="fill" class="stopover-index-field">
-        <mat-label>#</mat-label>
-        <input matInput type="number"
-               [step]="1"
-               [(ngModel)]="desiredStopoverIndex"
-               [min]="nextStopoverIndex"
-               [max]="points.length"
-               required>
-      </mat-form-field>
+    <div class="fix">
+      <div class="stopover-row">
+        <mat-form-field appearance="fill" class="stopover-index-field">
+          <mat-label>#</mat-label>
+          <input matInput type="number"
+                 [step]="1"
+                 [(ngModel)]="desiredStopoverIndex"
+                 [min]="nextStopoverIndex"
+                 [max]="points.length"
+                 required>
+        </mat-form-field>
 
-      <select-location
-        class="stopover-location-select"
-        [label]="'I want to stop by ...'"
-        [placeholder]="'Train Station'"
-        [control]="newStopoverControl"
-        [geoLocationButton]="true"
-        (locationSelected)="onLocationSelected($event)"
-        [min]="nextStopoverIndex"
-        [max]="points.length"
-        [current]="desiredStopoverIndex">
-      </select-location>
-    </div>
-
-    <mat-card appearance="outlined" class="card big">
-      <mat-card-content>
-        <div class="header field">
-          <mat-icon>flash_on</mat-icon>
-          <span class="label">Simulation Duration:</span>
-          <span class="value bold">{{ duration }} seconds</span>
-        </div>
-
-        <input style="width: 100%;"
-               type="range"
-               min="3"
-               max="30"
-               (change)="speed()"
-               [(ngModel)]="duration"
-               [disabled]="!isPaused"
-        />
-      </mat-card-content>
-    </mat-card>
-
-    <div class="button-container">
-      <button *ngIf="!isRunning" class="btn" mat-fab extended (click)="start()">Start</button>
-      <div *ngIf="isRunning" class="button-container">
-        <button *ngIf="isPaused" class="btn" mat-fab extended (click)="resume()">Resume</button>
-        <button *ngIf="!isPaused" class="btn" mat-fab extended (click)="pause()">Pause</button>
-        <button *ngIf="isRunning" class="btn warn" mat-fab extended (click)="complete()" [disabled]="!isPaused">Complete</button>
+        <select-location
+          class="stopover-location-select"
+          [label]="'I want to stop by ...'"
+          [placeholder]="'Train Station'"
+          [control]="newStopoverControl"
+          [geoLocationButton]="true"
+          (locationSelected)="onLocationSelected($event)"
+          [min]="nextStopoverIndex"
+          [max]="points.length"
+          [current]="desiredStopoverIndex">
+        </select-location>
       </div>
+
+      <mat-card appearance="outlined" class="card big">
+        <mat-card-content>
+          <div class="header field">
+            <mat-icon>flash_on</mat-icon>
+            <span class="label">Simulation Duration:</span>
+            <span class="value bold">{{ duration }} seconds</span>
+          </div>
+
+          <input style="width: 100%;"
+                 type="range"
+                 min="3"
+                 max="30"
+                 (change)="speed()"
+                 [(ngModel)]="duration"
+                 [disabled]="!isPaused"
+          />
+        </mat-card-content>
+      </mat-card>
+
+      <div class="button-container">
+        <button *ngIf="!isRunning" class="btn" mat-fab extended (click)="start()">Start</button>
+        <div *ngIf="isRunning" class="button-container">
+          <button *ngIf="isPaused" class="btn" mat-fab extended (click)="resume()">Resume</button>
+          <button *ngIf="!isPaused" class="btn" mat-fab extended (click)="pause()">Pause</button>
+          <button *ngIf="isRunning" class="btn warn" mat-fab extended (click)="complete()" [disabled]="!isPaused">Complete</button>
+        </div>
+      </div>
+
+      <!--TODO DELETE -->
+      <button (click)="console.log(points)">points</button>
+      <!--end delete-->
     </div>
 
-    <!--TODO DELETE -->
-    <button (click)="console.log(points)">points</button>
-    <!--end delete-->
+    __________
 
-    <div *ngFor="let point of points; let i = index">
-      <app-location-card
-        [location]="{ latitude: point.lat, longitude: point.lng, name: point.name, address: point.address }"
-        [label]="i === 0 ? 'Pick up' : i === points.length - 1 ? 'Drop off' : 'Stopover ' + i">
-      </app-location-card>
+    <div class="scroll">
+      <div *ngFor="let point of points; let i = index">
+        <app-location-card
+          [location]="{ latitude: point.lat, longitude: point.lng, name: point.name, address: point.address }"
+          [label]="i === 0 ? 'Pick up' : i === points.length - 1 ? 'Drop off' : 'Stopover ' + i">
+        </app-location-card>
+      </div>
     </div>
   </div>
 
