@@ -239,14 +239,6 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     this.openRating();
   }
 
-  addStopover() {
-    const newPoint = { lat: 53.5511, lng: 9.9937 };
-    this.points.splice(1, 0, newPoint);
-
-    this.renderPins();
-    this.drawRoute();
-  }
-
   openRating() {
     this.dialog.open(RatingPopupComponent, { disableClose: true }).afterClosed().subscribe();
   }
