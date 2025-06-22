@@ -2,6 +2,13 @@
   <div class="header">
     <mat-icon>location_on</mat-icon>
     <span class="label">{{ label }}</span>
+    <span class="spacer"></span>
+    <button mat-icon-button *ngIf="removable"
+            (click)="remove()" type="button" class="delete-btn"
+            matTooltip="Remove Stopover"
+            matTooltipPosition="right">
+      <mat-icon>delete</mat-icon>
+    </button>
   </div>
   <mat-card-content>
     <div class="field">

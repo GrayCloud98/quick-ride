@@ -7,8 +7,25 @@
 
           <div class="header field">
             <mat-icon>explore</mat-icon>
-            <span class="label">Add a new Stopover {{ desiredStopoverIndex === points.length ? 'after' : 'before' }}:</span>
-            <span class="value bold"> {{ desiredStopoverIndex === points.length ? 'Drop off' : 'Stopover ' + desiredStopoverIndex }}</span>
+            <span class="label">
+              Add a new Stopover
+              {{
+                desiredStopoverIndex === points.length
+                  ? 'after'
+                  : desiredStopoverIndex === points.length - 1
+                    ? 'before'
+                    : 'before'
+              }}:
+            </span>
+            <span class="value bold">
+              {{
+                desiredStopoverIndex === points.length
+                  ? 'Drop off'
+                  : desiredStopoverIndex === points.length - 1
+                    ? 'Drop off'
+                    : 'Stopover ' + desiredStopoverIndex
+              }}
+            </span>
           </div>
 
           <select-location
@@ -69,8 +86,10 @@
     <div class="scroll">
       <div *ngFor="let point of points; let i = index">
         <app-location-card
+          [removable]="!point.passed"
           [location]="{ latitude: point.lat, longitude: point.lng, name: point.name, address: point.address }"
-          [label]="i === 0 ? 'Pick up' : i === points.length - 1 ? 'Drop off' : 'Stopover ' + i">
+          [label]="i === 0 ? 'Pick up' : i === points.length - 1 ? 'Drop off' : 'Stopover ' + i"
+          (onRemove)="removeStopover(i)">
         </app-location-card>
       </div>
     </div>
