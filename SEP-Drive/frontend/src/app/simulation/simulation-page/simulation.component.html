@@ -34,9 +34,7 @@
             [placeholder]="'Train Station'"
             [control]="newStopoverControl"
             (locationSelected)="onLocationSelected($event)"
-            [min]="nextStopoverIndex"
-            [max]="points.length"
-            [current]="desiredStopoverIndex">
+            >
           </select-location>
 
           <input type="range"
