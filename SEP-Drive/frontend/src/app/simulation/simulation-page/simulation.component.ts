@@ -199,6 +199,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
 
       if (this.currentIndex >= totalSteps - 1) {
         this.pointer.position = this.path[totalSteps - 1];
+        this.isPaused = true;
         return;
       }
 
@@ -271,12 +272,16 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   }
 
   addStopover(newStopover: Point) {
-    const currentPoint: Point = {
-      name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex
-    };
+    if (this.points[this.points.length - 1].passed)
+      this.points.splice(this.desiredStopoverIndex, 0, newStopover);
 
-    if (this.desiredStopoverIndex === this.nextStopoverIndex)
+    else if (this.desiredStopoverIndex === this.nextStopoverIndex) {
+      const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
       this.points.splice(this.desiredStopoverIndex, 0, currentPoint, newStopover);
+      this.nextStopoverIndex += 1;
+      this.desiredStopoverIndex += 1;
+    }
+
     else
       this.points.splice(this.desiredStopoverIndex, 0, newStopover);
 
