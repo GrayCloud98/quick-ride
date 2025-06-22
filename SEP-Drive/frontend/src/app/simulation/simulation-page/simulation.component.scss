@@ -24,10 +24,11 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  padding-bottom: 10px;
 }
 
 .stopover-index-field {
-  flex: 0 0 70px;
+  flex: 0 0;
 }
 
 .stopover-location-select {
@@ -58,4 +59,14 @@
     min-height: 0;
     padding: 20px 20px 36px 20px;
   }
+}
+
+.bottom-padding {
+  padding-bottom: 20px;
+}
+
+.top-border {
+  border-top: 1px solid #e0e0e0;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
