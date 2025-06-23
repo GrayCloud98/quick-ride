@@ -254,6 +254,15 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     if (this.hasCompleted) return;
     this.hasCompleted = true;
 
+    const firstNotPassedIndex = this.points.findIndex(p => !p.passed);
+    if (firstNotPassedIndex !== -1) {
+      this.points.splice(firstNotPassedIndex);
+      const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
+      this.points.push(currentPoint);
+      this.renderPins();
+      this.drawRoute();
+    }
+
     this.simService.control(Control.COMPLETE);
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
@@ -286,14 +295,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
       this.points.splice(this.desiredStopoverPosition, 0, newStopover);
 
     else if (this.desiredStopoverPosition === this.nextStopoverPosition) {
-      const currentPoint: Point = {
-        name: 'Midway Point',
-        address: 'undefined',
-        lat: this.path[this.currentIndex].lat,
-        lng: this.path[this.currentIndex].lng,
-        passed: true,
-        index: this.currentIndex
-      };
+      const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
       this.points.splice(this.desiredStopoverPosition, 0, currentPoint, newStopover);
       this.nextStopoverPosition += 1;
       this.desiredStopoverPosition += 1;
@@ -307,18 +309,8 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   }
 
   removeStopover(index: number) {
-    console.log(index);
-
-    const currentPoint: Point = {
-      name: 'Midway Point',
-      address: 'undefined',
-      lat: this.path[this.currentIndex].lat,
-      lng: this.path[this.currentIndex].lng,
-      passed: true,
-      index: this.currentIndex
-    };
-
     if (index === this.nextStopoverPosition) {
+      const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
       this.points.splice(index, 1, currentPoint);
       this.nextStopoverPosition += 1;
     } else
