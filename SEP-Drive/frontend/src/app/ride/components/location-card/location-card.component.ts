@@ -11,6 +11,7 @@ export class LocationCardComponent {
   @Input() location!: Location;
   @Input() label: string = 'Location';
   @Input() removable = false;
+  @Input() isSimulationPaused = true;
   @Output() onRemove = new EventEmitter<void>();
 
   remove(){

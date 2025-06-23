@@ -86,7 +86,7 @@
         </mat-card-content>
 
         <mat-card-content class="content-section top-border">
-          <div class="button-container gap">
+          <div class="button-container">
             <button *ngIf="!isRunning" class="btn" mat-fab extended (click)="start()">Start</button>
             <button *ngIf="isRunning && isPaused" class="btn" mat-fab extended (click)="resume()">Resume</button>
             <button *ngIf="isRunning && !isPaused" class="btn" mat-fab extended (click)="pause()">Pause</button>
@@ -97,10 +97,11 @@
     </div>
 
 
-    <!--          [isSimulationPaused]="isPaused"-->
+    <!--          -->
     <div class="scroll">
       <div *ngFor="let point of points; let i = index">
         <app-location-card
+          [isSimulationPaused]="isPaused"
           [removable]="!point.passed"
           [location]="{ latitude: point.lat, longitude: point.lng, name: point.name, address: point.address }"
           [label]="i === 0 ? 'Pick up' : i === points.length - 1 ? 'Drop off' : 'Stopover ' + i"
