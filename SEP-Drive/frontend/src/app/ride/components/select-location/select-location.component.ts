@@ -82,6 +82,7 @@ export class SelectLocationComponent implements OnInit {
         latitude: this.latitude.value!,
         longitude: this.longitude.value!,
         name: 'Manual Location',
+        address: 'undefined'
       };
       this.locationSelected.emit(loc);
       this.manualMode = false;

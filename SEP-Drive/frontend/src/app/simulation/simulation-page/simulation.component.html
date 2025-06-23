@@ -10,20 +10,20 @@
             <span class="label">
               Add a new Stopover
               {{
-                desiredStopoverIndex === points.length
+                desiredStopoverPosition === points.length
                   ? 'after'
-                  : desiredStopoverIndex === points.length - 1
+                  : desiredStopoverPosition === points.length - 1
                     ? 'before'
                     : 'before'
               }}:
             </span>
             <span class="value bold">
               {{
-                desiredStopoverIndex === points.length
+                desiredStopoverPosition === points.length
                   ? 'Drop off'
-                  : desiredStopoverIndex === points.length - 1
+                  : desiredStopoverPosition === points.length - 1
                     ? 'Drop off'
-                    : 'Stopover ' + desiredStopoverIndex
+                    : 'Stopover ' + desiredStopoverPosition
               }}
             </span>
           </div>
@@ -39,8 +39,8 @@
 
           <input type="range"
                  style="width: 100%"
-                 [(ngModel)]="desiredStopoverIndex"
-                 [min]="nextStopoverIndex"
+                 [(ngModel)]="desiredStopoverPosition"
+                 [min]="nextStopoverPosition"
                  [max]="points.length"
                  [step]="1"
                  required>

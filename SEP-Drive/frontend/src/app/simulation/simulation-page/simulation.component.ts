@@ -1,11 +1,11 @@
-import {AfterViewInit, Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
-import {Control, SimulationService, Update} from '../simulation.service';
-import {MatDialog} from '@angular/material/dialog';
-import {RatingPopupComponent} from '../rating-popup/rating-popup.component';
-import {FormControl, Validators} from '@angular/forms';
-import {Location} from '../../ride/models/location.model';
+import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { Control, SimulationService, Update } from '../simulation.service';
+import { MatDialog } from '@angular/material/dialog';
+import { RatingPopupComponent } from '../rating-popup/rating-popup.component';
+import { FormControl, Validators } from '@angular/forms';
+import { Location } from '../../ride/models/location.model';
 
-interface Point{
+interface Point {
   name?: string,
   address?: string,
   lat: number,
@@ -13,6 +13,7 @@ interface Point{
   index: number,
   passed: boolean
 }
+
 @Component({
   selector: 'simulation-page',
   standalone: false,
@@ -20,29 +21,37 @@ interface Point{
   styleUrl: './simulation.component.scss'
 })
 export class SimulationComponent implements AfterViewInit, OnDestroy {
+  // 🗺️ Map and Animation
   @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef;
-  map!: google.maps.Map;
-  pointer!: google.maps.marker.AdvancedMarkerElement;
-  animationFrameId: number | null = null;
-  path: google.maps.LatLngLiteral[] = [];
+  private map!: google.maps.Map;
+  private pointer!: google.maps.marker.AdvancedMarkerElement;
+  private animationFrameId: number | null = null;
+  private directionsRenderer?: google.maps.DirectionsRenderer;
+  private pins: google.maps.marker.AdvancedMarkerElement[] = [];
+  private path: google.maps.LatLngLiteral[] = [];
 
-  currentIndex = 0;
+  // 🚘 Route/Stopovers State
   // points: google.maps.LatLngLiteral[] = []; // todo uncomment
-  points: Point[] = [ { lat: 52.52, lng: 13.405, passed: true, index: 0, name: 'Berlin', address: 'Berlin, Germany' }, { lat: 53.5511, lng: 9.9937, passed: false, index: 1, name: 'Hamburg', address: 'Hamburg, Germany' }, { lat: 51.3397, lng: 12.3731, passed: false, index: 2, name: 'Leipzig', address: 'Leipzig, Germany' }, { lat: 48.1351, lng: 11.582, passed: false, index: 3, name: 'Munich', address: 'Munich, Germany' } ];  duration = 30;
+  points: Point[] = [ { lat: 52.52, lng: 13.405, passed: true, index: 0, name: 'Berlin', address: 'Berlin, Germany' }, { lat: 53.5511, lng: 9.9937, passed: false, index: 1, name: 'Hamburg', address: 'Hamburg, Germany' }, { lat: 51.3397, lng: 12.3731, passed: false, index: 2, name: 'Leipzig', address: 'Leipzig, Germany' }, { lat: 48.1351, lng: 11.582, passed: false, index: 3, name: 'Munich', address: 'Munich, Germany' } ];
+  currentIndex = 0;
+  duration = 30;
+  nextStopoverPosition = 1; //todo new
+  desiredStopoverPosition = 1; //todo new
+
+  // ⏱️ State Flags
   isRunning = false;
   isPaused = false;
+  hasCompleted = false;
   metadataLoaded = false;
 
-  hasCompleted = false;
+  // 🧩 Form Controls
+  newStopoverControl = new FormControl<Location | string>('', [Validators.required]);
 
-  nextStopoverIndex = 1;
-
-  private pins: google.maps.marker.AdvancedMarkerElement[] = [];
-  private directionsRenderer?: google.maps.DirectionsRenderer;
-
+  // 🛠️ Constructor
   constructor(private dialog: MatDialog,
               private simService: SimulationService) {}
 
+  // 🔄 Lifecycle
   ngAfterViewInit(): void {
     this.simService.connect();
     this.initializeMap(); // todo delete
@@ -60,7 +69,6 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
         }
 
         if (update.hasStarted !== this.isRunning || update.paused !== this.isPaused) {
-
           if (update.hasStarted) {
             if (!this.isRunning) this.start();
             else if (update.paused) this.pause();
@@ -83,6 +91,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     await this.simService.disconnect();
   }
 
+  // 🗺️ Map Setup
   private initializeMap(): void {
     const mapOptions: google.maps.MapOptions = {
       center: this.points[0],
@@ -191,8 +200,8 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
         point => {
           if (!point.passed && this.currentIndex >= point.index) {
             point.passed = true;
-            this.nextStopoverIndex += 1;
-            if(this.desiredStopoverIndex < this.nextStopoverIndex) this.desiredStopoverIndex += 1;
+            this.nextStopoverPosition += 1;
+            if (this.desiredStopoverPosition < this.nextStopoverPosition) this.desiredStopoverPosition += 1;
           }
         }
       );
@@ -209,21 +218,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     requestAnimationFrame(step);
   }
 
-  private createPin(color: string): HTMLElement {
-    const pin = document.createElement('pin');
-    pin.innerHTML = `<svg width="32" height="32" viewBox="0 0 24 24" fill="${color}" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>`;
-    return pin;
-  }
-
-  private createCar(): HTMLElement {
-    const car = document.createElement('car');
-    car.innerText = '🚗';
-    car.style.fontSize = '35px';
-    car.style.position = 'absolute';
-    car.style.transform = 'translate(-50%, -50%)';
-    return car;
-  }
-
+  // 🚗 Simulation Controls
   start(): void {
     if (!this.path.length) return;
 
@@ -267,31 +262,74 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     this.openRating();
   }
 
-  openRating() {
+  // ⭐ Rating
+  private openRating() {
     this.dialog.open(RatingPopupComponent, { disableClose: true }).afterClosed().subscribe();
   }
 
-  addStopover(newStopover: Point) {
-    if (this.points[this.points.length - 1].passed)
-      this.points.splice(this.desiredStopoverIndex, 0, newStopover);
+  // ➕ Stopover Management
+  onLocationSelected(loc: Location) {
+    this.newStopoverControl.setValue(loc);
+    const newPoint: Point = {
+      name: loc.name,
+      address: loc.address,
+      lat: loc.latitude,
+      lng: loc.longitude,
+      index: 0,
+      passed: false
+    };
+    this.addStopover(newPoint);
+  }
 
-    else if (this.desiredStopoverIndex === this.nextStopoverIndex) {
-      const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
-      this.points.splice(this.desiredStopoverIndex, 0, currentPoint, newStopover);
-      this.nextStopoverIndex += 1;
-      this.desiredStopoverIndex += 1;
+  private addStopover(newStopover: Point) {
+    if (this.points[this.points.length - 1].passed)
+      this.points.splice(this.desiredStopoverPosition, 0, newStopover);
+
+    else if (this.desiredStopoverPosition === this.nextStopoverPosition) {
+      const currentPoint: Point = {
+        name: 'Midway Point',
+        address: 'undefined',
+        lat: this.path[this.currentIndex].lat,
+        lng: this.path[this.currentIndex].lng,
+        passed: true,
+        index: this.currentIndex
+      };
+      this.points.splice(this.desiredStopoverPosition, 0, currentPoint, newStopover);
+      this.nextStopoverPosition += 1;
+      this.desiredStopoverPosition += 1;
     }
 
     else
-      this.points.splice(this.desiredStopoverIndex, 0, newStopover);
+      this.points.splice(this.desiredStopoverPosition, 0, newStopover);
 
     this.renderPins();
     this.drawRoute();
   }
 
-  protected readonly console = console; // todo delete me
+  removeStopover(index: number) {
+    console.log(index);
 
-  assignStopoverIndices() {
+    const currentPoint: Point = {
+      name: 'Midway Point',
+      address: 'undefined',
+      lat: this.path[this.currentIndex].lat,
+      lng: this.path[this.currentIndex].lng,
+      passed: true,
+      index: this.currentIndex
+    };
+
+    if (index === this.nextStopoverPosition) {
+      this.points.splice(index, 1, currentPoint);
+      this.nextStopoverPosition += 1;
+    } else
+      this.points.splice(index, 1);
+
+    this.renderPins();
+    this.drawRoute();
+  }
+
+  // 🧮 Helpers
+  private assignStopoverIndices() {
     this.points.forEach(point => {
       let closestIndex = 0;
       let minDist = Number.MAX_VALUE;
@@ -306,29 +344,20 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  newStopoverControl = new FormControl<Location | string>('', [Validators.required]);
-  onLocationSelected(loc: Location) {
-    this.newStopoverControl.setValue(loc);
-    const newPoint: Point = { name: loc.name, address: loc.address, lat: loc.latitude, lng: loc.longitude, index: 0, passed: false }
-    this.addStopover(newPoint);
+  private createPin(color: string): HTMLElement {
+    const pin = document.createElement('pin');
+    pin.innerHTML = `<svg width="32" height="32" viewBox="0 0 24 24" fill="${color}" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>`;
+    return pin;
   }
 
-  desiredStopoverIndex = 1;
-
-  removeStopover(index: number) {
-    console.log(index)
-
-    const currentPoint: Point = {
-      name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex
-    };
-
-    if (index === this.nextStopoverIndex) {
-      this.points.splice(index, 1, currentPoint);
-      this.nextStopoverIndex += 1;
-    } else
-      this.points.splice(index, 1);
-
-    this.renderPins();
-    this.drawRoute();
+  private createCar(): HTMLElement {
+    const car = document.createElement('car');
+    car.innerText = '🚗';
+    car.style.fontSize = '35px';
+    car.style.position = 'absolute';
+    car.style.transform = 'translate(-50%, -50%)';
+    return car;
   }
+
+  protected readonly console = console; // todo delete me
 }
