@@ -294,7 +294,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     if (this.points[this.points.length - 1].passed)
       this.points.splice(this.desiredStopoverPosition, 0, newStopover);
 
-    else if (this.desiredStopoverPosition === this.nextStopoverPosition) {
+    else if (this.isRunning && this.desiredStopoverPosition === this.nextStopoverPosition) {
       const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
       this.points.splice(this.desiredStopoverPosition, 0, currentPoint, newStopover);
       this.nextStopoverPosition += 1;
@@ -309,7 +309,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   }
 
   removeStopover(index: number) {
-    if (index === this.nextStopoverPosition) {
+    if (this.isRunning && index === this.nextStopoverPosition) {
       const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
       this.points.splice(index, 1, currentPoint);
       this.nextStopoverPosition += 1;
