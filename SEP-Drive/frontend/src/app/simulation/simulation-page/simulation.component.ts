@@ -43,7 +43,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
 
   // ⏱️ State Flags
   isRunning = false;
-  isPaused = false;
+  isPaused = true;
   hasCompleted = false;
   metadataLoaded = false;
 

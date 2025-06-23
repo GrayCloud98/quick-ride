@@ -53,6 +53,7 @@
             [label]="'I want to stop by ...'"
             [placeholder]="'Train Station'"
             [control]="newStopoverControl"
+            [isSimulationPaused]="isPaused"
             (locationSelected)="onLocationSelected($event)"
             >
           </select-location>
@@ -63,6 +64,7 @@
                  [min]="nextStopoverPosition"
                  [max]="points.length"
                  [step]="1"
+                 [disabled]="!isPaused"
                  required>
         </mat-card-content>
 
@@ -95,7 +97,7 @@
     </div>
 
 
-
+    <!--          [isSimulationPaused]="isPaused"-->
     <div class="scroll">
       <div *ngFor="let point of points; let i = index">
         <app-location-card
