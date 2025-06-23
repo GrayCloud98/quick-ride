@@ -42,9 +42,9 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   desiredStopoverPosition = 1; //todo new
 
   // ⏱️ State Flags
-  isRunning = false;
-  isPaused = true;
+  hasStarted = false;
   hasCompleted = false;
+  paused = true;
   metadataLoaded = false;
 
   // 🧩 Form Controls
@@ -61,7 +61,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     this.initializeMap(); // todo delete
     this.simService.getSimulationUpdates().subscribe(
       (update: Update) => {
-        console.log("🎁", update);
+        console.log("🎁", update); //todo delete
 
         this.duration = update.duration;
         this.currentIndex = update.currentIndex;
@@ -72,20 +72,36 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
           return;
         }
 
-        if (update.hasStarted !== this.isRunning || update.paused !== this.isPaused) {
-          if (update.hasStarted) {
-            if (!this.isRunning) this.start();
-            else if (update.paused) this.pause();
-            else if (!update.paused) this.resume();
+        // hopefully working logic :<
+        if (!this.hasStarted && update.hasStarted){
+          this.start();
+          this.hasStarted = true;
+        }
+        else {
+          if (this.paused !== update.paused) {
+            if (update.paused)
+              this.pause();
+            else
+              this.resume();
+            this.paused = update.paused;
           }
-
-          this.isRunning = update.hasStarted;
-          this.isPaused = update.paused;
         }
 
+        // use this in case you fucked up
+        // if (update.hasStarted !== this.hasStarted || update.paused !== this.paused) {
+        //   if (update.hasStarted) {
+        //     if (!this.hasStarted) this.start();
+        //     else if (update.paused) this.pause();
+        //     else if (!update.paused) this.resume();
+        //   }
+        //
+        //   this.hasStarted = update.hasStarted;
+        //   this.paused = update.paused;
+        // }
+
         if (!this.metadataLoaded) {
-          this.metadataLoaded = true;
           this.initializeMap();
+          this.metadataLoaded = true;
         }
       }
     );
@@ -193,7 +209,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     const startIndex = this.currentIndex;
 
     const step = (currentTime: number) => {
-      if (!this.isRunning || this.isPaused) return;
+      if (!this.hasStarted || this.paused) return;
 
       const elapsed = currentTime - startTime;
       const progressRatio = elapsed / totalDurationMs;
@@ -213,7 +229,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
 
       if (this.currentIndex >= totalSteps - 1) {
         this.pointer.position = this.path[totalSteps - 1];
-        this.isPaused = true;
+        this.paused = true;
         return;
       }
 
@@ -228,14 +244,14 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     if (!this.path.length) return;
 
     this.currentIndex = 0;
-    this.isRunning = true;
-    this.isPaused = false;
+    this.hasStarted = true;
+    this.paused = false;
     this.animate();
     this.simService.control(Control.START, this.currentIndex);
   }
 
   pause(): void {
-    this.isPaused = true;
+    this.paused = true;
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;
@@ -244,9 +260,9 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   }
 
   resume(): void {
-    if (!this.isRunning || !this.isPaused) return;
+    if (!this.hasStarted || !this.paused) return;
 
-    this.isPaused = false;
+    this.paused = false;
     this.animate();
     this.simService.control(Control.RESUME, this.currentIndex);
   }
@@ -301,7 +317,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     if (this.points[this.points.length - 1].passed)
       this.points.splice(this.desiredStopoverPosition, 0, newStopover);
 
-    else if (this.isRunning && this.desiredStopoverPosition === this.nextStopoverPosition) {
+    else if (this.hasStarted && this.desiredStopoverPosition === this.nextStopoverPosition) {
       const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
       this.points.splice(this.desiredStopoverPosition, 0, currentPoint, newStopover);
       this.nextStopoverPosition += 1;
@@ -317,7 +333,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   }
 
   removeStopover(index: number) {
-    if (this.isRunning && index === this.nextStopoverPosition) {
+    if (this.hasStarted && index === this.nextStopoverPosition) {
       const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
       this.points.splice(index, 1, currentPoint);
       this.nextStopoverPosition += 1;
@@ -359,8 +375,6 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     car.style.transform = 'translate(-50%, -50%)';
     return car;
   }
-
-  protected readonly console = console; // todo delete me
 
   async updateRideInfo(): Promise<void> {
     if (this.points.length < 2) return;

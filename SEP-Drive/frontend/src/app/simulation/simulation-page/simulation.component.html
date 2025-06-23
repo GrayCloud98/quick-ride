@@ -53,7 +53,7 @@
             [label]="'I want to stop by ...'"
             [placeholder]="'Train Station'"
             [control]="newStopoverControl"
-            [isSimulationPaused]="isPaused"
+            [isSimulationPaused]="paused"
             (locationSelected)="onLocationSelected($event)"
             >
           </select-location>
@@ -64,7 +64,7 @@
                  [min]="nextStopoverPosition"
                  [max]="points.length"
                  [step]="1"
-                 [disabled]="!isPaused"
+                 [disabled]="!paused"
                  required>
         </mat-card-content>
 
@@ -82,26 +82,24 @@
             max="30"
             (change)="speed()"
             [(ngModel)]="duration"
-            [disabled]="!isPaused">
+            [disabled]="!paused">
         </mat-card-content>
 
         <mat-card-content class="content-section top-border">
           <div class="button-container">
-            <button *ngIf="!isRunning" class="btn" mat-fab extended (click)="start()">Start</button>
-            <button *ngIf="isRunning && isPaused" class="btn" mat-fab extended (click)="resume()">Resume</button>
-            <button *ngIf="isRunning && !isPaused" class="btn" mat-fab extended (click)="pause()">Pause</button>
-            <button *ngIf="isRunning" class="btn warn" mat-fab extended (click)="complete()" [disabled]="!isPaused">Complete</button>
+            <button *ngIf="!hasStarted" class="btn" mat-fab extended (click)="start()">Start</button>
+            <button *ngIf="hasStarted && paused" class="btn" mat-fab extended (click)="resume()">Resume</button>
+            <button *ngIf="hasStarted && !paused" class="btn" mat-fab extended (click)="pause()">Pause</button>
+            <button *ngIf="hasStarted" class="btn warn" mat-fab extended (click)="complete()" [disabled]="!paused">Complete</button>
           </div>
         </mat-card-content>
       </mat-card>
     </div>
 
-
-    <!--          -->
     <div class="scroll">
       <div *ngFor="let point of points; let i = index">
         <app-location-card
-          [isSimulationPaused]="isPaused"
+          [isSimulationPaused]="paused"
           [removable]="!point.passed"
           [location]="{ latitude: point.lat, longitude: point.lng, name: point.name, address: point.address }"
           [label]="i === 0 ? 'Pick up' : i === points.length - 1 ? 'Drop off' : 'Stopover ' + i"
