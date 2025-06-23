@@ -4,14 +4,16 @@ import { MatDialog } from '@angular/material/dialog';
 import { RatingPopupComponent } from '../rating-popup/rating-popup.component';
 import { FormControl, Validators } from '@angular/forms';
 import { Location } from '../../ride/models/location.model';
+import { DistanceService} from '../../ride/services/distance.service';
+import { VehicleClass } from '../../ride/models/ride.model';
 
 interface Point {
-  name?: string,
-  address?: string,
+  name?: string, //todo new
+  address?: string, //todo new
   lat: number,
   lng: number,
   index: number,
-  passed: boolean
+  passed: boolean //todo new
 }
 
 @Component({
@@ -32,6 +34,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
 
   // 🚘 Route/Stopovers State
   // points: google.maps.LatLngLiteral[] = []; // todo uncomment
+  ride = {vehicleClass: VehicleClass.LARGE, distance: 0, duration: 0, estimatedPrice: 0} //todo new
   points: Point[] = [ { lat: 52.52, lng: 13.405, passed: true, index: 0, name: 'Berlin', address: 'Berlin, Germany' }, { lat: 53.5511, lng: 9.9937, passed: false, index: 1, name: 'Hamburg', address: 'Hamburg, Germany' }, { lat: 51.3397, lng: 12.3731, passed: false, index: 2, name: 'Leipzig', address: 'Leipzig, Germany' }, { lat: 48.1351, lng: 11.582, passed: false, index: 3, name: 'Munich', address: 'Munich, Germany' } ];
   currentIndex = 0;
   duration = 30;
@@ -49,6 +52,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
 
   // 🛠️ Constructor
   constructor(private dialog: MatDialog,
+              private distanceService: DistanceService,
               private simService: SimulationService) {}
 
   // 🔄 Lifecycle
@@ -100,6 +104,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     };
 
     this.map = new google.maps.Map(this.mapContainer.nativeElement, mapOptions);
+    void this.updateRideInfo(); // todo retrieve from back end on init
     this.renderPins();
     this.drawRoute();
   }
@@ -259,6 +264,8 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
       this.points.splice(firstNotPassedIndex);
       const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
       this.points.push(currentPoint);
+
+      void this.updateRideInfo();
       this.renderPins();
       this.drawRoute();
     }
@@ -304,6 +311,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     else
       this.points.splice(this.desiredStopoverPosition, 0, newStopover);
 
+    void this.updateRideInfo();
     this.renderPins();
     this.drawRoute();
   }
@@ -316,6 +324,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     } else
       this.points.splice(index, 1);
 
+    void this.updateRideInfo();
     this.renderPins();
     this.drawRoute();
   }
@@ -352,4 +361,30 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   }
 
   protected readonly console = console; // todo delete me
+
+  async updateRideInfo(): Promise<void> {
+    if (this.points.length < 2) return;
+
+    let totalDistance = 0;
+    let totalDuration = 0;
+    let totalEstimatedPrice = 0;
+
+    for (let i = 0; i < this.points.length - 1; i++) {
+      const origin = { lat: this.points[i].lat, lng: this.points[i].lng };
+      const destination = { lat: this.points[i + 1].lat, lng: this.points[i + 1].lng };
+
+      try {
+        const res = await this.distanceService.getDistanceDurationAndPrice(origin, destination, this.ride.vehicleClass);
+        totalDistance += res.distance;
+        totalDuration += res.duration;
+        totalEstimatedPrice += res.estimatedPrice;
+      } catch (err) {
+        console.error(`Distance API error between point ${i} and ${i + 1}`, err);
+      }
+    }
+
+    this.ride.distance = totalDistance;
+    this.ride.duration = totalDuration;
+    this.ride.estimatedPrice = totalEstimatedPrice;
+  }
 }
