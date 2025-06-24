@@ -10,7 +10,7 @@
   <div class="header field">
     <mat-icon>star</mat-icon>
     <span class="label">Driver Rating:</span>
-    <span class="value">{{ offer.driverRating }}</span>
+    <span class="value">{{ offer.driverRating | number:'1.2-2' }}</span>
   </div>
 
   <div class="header field">
@@ -28,7 +28,7 @@
   <div class="header field">
     <mat-icon>map</mat-icon>
     <span class="label">Travelled Distance:</span>
-    <span class="value grey-italic">{{ offer.travelledDistance }} km</span>
+    <span class="value grey-italic">{{ offer.travelledDistance | number:'1.2-2' }} km</span>
   </div>
 
   <div class="header field">

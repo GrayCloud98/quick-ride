@@ -1,5 +1,6 @@
 package com.example.sep_drive_backend.models;
 
+import com.example.sep_drive_backend.constants.RideStatus;
 import com.example.sep_drive_backend.constants.RoleEnum;
 import jakarta.persistence.*;
 
@@ -32,7 +33,11 @@ public abstract class  User {
     private String profilePicture;
     private int totalRides;
     private float rating;
-    private int numberOfRatings ;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "wallet_id", referencedColumnName = "id", unique = true)
+    private Wallet wallet;
+
+
 
     public User() {}
 
@@ -47,12 +52,8 @@ public abstract class  User {
         this.profilePicture = profilePicture;
         this.totalRides = 0;
         this.rating = 0;
-        this.numberOfRatings = 0;
     }
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "wallet_id", referencedColumnName = "id", unique = true)
-    private Wallet wallet;
 
     public Wallet getWallet() {
         return wallet;
@@ -116,7 +117,6 @@ public abstract class  User {
         this.id = id;
     }
 
-
     public String getUsername() {
         return username;
     }
@@ -147,17 +147,6 @@ public abstract class  User {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-    public int getNumberOfRatings() {
-        return numberOfRatings;
-    }
-    public void setNumberOfRatings(int numberOfRatings) {
-        this.numberOfRatings = numberOfRatings;
-    }
-    public void addRating(float newRating) {
-        float total = this.rating * this.numberOfRatings;
-        this.numberOfRatings++;
-        this.rating = (total + newRating) / this.numberOfRatings;
     }
 
 }

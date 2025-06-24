@@ -1,6 +1,6 @@
 package com.example.sep_drive_backend.models;
 
-import com.example.sep_drive_backend.constants.Ridestatus;
+import com.example.sep_drive_backend.constants.RideStatus;
 import com.example.sep_drive_backend.constants.VehicleClassEnum;
 import jakarta.persistence.*;
 
@@ -16,7 +16,7 @@ public class RideRequest {
 
     @ManyToOne
     @JoinColumn(name = "customer_username", referencedColumnName = "username", nullable = false)
-    private Customer customer; // This will be the reference to the Customer entity via 'username'
+    private Customer customer;
 
     @Column
     private String startAddress;
@@ -26,7 +26,7 @@ public class RideRequest {
     @Column (nullable = true)
     private String startLocationName;
     @Column (nullable = true)
-    private String DestinationLocationName;
+    private String destinationLocationName;
 
     @Column
     private String destinationAddress;
@@ -45,69 +45,85 @@ public class RideRequest {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
+    private int customerRating;
+    private int driverRating;
 
-    @OneToOne
-    @JoinColumn(name = "ride_offer_id")
-    private RideOffer rideOffer;
     @Column
-    private Double currentLat;
-
-    private Double simulationSpeed;
-    @Column
-    private Double currentLng;
-
-    private boolean customerRated = false;
-    private boolean driverRated = false;
-    public boolean getCustomerRated() {
-        return customerRated;
-    }
-    public void setCustomerRated(boolean customerRated) {
-        this.customerRated = customerRated;
-    }
-    public boolean getDriverRated() {
-        return driverRated;
-    }
-    public void setDriverRated(boolean driverRated) {
-        this.driverRated = driverRated;
-    }
-    public RideOffer getRideOffer() {
-        return rideOffer;
-    }
-
-    public void setRideOffer(RideOffer rideOffer) {
-        this.rideOffer = rideOffer;
-    }
-
     @Enumerated(EnumType.STRING)
-    private Ridestatus status;
+    private RideStatus rideStatus;
 
     @Column
     @Enumerated(EnumType.STRING)
     private VehicleClassEnum vehicleClass;
 
-    public Double getSimulationSpeed() {
-        return simulationSpeed;
-    }
-    public void setSimulationSpeed(Double simulationSpeed) {
-        this.simulationSpeed = simulationSpeed;
-    }
-    public Double getCurrentLat() {
-        return currentLat;
+    private LocalDateTime endedAt;
+
+    public LocalDateTime getEndedAt() {
+        return endedAt;
     }
 
-    public void setCurrentLat(Double currentLat) {
-        this.currentLat = currentLat;
+    public void markEnded() {
+        this.endedAt = LocalDateTime.now();
     }
-    public Double getCurrentLng() {
-        return currentLng;
+
+    @PreUpdate
+    protected void onEnd() {
+        this.endedAt = LocalDateTime.now();
     }
-    public void setCurrentLng(Double currentLng) {
-        this.currentLng = currentLng;
+
+    public RideRequest() {
     }
+
+    public RideRequest(Customer customer, String startAddress, Double startLatitude, Double startLongitude, String startLocationName, String destinationLocationName, String destinationAddress, Double destinationLatitude, Double destinationLongitude, Double distance, double duration, Double estimatedPrice, VehicleClassEnum vehicleClass) {
+        this.customer = customer;
+        this.startAddress = startAddress;
+        this.startLatitude = startLatitude;
+        this.startLongitude = startLongitude;
+        this.startLocationName = startLocationName;
+        this.destinationLocationName = destinationLocationName;
+        this.destinationAddress = destinationAddress;
+        this.destinationLatitude = destinationLatitude;
+        this.destinationLongitude = destinationLongitude;
+        this.distance = distance;
+        this.duration = duration;
+        this.estimatedPrice = estimatedPrice;
+        this.vehicleClass = vehicleClass;
+        this.rideStatus = RideStatus.CREATED;
+    }
+
+    public int getCustomerRating() {
+        return customerRating;
+    }
+
+    public void setCustomerRating(int customerRating) {
+        this.customerRating = customerRating;
+    }
+
+    public int getDriverRating() {
+        return driverRating;
+    }
+
+    public void setDriverRating(int driverRating) {
+        this.driverRating = driverRating;
+    }
+
+    public RideStatus getRideStatus() {
+        return rideStatus;
+    }
+
+    public void setRideStatus(RideStatus rideStatus) {
+        this.rideStatus = rideStatus;
+    }
+
+    public void setDuration(double duration) {
+        this.duration = duration;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
     public Customer getCustomer() {
         return customer;
     }
@@ -116,34 +132,7 @@ public class RideRequest {
         this.customer = customer;
     }
 
-    public RideRequest() {}
-    public RideRequest(Long id, String startAddress, String startLocationName, String destinationLocationName, String destinationAddress, Double startLatitude, Double startLongitude, Double destinationLatitude, Double destinationLongitude, VehicleClassEnum vehicleClass, Customer customer , Double distance, Double duration, Double estimatedPrice) {
-        this.id = id;
-        this.startAddress = startAddress;
-        this.destinationAddress = destinationAddress;
-        this.startLatitude = startLatitude;
-        this.startLongitude = startLongitude;
-        this.destinationLatitude = destinationLatitude;
-        this.destinationLongitude = destinationLongitude;
-        this.vehicleClass = vehicleClass;
-        this.customer = customer;
-        this.startLocationName = startLocationName;
-        this.DestinationLocationName = destinationLocationName;
-        this.distance = distance;
-        this.duration = duration;
-        this.estimatedPrice = estimatedPrice;
-        this.status = Ridestatus.PLANNED;
-        this.currentLat=this.startLatitude;
-        this.currentLng=this.startLongitude;
-        this.simulationSpeed=3.0;
-    }
 
-    public Ridestatus getStatus() {
-        return status;
-    }
-    public void setStatus(Ridestatus status) {
-        this.status = status;
-    }
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -161,11 +150,11 @@ public class RideRequest {
     }
 
     public String getDestinationLocationName() {
-        return DestinationLocationName;
+        return destinationLocationName;
     }
 
     public void setDestinationLocationName(String destinationLocationName) {
-        DestinationLocationName = destinationLocationName;
+        this.destinationLocationName = destinationLocationName;
     }
 
 

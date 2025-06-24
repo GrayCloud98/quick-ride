@@ -8,20 +8,29 @@
     >
 
   <div *ngIf="isLoggedIn">
-    <button *ngIf="isCustomer"
+    <button *ngIf="userHasActiveSimulation"
             mat-raised-button
             color="accent"
             class="nav-btn"
-            (click)="userHasActiveRide ? routeToActiveRide() : routeToRideRequest()"
+            [routerLink]="['/simulation']"
+    >
+      Active Simulation
+    </button>
+
+    <button *ngIf="isCustomer && !userHasActiveSimulation"
+            mat-raised-button
+            color="accent"
+            class="nav-btn"
+            [routerLink]="userHasActiveRide? ['/ride/active'] : ['/ride/request']"
     >
       {{ userHasActiveRide ? 'Active Request' : 'Request Ride' }}
     </button>
 
-    <button *ngIf="!isCustomer"
+    <button *ngIf="!isCustomer && !userHasActiveSimulation"
             mat-raised-button
             color="accent"
             class="nav-btn"
-            (click)="routeToAvailableRides()"
+            [routerLink]="['/ride/available']"
     >
       View Requests
     </button>

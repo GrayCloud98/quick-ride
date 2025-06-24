@@ -77,6 +77,7 @@ public class UserController {
             dto.setBirthDate(driver.getBirthDate());
             dto.setRole(driver.getRole());
             dto.setRating(driver.getRating());
+            dto.setTotalRides(driver.getTotalRides());
             dto.setVehicleClass(driver.getVehicleClass());
             dto.setProfilePicture(driver.getProfilePicture());
             return ResponseEntity.ok(dto);

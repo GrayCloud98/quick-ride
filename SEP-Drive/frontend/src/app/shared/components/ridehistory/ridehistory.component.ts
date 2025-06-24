@@ -1,9 +1,8 @@
 import { Component, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
-import {AuthService} from "../../../auth/auth.service";
+import { AuthService } from "../../../auth/auth.service";
 import { RideHistoryService, TripHistoryDTO } from '../../services/ridehistory.service';
-
 
 @Component({
   selector: 'app-ridehistorye',
@@ -17,17 +16,18 @@ export class RidehistoryComponent implements OnInit, AfterViewInit {
     'driverRating', 'driverName', 'driverUsername',
     'customerRating', 'customerName', 'customerUsername'
   ];
+
   constructor(
     private rideHistoryService: RideHistoryService,
     private readonly authService: AuthService
   ) {}
+
   dataSource = new MatTableDataSource<TripHistoryDTO>([]);
   loading = true;
   error: string | null = null;
 
-
   columnHeaders: { [key: string]: string } = {
-    id: 'Trip-id',
+    id: 'Ride-id',
     date: 'Date/Time',
     distance: 'Distance',
     duration: 'Duration',
@@ -40,9 +40,9 @@ export class RidehistoryComponent implements OnInit, AfterViewInit {
     customerUsername: 'CustomerUsername'
   };
 
-
   @ViewChild(MatSort) sort!: MatSort;
-  iscustomer :boolean | null= null;
+  iscustomer: boolean | null = null;
+
   ngOnInit() {
     this.authService.isCustomer().subscribe({
       next: iscustomer => {
@@ -63,13 +63,13 @@ export class RidehistoryComponent implements OnInit, AfterViewInit {
             this.dataSource.data = history;
             this.loading = false;
           },
-          error: (err) => {
+          error: () => {
             this.error = '';
             this.loading = false;
           }
         });
       },
-      error: err => {
+      error: () => {
         this.error = 'Role could not be determined';
         this.loading = false;
       }

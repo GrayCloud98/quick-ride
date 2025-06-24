@@ -2,7 +2,6 @@ package com.example.sep_drive_backend.models;
 
 import com.example.sep_drive_backend.constants.RoleEnum;
 import jakarta.persistence.Entity;
-
 import java.util.Date;
 
 @Entity

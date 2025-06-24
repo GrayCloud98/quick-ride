@@ -1,0 +1,35 @@
+<div class="main-container">
+  <div class="left-container">
+    <mat-card appearance="outlined" class="card big">
+      <mat-card-content>
+        <div class="header field">
+          <mat-icon>flash_on</mat-icon>
+          <span class="label">Simulation Duration:</span>
+          <span class="value bold">{{ duration }} seconds</span>
+        </div>
+
+        <input style="width: 100%;"
+               type="range"
+               min="3"
+               max="30"
+               (change)="speed()"
+               [(ngModel)]="duration"
+               [disabled]="!isPaused"
+        />
+      </mat-card-content>
+    </mat-card>
+
+    <div class="button-container">
+      <button *ngIf="!isRunning" class="btn" mat-fab extended (click)="start()">Start</button>
+      <div *ngIf="isRunning" class="row-btn">
+        <button class="btn" mat-fab extended (click)="resume()" [disabled]="!isPaused">Resume</button>
+        <button class="btn" mat-fab extended (click)="pause()" [disabled]="isPaused">Pause</button>
+      </div>
+      <button *ngIf="isRunning" class="btn warn" mat-fab extended (click)="complete()" [disabled]="!isPaused">Complete</button>
+    </div>
+  </div>
+
+  <div class="right-container map">
+    <div #mapContainer class="sep-map"></div>
+  </div>
+</div>
