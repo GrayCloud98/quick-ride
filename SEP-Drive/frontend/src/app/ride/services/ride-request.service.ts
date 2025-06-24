@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {Ride, VehicleClass} from '../models/ride.model';
+import {Ride} from '../models/ride.model';
 
 @Injectable({
   providedIn: 'root'
@@ -27,9 +27,18 @@ export class RideRequestService {
       destinationAddress: ride.dropoff.address,
       distance: ride.distance,
       duration: ride.duration,
-      estimatedPrice: ride.estimatedPrice
-    };
+      estimatedPrice: ride.estimatedPrice,
 
+      waypoints: ride.stopovers?.map(
+        (stopover, index) => ({
+          address: stopover.address,
+          name: stopover.name,
+          latitude: stopover.latitude,
+          longitude: stopover.longitude,
+          sequenceOrder: index
+        })
+      ) ?? []
+    };
     return this.http.post<Ride>(this.baseUrl, rideJson);
   }
 
@@ -37,22 +46,31 @@ export class RideRequestService {
     return this.http.get<Ride>(this.baseUrl).pipe(
       map((ride: any) => ({
         pickup: {
-          latitude: Number(ride.startLatitude),
-          longitude: Number(ride.startLongitude),
-          address: ride.startAddress || undefined,
-          name: ride.startLocationName || undefined
+          latitude: ride.startLatitude,
+          longitude: ride.startLongitude,
+          address: ride.startAddress,
+          name: ride.startLocationName
         },
         dropoff: {
-          latitude: Number(ride.destinationLatitude),
-          longitude: Number(ride.destinationLongitude),
-          address: ride.destinationAddress || undefined,
-          name: ride.destinationLocationName || undefined
+          latitude: ride.destinationLatitude,
+          longitude: ride.destinationLongitude,
+          address: ride.destinationAddress,
+          name: ride.destinationLocationName
         },
-        vehicleClass: ride.vehicleClass as VehicleClass,
+        vehicleClass: ride.vehicleClass,
         active: true,
-        distance: Number(ride.distance) || 0,
-        duration: Number(ride.duration) || 0,
-        estimatedPrice: Number(ride.estimatedPrice) || 0
+        distance: ride.distance || 0,
+        duration: ride.duration || 0,
+        estimatedPrice: ride.estimatedPrice || 0,
+
+        stopovers: (ride.waypoints ?? []).map(
+          (wp: any) => ({
+            address: wp.address,
+            name: wp.name,
+            latitude: wp.latitude,
+            longitude: wp.longitude
+          })
+        )
       }))
     );
   }
