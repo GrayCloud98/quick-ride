@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {filter, switchMap, tap} from 'rxjs';
 
-import {Ride, VehicleClass} from '../../models/ride.model';
+import {Ride} from '../../models/ride.model';
 import {RideRequestService} from '../../services/ride-request.service';
 import {AuthService} from '../../../auth/auth.service';
 import {RideStateService} from '../../services/ride-state.service';
@@ -17,15 +17,7 @@ export class ActiveRidePageComponent implements OnInit {
   username: string = '';
   accessAllowed: boolean = false;
   userHasActiveRide: boolean = false;
-  activeRide: Ride = {
-    pickup: { latitude: 0, longitude: 0 },
-    dropoff: { latitude: 0, longitude: 0 },
-    vehicleClass: VehicleClass.SMALL,
-    active: false,
-    distance: 0,
-    duration: 0,
-    estimatedPrice: 0
-  };
+  activeRide!: Ride;
 
   constructor(
     private rideService: RideRequestService,
