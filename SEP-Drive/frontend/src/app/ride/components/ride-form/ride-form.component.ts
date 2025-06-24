@@ -44,6 +44,7 @@ duration: 0,
 estimatedPrice: 0
 };
 
+submitFailed = false;
 
 constructor(
     private rideService: RideRequestService,
@@ -108,7 +109,7 @@ constructor(
       this.rideService.updateActiveRideStatus();
       void this.router.navigate(['/ride/active']);
     },
-    error: err => console.error(err)
+    error: () => this.submitFailed = true
   });
 }
 
