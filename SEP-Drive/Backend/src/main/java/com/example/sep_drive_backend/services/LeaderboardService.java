@@ -49,4 +49,5 @@ public class LeaderboardService {
             return dto;
         }).collect(Collectors.toList());
     }
+
 }

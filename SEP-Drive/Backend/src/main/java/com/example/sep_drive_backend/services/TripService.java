@@ -24,55 +24,7 @@ public class TripService {
     private UserRepository userRepository;
 
 
-    public List<TripeDTO> getTripHistoryForUser(String username) {
-        List<Trips> trips = tripRepository.findCompletedTripsByUser(username);
 
-        return trips.stream().map(trip -> {
-            TripeDTO dto = new TripeDTO();
-            dto.setTripId(trip.getId());
-            dto.setEndTime(trip.getEndTime());
-            dto.setDistanceKm(trip.getDistanceKm());
-            dto.setDurationMin(trip.getDurationMin());
-            dto.setPriceEuro(trip.getPriceEuro());
-            dto.setCustomerRating(trip.getCustomerRating());
-            dto.setDriverRating(trip.getDriverRating());
-            dto.setCustomerFullName(trip.getCustomerFullName());
-            dto.setDriverFullName(trip.getDriverFullName());
-            dto.setCustomerUsername(trip.getCustomerUsername());
-            dto.setDriverUsername(trip.getDriverUsername());
-
-
-            return dto;
-        }).collect(Collectors.toList());
-    }
-
-
-    public void completeTrip(TripCompleteRequest request) {
-
-        User customer = userRepository.findByUsername(request.getCustomerUsername())
-                .orElseThrow(() -> new IllegalArgumentException("Kunde nicht gefunden: " + request.getCustomerUsername()));
-
-        User driver = userRepository.findByUsername(request.getDriverUsername())
-                .orElseThrow(() -> new IllegalArgumentException("Fahrer nicht gefunden: " + request.getDriverUsername()));
-
-
-        if (customer == null || driver == null) {
-            throw new IllegalArgumentException("Benutzer nicht gefunden.");
-        }
-
-        Trips trip = new Trips();
-        trip.setStatus(TripsStatus.COMPLETED);
-        trip.setEndTime(LocalDateTime.now());
-        trip.setDistanceKm(request.getDistanceKm());
-        trip.setDurationMin(request.getDurationMin());
-        trip.setPriceEuro(request.getPriceEuro());
-        trip.setCustomerRating(request.getCustomerRating());
-        trip.setDriverRating(request.getDriverRating());
-        trip.setCustomer(customer);
-        trip.setDriver(driver);
-
-        tripRepository.save(trip);
-    }
 
 
 }

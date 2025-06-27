@@ -36,25 +36,8 @@ public class TripController {
 
 
 
-    @PostMapping("/complete")
-    public ResponseEntity<Void> completeTrip(@RequestBody TripCompleteRequest request, HttpServletRequest httpRequest) {
-        String token = jwtTokenProvider.resolveToken(httpRequest);
-        String username = jwtTokenProvider.getUsername(token);
 
 
-        tripService.completeTrip(request);
-        return ResponseEntity.ok().build();
-    }
-
-
-    @GetMapping("/history")
-    public ResponseEntity<List<TripeDTO>> getTripHistory(HttpServletRequest request) {
-        String token = jwtTokenProvider.resolveToken(request);
-        String username = jwtTokenProvider.getUsername(token);
-
-        List<TripeDTO> history = tripService.getTripHistoryForUser(username);
-        return ResponseEntity.ok(history);
-    }
 
 
     @GetMapping("/leaderboard")

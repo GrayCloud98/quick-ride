@@ -8,9 +8,10 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "trips")
 public class Trips {
+    public Trips() {
+    }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Enumerated(EnumType.STRING)
@@ -44,7 +45,7 @@ public class Trips {
     private String customerUsername;
 
     private String driverFullName;
-    private String driverUsername;
+
 
 
     public Long getId() {
@@ -157,12 +158,6 @@ public class Trips {
         this.driverFullName = driverFullName;
     }
 
-    public String getDriverUsername() {
-        return driverUsername;
-    }
 
-    public void setDriverUsername(String driverUsername) {
-        this.driverUsername = driverUsername;
-    }
 
 }
