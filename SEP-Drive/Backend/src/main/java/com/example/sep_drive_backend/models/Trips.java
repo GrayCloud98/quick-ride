@@ -28,8 +28,8 @@ public class Trips {
 
     private double priceEuro;
 
-    private Integer customerRating = 0;  // 1 to 5
-    private Integer driverRating = 0;    // 1 to 5
+    private Integer customerRating = 0;
+    private Integer driverRating = 0;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")

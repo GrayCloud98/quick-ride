@@ -1,0 +1,21 @@
+<h1 mat-dialog-title>Rate your {{ partner }}</h1>
+
+<div mat-dialog-content>
+  <div class="stars centered-box">
+    <mat-icon
+      *ngFor="let star of stars; let i = index"
+      [class.filled]="i < hoverRating || i < rating"
+      (mouseenter)="onMouseEnter(i + 1)"
+      (mouseleave)="onMouseLeave()"
+      (click)="onStarClick(i + 1)"
+    >
+      star
+    </mat-icon>
+  </div>
+</div>
+
+<div mat-dialog-actions>
+  <button mat-button color="primary" (click)="onSubmit()" [disabled]="rating === 0" [routerLink]="['/']">
+    Submit
+  </button>
+</div>

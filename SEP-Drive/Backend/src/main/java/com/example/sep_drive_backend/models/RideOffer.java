@@ -1,12 +1,13 @@
 package com.example.sep_drive_backend.models;
 
+import com.example.sep_drive_backend.constants.RideStatus;
 import jakarta.persistence.*;
 
 @Entity
 public class RideOffer {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne
@@ -16,11 +17,21 @@ public class RideOffer {
     @JoinColumn(name = "ride_request_id", referencedColumnName = "id", nullable = false)
     private RideRequest rideRequest;
 
-    public RideOffer() {}
-    public RideOffer(Long id, Driver driver, RideRequest rideRequest) {
-        this.id = id;
-        this.driver = driver;
-        this.rideRequest = rideRequest;
+    @Column
+    @Enumerated(EnumType.STRING)
+    private RideStatus rideStatus;
+
+    public RideOffer() {
+    }
+
+
+
+    public RideStatus getRideStatus() {
+        return rideStatus;
+    }
+
+    public void setRideStatus(RideStatus rideStatus) {
+        this.rideStatus = rideStatus;
     }
 
     public Long getId() {
@@ -46,4 +57,6 @@ public class RideOffer {
     public void setRideRequest(RideRequest rideRequest) {
         this.rideRequest = rideRequest;
     }
+
+
 }

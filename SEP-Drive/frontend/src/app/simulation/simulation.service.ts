@@ -1,112 +1,130 @@
-import {Injectable} from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
-import {VehicleClass} from '../ride/models/ride.model';
-import {HttpClient} from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Client, IMessage } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
+import {BehaviorSubject, Observable, Subject, switchMap} from 'rxjs';
+import {HttpClient, HttpParams} from '@angular/common/http';
+import {AuthService} from '../auth/auth.service';
 
+export interface Update {
+  rideSimulationId: number,
+  paused: boolean,
+  hasStarted: boolean,
+  currentIndex: number,
+  duration: number,
+  startPoint: {lat: number, lng: number},
+  endPoint: {lat: number, lng: number}
+  startLocationName: string,
+  destinationLocationName: string,
+  rideStatus: 'CREATED' | 'IN_PROGRESS' | 'COMPLETED'
+}
+export enum Control {
+  FETCH = 'fetch',
+  START = 'start',
+  PAUSE = 'pause',
+  RESUME = 'resume',
+  SPEED = 'speed',
+  COMPLETE = 'complete'
+}
 @Injectable({
   providedIn: 'root'
 })
 export class SimulationService {
+  private client: Client;
+  private simulationUpdateSubject = new Subject<any>();
+
+  private simulationId = 1;
   private baseUrl = 'http://localhost:8080/api/ride-requests';
-  constructor(private http: HttpClient) {
+
+  constructor(private http: HttpClient,
+              private authService: AuthService) {
+
+    this.client = new Client({
+      webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+      reconnectDelay: 5000,
+      debug: () => {}
+    });
+
+    this.client.onConnect = () => {
+      this.http.get<number>(this.baseUrl + '/sim-id').subscribe({
+        next: id => {
+          this.simulationId = id;
+          this.client.subscribe(
+            `/topic/simulation/${this.simulationId}`,
+            (message: IMessage) => this.simulationUpdateSubject.next(JSON.parse(message.body))
+          );
+          this.control(Control.FETCH);
+        },
+        error: err => console.error('Fetching simulationId failed', err),
+      });
+    };
+
+    this.client.onStompError = (frame) => console.error('⚠️ STOMP Error:', frame)
+
+    this.client.onWebSocketClose = () => console.warn('🚪 WebSocket closed')
   }
 
-  private simID = new BehaviorSubject<number | null>(null);
-
-  public getAcceptedRideDetails(): Observable<Simulation> {
-    return this.http.get<any>(this.baseUrl + '/rides/accepted').pipe(
-      map((simulation: any) => ({
-        rideId: simulation.rideId,
-        status: simulation.status,
-        startLat: simulation.startLat,
-        startLng: simulation.startLng,
-        destLat: simulation.destLat,
-        destLng: simulation.destLng,
-        currentLat: simulation.currentLat,
-        currentLng: simulation.currentLng,
-        simulationSpeed: simulation.simulationSpeed,
-        estimatedPrice: simulation.estimatedPrice,
-        customerUsername: simulation.customerUsername,
-        driverUsername: simulation.driverUsername,
-        driverFullName: simulation.driverFullName,
-        vehicleClass: simulation.vehicleClass,
-        driverRating: simulation.driverRating
-      }))
-    );
+  connect(): void {
+    this.client.activate();
   }
 
-  public submitRideRating(rideId: number, rating: number, feedback: string) {
-    return this.http.post('http://localhost:8080/api/rides/rate', {
-      rating,
-      feedback
+  async disconnect(): Promise<void> {
+    try {
+      await this.client.deactivate();
+    } catch (error) {
+      console.error('⚠️ Error during WebSocket disconnection:', error);
+    }
+  }
+
+ /* input:
+  * START, PAUSE, RESUME = currentIndex
+  * SPEED = duration
+  * FETCH, COMPLETE = *leave empty*
+  */
+  control(control: Control, input?: number): void {
+    const payload: any = { rideSimulationId: this.simulationId };
+
+    if (control === Control.SPEED)
+      payload.duration = input;
+    else
+      payload.currentIndex = input;
+
+    this.client.publish({
+      destination: `/app/simulation/${control}`,
+      body: JSON.stringify(payload)
     });
   }
 
-  public postUpdateSimulation(simulation: Simulation) {
-
-    const body = {
-      currentLat: simulation.currentLat,
-      currentLng: simulation.currentLng,
-      status: simulation.status,
-      simulationSpeed: simulation.simulationSpeed
-    }
-
-    return this.http.post<any>(`${this.baseUrl}/ride-request/${simulation.rideId}/simulation`, body)
+  getSimulationUpdates(): Observable<any> {
+    return this.simulationUpdateSubject.asObservable();
   }
 
-  public getUpdateSimulation(id: number): Observable<SimulationUpdate> {
-    return this.http.get<any>(`${this.baseUrl}/ride-request/${id}/simulation`).pipe(
-      map((update: any) => ({
-        currentLat: update.currentLat,
-        currentLng: update.currentLng,
-        status: update.status,
-        simulationSpeed: update.simulationSpeed
-      }))
+  rate(rate: number): Observable<any> {
+    const params = new HttpParams()
+      .set('rideSimulationId', this.simulationId.toString())
+      .set('rate', rate.toString());
+
+    return this.authService.isCustomer().pipe(
+      switchMap(
+        isCustomer => {
+          const suffix = isCustomer ? '/rate/driver' : '/rate/customer';
+          const url = this.baseUrl + suffix;
+          return this.http.post(url, null, { params });
+        }
+      )
     );
   }
 
-  public updateID(){
-    this.getAcceptedRideDetails().subscribe({
-      next: sim => this.simID.next(sim.rideId)
-    })
+  private activeSimulationStatus = new BehaviorSubject<boolean>(false);
+  public activeSimulationStatus$ = this.activeSimulationStatus.asObservable();
+
+  public userHasActiveSimulation(): Observable<boolean> {
+    return this.http.get<boolean>(`${this.baseUrl}/has-active-sim`);
   }
 
-  rating(rating: number) {
-    return this.http.post(
-      this.baseUrl + '/rate', null, { params: {rideId: this.simID.value!, rating: rating} }
-    );
+  updateActiveSimulationStatus(): void {
+    this.userHasActiveSimulation().subscribe({
+      next: status => this.activeSimulationStatus.next(status),
+      error: err => console.error(err)
+    });
   }
-}
-
-export enum SimulationStatus {
-  PLANNED,
-  IN_PROGRESS,
-  PAUSED,
-  COMPLETED
-}
-
-export interface Simulation {
-  rideId: number,
-  status: SimulationStatus,
-  startLat: number,
-  startLng: number,
-  destLat: number,
-  destLng: number,
-  currentLat: number,
-  currentLng: number,
-  simulationSpeed: number,
-  estimatedPrice: number,
-  customerUsername: string,
-  driverUsername: string,
-  driverFullName: string,
-  vehicleClass: VehicleClass,
-  driverRating: string
-}
-
-export interface SimulationUpdate {
-  currentLat: number,
-  currentLng: number,
-  status: SimulationStatus,
-  simulationSpeed: number
 }

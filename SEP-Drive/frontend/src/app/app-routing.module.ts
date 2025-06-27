@@ -3,17 +3,17 @@ import { TwoFaComponent } from  './shared/components/two-fa/two-fa.component';
 import { RouterModule, Routes } from '@angular/router';
 import { ProfilePageComponent } from './profile-page/profile-page.component';
 import { RideRoutingModule } from './ride/ride-routing.module';
-import { RideSimulationComponent } from './simulation/ride-simulation/ride-simulation.component';
 import { WalletPageComponent } from './profile-page/wallet-page/wallet-page.component';
 import { RegisterComponent } from './auth/register/register.component';
 import {UserNotFoundComponent} from './shared/components/user-not-found/user-not-found.component';
 import {RidehistoryComponent} from './shared/components/ridehistory/ridehistory.component';
+import {SimulationComponent} from './simulation/simulation-page/simulation.component';
 
 const routes: Routes = [
   { path: 'ride', loadChildren: () => RideRoutingModule },
   { path: 'register', component: RegisterComponent },
   { path: 'two-factor', component: TwoFaComponent },
-  { path: 'simulation', component: RideSimulationComponent },
+  { path: 'simulation', component: SimulationComponent },
   { path: 'wallet', component: WalletPageComponent },
   { path: 'user-not-found', component: UserNotFoundComponent },
   { path: 'history', component:RidehistoryComponent},

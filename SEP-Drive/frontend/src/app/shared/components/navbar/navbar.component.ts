@@ -7,6 +7,7 @@ import {Observable} from 'rxjs';
 import {AuthService} from '../../../auth/auth.service';
 import {RideRequestService} from '../../../ride/services/ride-request.service';
 import {RidehistoryComponent} from '../ridehistory/ridehistory.component';
+import {SimulationService} from '../../../simulation/simulation.service';
 
 @Component({
   selector: 'app-navbar',
@@ -27,7 +28,8 @@ export class NavbarComponent implements OnInit {
     private readonly dialogue: MatDialog,
     private readonly router: Router,
     private readonly authService: AuthService,
-    private readonly rideService: RideRequestService
+    private readonly rideService: RideRequestService,
+    private readonly simService: SimulationService
   ) {}
 
   ngOnInit(): void {
@@ -91,33 +93,25 @@ export class NavbarComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  // Logic for Ride Request Button
+  // Buttons Logic: Ride Request, Active Request & Active Simulation
   userHasActiveRide: boolean = false;
+  userHasActiveSimulation: boolean = false;
   isCustomer: boolean = false;
 
   private applyRideRequestButtonDisplayLogic(){
     this.authService.isCustomer().subscribe({
-      next: isCustomer => this.isCustomer = isCustomer,
-      error: err => console.log(err)
+      next: isCustomer => this.isCustomer = isCustomer
     })
 
     this.rideService.updateActiveRideStatus();
     this.rideService.activeRideStatus$.subscribe({
-      next: (status: boolean) => this.userHasActiveRide = status,
-      error: err => console.log(err)
+      next: status => this.userHasActiveRide = status
     });
-  }
 
-  routeToRideRequest() {
-    void this.router.navigate([`/ride/request`]);
-  }
 
-  routeToActiveRide() {
-    void this.router.navigate([`/ride/active`]);
+    this.simService.updateActiveSimulationStatus();
+    this.simService.activeSimulationStatus$.subscribe({
+      next: status => this.userHasActiveSimulation = status
+    })
   }
-
-  routeToAvailableRides() {
-    void this.router.navigate([`/ride/available`]);
-  }
-
 }

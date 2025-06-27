@@ -23,7 +23,7 @@ public class TripService {
     @Autowired
     private UserRepository userRepository;
 
-    //von entity zu DTO zu frontende
+
     public List<TripeDTO> getTripHistoryForUser(String username) {
         List<Trips> trips = tripRepository.findCompletedTripsByUser(username);
 
@@ -40,19 +40,13 @@ public class TripService {
             dto.setDriverFullName(trip.getDriverFullName());
             dto.setCustomerUsername(trip.getCustomerUsername());
             dto.setDriverUsername(trip.getDriverUsername());
-//            User customer = trip.getCustomer();
-//            User driver = trip.getDriver();
-//
-//            dto.setCustomerUsername(customer.getUsername());
-//            dto.setCustomerFullName(customer.getFirstName() + " " + customer.getLastName());
-//            dto.setDriverUsername(driver.getUsername());
-//            dto.setDriverFullName(driver.getFirstName() + " " + driver.getLastName());
+
 
             return dto;
         }).collect(Collectors.toList());
     }
 
-    //von controller zu completed zu trips
+
     public void completeTrip(TripCompleteRequest request) {
 
         User customer = userRepository.findByUsername(request.getCustomerUsername())
@@ -81,11 +75,4 @@ public class TripService {
     }
 
 
-    public List<Trips> getTripsForUser(String username, String role) {
-        if ("DRIVER".equalsIgnoreCase(role)) {
-            return tripRepository.findByDriverUsername(username);
-        } else {
-            return tripRepository.findByCustomerUsername(username);
-        }
-    }
 }

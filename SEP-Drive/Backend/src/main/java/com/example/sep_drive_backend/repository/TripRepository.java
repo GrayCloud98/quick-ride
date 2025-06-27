@@ -7,7 +7,8 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface TripRepository extends JpaRepository<Trips, Long> {
+public interface TripRepository
+        extends JpaRepository<Trips, Long> {
 
 
     @Query("SELECT t FROM Trips t " +
@@ -19,8 +20,4 @@ public interface TripRepository extends JpaRepository<Trips, Long> {
     List<Trips> findByDriverUsername(String username);
 
 
-    List<Trips> findByCustomerUsername(String username);
-
-
-    List<Trips> findByStatus(String status);
 }

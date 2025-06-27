@@ -1,8 +1,10 @@
 package com.example.sep_drive_backend.controller;
 
+import com.example.sep_drive_backend.dto.LeaderboardEntryDTO;
 import com.example.sep_drive_backend.dto.TripeDTO;
 import com.example.sep_drive_backend.dto.TripCompleteRequest;
 import com.example.sep_drive_backend.models.JwtTokenProvider;
+import com.example.sep_drive_backend.services.LeaderboardService;
 import com.example.sep_drive_backend.services.TripService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,17 @@ public class TripController {
     private TripService tripService;
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private LeaderboardService leaderboardService;
+
+
+
+    public TripController(TripService tripService, JwtTokenProvider jwtTokenProvider, LeaderboardService leaderboardService) {
+        this.tripService = tripService;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.leaderboardService = leaderboardService;
+    }
+
 
 
 
@@ -42,5 +55,16 @@ public class TripController {
         List<TripeDTO> history = tripService.getTripHistoryForUser(username);
         return ResponseEntity.ok(history);
     }
+
+
+    @GetMapping("/leaderboard")
+    public ResponseEntity<List<LeaderboardEntryDTO>> getLeaderboard(HttpServletRequest request) {
+        String token = jwtTokenProvider.resolveToken(request);
+        String username = jwtTokenProvider.getUsername(token);
+        return ResponseEntity.ok(leaderboardService.getLeaderboard());
+    }
+
+
+
 
 }

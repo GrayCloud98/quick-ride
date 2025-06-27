@@ -46,13 +46,16 @@ export class RideFormComponent implements OnInit {
     estimatedPrice: 0
   };
 
-  constructor(
-      private rideService: RideRequestService,
-      private authService: AuthService,
-      private router: Router,
-      private distanceService: DistanceService,
-      private rideStateService: RideStateService
-    ) {}
+submitFailed = false;
+
+constructor(
+    private rideService: RideRequestService,
+    private authService: AuthService,
+    private router: Router,
+    private distanceService: DistanceService,
+    private rideStateService: RideStateService
+  ) {
+  }
 
   get isFormInvalid(): boolean {
     return (
@@ -112,7 +115,7 @@ export class RideFormComponent implements OnInit {
       this.rideService.updateActiveRideStatus();
       void this.router.navigate(['/ride/active']);
     },
-    error: err => console.error(err)
+    error: () => this.submitFailed = true
   });
 }
 
