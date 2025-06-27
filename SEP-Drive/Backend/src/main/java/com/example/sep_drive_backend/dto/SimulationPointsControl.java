@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SimulationPointsControl extends SimulationControlMessage{
+
     private List<Waypoint> waypoints = new ArrayList<>();
     private RideSimulation.Point startPoint;
     private RideSimulation.Point endPoint;
