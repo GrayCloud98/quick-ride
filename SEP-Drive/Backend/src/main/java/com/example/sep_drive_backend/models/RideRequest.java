@@ -2,9 +2,12 @@ package com.example.sep_drive_backend.models;
 
 import com.example.sep_drive_backend.constants.RideStatus;
 import com.example.sep_drive_backend.constants.VehicleClassEnum;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class RideRequest {
@@ -12,7 +15,10 @@ public class RideRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @OneToMany(mappedBy = "rideRequest", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("sequenceOrder ASC")
+    @JsonManagedReference
+    private List<Waypoint> waypoints = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "customer_username", referencedColumnName = "username", nullable = false)
@@ -74,7 +80,7 @@ public class RideRequest {
     public RideRequest() {
     }
 
-    public RideRequest(Customer customer, String startAddress, Double startLatitude, Double startLongitude, String startLocationName, String destinationLocationName, String destinationAddress, Double destinationLatitude, Double destinationLongitude, Double distance, double duration, Double estimatedPrice, VehicleClassEnum vehicleClass) {
+    public RideRequest(Customer customer, String startAddress, Double startLatitude, Double startLongitude, String startLocationName, String destinationLocationName, String destinationAddress, Double destinationLatitude, Double destinationLongitude, Double distance, double duration, Double estimatedPrice, VehicleClassEnum vehicleClass,List<Waypoint> waypoints) {
         this.customer = customer;
         this.startAddress = startAddress;
         this.startLatitude = startLatitude;
@@ -89,6 +95,7 @@ public class RideRequest {
         this.estimatedPrice = estimatedPrice;
         this.vehicleClass = vehicleClass;
         this.rideStatus = RideStatus.CREATED;
+        this.waypoints = waypoints;
     }
 
     public int getCustomerRating() {
@@ -244,4 +251,9 @@ public class RideRequest {
     public void setEstimatedPrice(Double estimatedPrice) {
         this.estimatedPrice = estimatedPrice;
     }
+
+    public List<Waypoint> getWaypoints() {
+        return waypoints;
+    }
+    public void setWaypoints(List<Waypoint> waypoints) { this.waypoints = waypoints; }
 }

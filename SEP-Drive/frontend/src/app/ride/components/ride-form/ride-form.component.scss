@@ -1,29 +1,20 @@
-.request-form {
-  min-width: 150px;
-  max-width: 500px;
-  width: 100%;
-}
-
-.full-width {
-  width: 100%;
-}
-
-.address-text {
-  color: grey;
-  font-style: italic;
-}
-
-.mat-mdc-radio-button ~ .mat-mdc-radio-button {
-  margin-left: 16px;
-}
-
 .button-container {
-  padding: 16px;
+  padding-bottom: 16px;
 }
 
-.form-label {
-  font-weight: bold;
-  margin-top: 16px;
-  margin-bottom: 8px;
-  display: block;
+.label {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #3f51b5;
 }
+
+.radio-group {
+  display: flex;
+}
+
+.radio {
+  flex: 1 1 0;
+  text-align: center;
+}
+
+
