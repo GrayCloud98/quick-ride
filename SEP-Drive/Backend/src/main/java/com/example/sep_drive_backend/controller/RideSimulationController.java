@@ -85,8 +85,7 @@ public class RideSimulationController {
 
     @MessageMapping("/simulation/changePoints")
     public void changePoints(@Payload SimulationPointsControl msg) {
-
-        RideSimulation sim = rideSimulationService.changePoints(msg.getRideSimulationId(), msg.getWaypoints());
+        RideSimulation sim = rideSimulationService.changePoints(msg.getRideSimulationId(), msg);
         broadcastUpdate(sim);
     }
 

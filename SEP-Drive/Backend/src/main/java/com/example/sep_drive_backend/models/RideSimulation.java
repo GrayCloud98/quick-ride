@@ -20,10 +20,6 @@ public class RideSimulation {
     private boolean paused = true;
     private boolean hasStarted = false;
     private int currentIndex = 0;
-    @OneToMany(mappedBy = "rideRequest", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("sequenceOrder ASC")
-    @JsonManagedReference
-    private List<Waypoint> waypoints = new ArrayList<>();
 
     @Embedded
     @AttributeOverrides({
@@ -32,13 +28,6 @@ public class RideSimulation {
     })
     private Point startPoint;
 
-    public List<Waypoint> getWaypoints() {
-        return waypoints;
-    }
-
-    public void setWaypoints(List<Waypoint> waypoints) {
-        this.waypoints = waypoints;
-    }
 
     @Embedded
     @AttributeOverrides({

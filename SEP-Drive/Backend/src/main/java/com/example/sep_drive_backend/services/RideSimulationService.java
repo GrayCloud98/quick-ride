@@ -1,6 +1,7 @@
 package com.example.sep_drive_backend.services;
 import com.example.sep_drive_backend.constants.RideStatus;
 import com.example.sep_drive_backend.dto.RideSimulationUpdate;
+import com.example.sep_drive_backend.dto.SimulationPointsControl;
 import com.example.sep_drive_backend.models.Customer;
 import com.example.sep_drive_backend.models.Driver;
 import com.example.sep_drive_backend.models.RideSimulation;
@@ -74,8 +75,13 @@ public class RideSimulationService {
         return simOpt.get();
     }
 
-    public RideSimulation changePoints(Long id, List<Waypoint> waypoints) {
+    public RideSimulation changePoints(Long id, SimulationPointsControl simPointsControl) {
         RideSimulation sim = getSimulationById(id);
+        sim.setStartLocationName(simPointsControl.getStartLocationName());
+        sim.setDestinationLocationName(simPointsControl.getDestinationLocationName());
+        sim.getRideOffer().getRideRequest().setWaypoints(simPointsControl.getWaypoints());
+        sim.setStartPoint(simPointsControl.getStartPoint());
+        sim.setEndPoint(simPointsControl.getEndPoint());
         rideSimulationRepository.save(sim);
         return sim;
     }
@@ -92,7 +98,7 @@ public class RideSimulationService {
         dto.setStartPoint(sim.getStartPoint());
         dto.setRideStatus(sim.getRideStatus());
         dto.setEndPoint(sim.getEndPoint());
-        dto.setWaypoints(sim.getWaypoints());
+        dto.setWaypoints(sim.getRideOffer().getRideRequest().getWaypoints());
         return dto;
     }
 
@@ -107,7 +113,7 @@ public class RideSimulationService {
         dto.setStartLocationName(sim.getStartLocationName());
         dto.setCurrentIndex(sim.getCurrentIndex());
         dto.setDestinationLocationName(sim.getDestinationLocationName());
-        dto.setWaypoints(sim.getWaypoints());
+        dto.setWaypoints(sim.getRideOffer().getRideRequest().getWaypoints());
         dto.setRideStatus(RideStatus.COMPLETED);
         return dto;
     }
