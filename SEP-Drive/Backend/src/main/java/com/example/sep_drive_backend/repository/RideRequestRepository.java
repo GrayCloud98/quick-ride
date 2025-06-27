@@ -3,6 +3,8 @@ package com.example.sep_drive_backend.repository;
 import com.example.sep_drive_backend.constants.RideStatus;
 import com.example.sep_drive_backend.models.RideRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,5 +18,14 @@ public interface RideRequestRepository extends JpaRepository<RideRequest, Long> 
     boolean existsByCustomerUsernameAndRideStatusIn(String username, List<RideStatus> statuses);
     Optional<RideRequest> findFirstByCustomerUsernameAndRideStatus(String username, RideStatus status);
     List<RideRequest> findAllByRideStatus(RideStatus status);
+
+    @Query("""
+    SELECT o.rideRequest FROM RideOffer o
+    WHERE o.driver.username = :username
+    AND YEAR(o.rideRequest.endedAt) = :year
+    AND o.rideRequest.endedAt IS NOT NULL
+""")
+    List<RideRequest> findCompletedRidesByDriverAndYear(@Param("username") String username, @Param("year") int year);
+
 
 }

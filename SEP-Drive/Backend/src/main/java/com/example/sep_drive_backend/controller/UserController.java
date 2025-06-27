@@ -2,6 +2,7 @@ package com.example.sep_drive_backend.controller;
 
 import com.example.sep_drive_backend.dto.CustomerProfileResponse;
 import com.example.sep_drive_backend.dto.DriverProfileResponse;
+import com.example.sep_drive_backend.dto.DriverStatsDto;
 import com.example.sep_drive_backend.models.Customer;
 import com.example.sep_drive_backend.models.Driver;
 import com.example.sep_drive_backend.models.User;
@@ -9,11 +10,14 @@ import com.example.sep_drive_backend.repository.CustomerRepository;
 import com.example.sep_drive_backend.repository.DriverRepository;
 import com.example.sep_drive_backend.repository.UserRepository;
 import com.example.sep_drive_backend.models.JwtTokenProvider;
+import com.example.sep_drive_backend.services.DriverService;
+import com.example.sep_drive_backend.services.LoginService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,6 +39,10 @@ public class UserController {
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private DriverService driverService;
+    @Autowired
+    private LoginService loginService;
 
     // Get the token's holder's profile (authentication required)
     @GetMapping("/me")
@@ -127,5 +135,13 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
+
+    @GetMapping("/daily-stats")
+    public ResponseEntity<?> getDriverMonthlyStats(HttpServletRequest request, @RequestParam int year) {
+        String userName = loginService.extractUsername(request);
+        DriverStatsDto driverStatsDto = driverService.getDriverMonthlyStatsForAYear(userName, year);
+        return ResponseEntity.ok(driverStatsDto);
+    }
+
 
 }
