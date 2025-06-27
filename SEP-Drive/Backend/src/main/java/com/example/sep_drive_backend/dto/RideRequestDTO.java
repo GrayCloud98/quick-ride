@@ -5,6 +5,8 @@ import com.example.sep_drive_backend.models.Customer;
 import com.example.sep_drive_backend.models.RideRequest;
 import jakarta.persistence.Column;
 
+import java.util.List;
+
 public class RideRequestDTO {
 
     public RideRequestDTO() {
@@ -23,8 +25,11 @@ public class RideRequestDTO {
         this.distance = request.getDistance();
         this.duration = (double) request.getDuration();
         this.estimatedPrice = request.getEstimatedPrice();
+        this.waypoints = request.getWaypoints().stream()
+                .map(WaypointDTO::new)
+                .toList();
     }
-
+    private List<WaypointDTO> waypoints;
     private Double distance;
     private Double duration;
     private Double estimatedPrice;
@@ -147,6 +152,11 @@ public class RideRequestDTO {
     public void setVehicleClass(VehicleClassEnum vehicleClass) {
         this.vehicleClass = vehicleClass;
     }
-
+    public List<WaypointDTO> getWaypoints() {
+        return waypoints;
+    }
+    public void setWaypoints(List<WaypointDTO> waypoints) {
+        this.waypoints = waypoints;
+    }
 
 }

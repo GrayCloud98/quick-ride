@@ -64,22 +64,37 @@ public class RideRequestService {
             throw new IllegalStateException("Customer does not have enough funds for this ride. " +
                     "Available: " + (walletBalanceCents / 100.0) + "€, Required: " + dto.getEstimatedPrice() + "€");
         }
+        RideRequest request = new RideRequest();
+        request.setCustomer(customer);
+        request.setStartAddress(dto.getStartAddress());
+        request.setStartLatitude(dto.getStartLatitude());
+        request.setStartLongitude(dto.getStartLongitude());
+        request.setDestinationAddress(dto.getDestinationAddress());
+        request.setDestinationLatitude(dto.getDestinationLatitude());
+        request.setDestinationLongitude(dto.getDestinationLongitude());
+        request.setVehicleClass(dto.getVehicleClass()); // now uses enum
+        request.setStartLocationName(dto.getStartLocationName());
+        request.setDestinationLocationName(dto.getDestinationLocationName());
+        request.setDistance(dto.getDistance());
+        request.setDuration(dto.getDuration());
+        request.setEstimatedPrice(dto.getEstimatedPrice());
 
-        RideRequest request = new RideRequest(
-                customer,
-                dto.getStartAddress(),
-                dto.getStartLatitude(),
-                dto.getStartLongitude(),
-                dto.getStartLocationName(),
-                dto.getDestinationLocationName(),
-                dto.getDestinationAddress(),
-                dto.getDestinationLatitude(),
-                dto.getDestinationLongitude(),
-                dto.getDistance(),
-                dto.getDuration(),
-                dto.getEstimatedPrice(),
-                dto.getVehicleClass()
-        );
+        if (dto.getWaypoints() != null && !dto.getWaypoints().isEmpty()) {
+            List<Waypoint> waypoints = dto.getWaypoints().stream()
+                    .map(wpDto -> {
+                        Waypoint wp = new Waypoint();
+                        wp.setAddress(wpDto.getAddress());
+                        wp.setLatitude(wpDto.getLatitude());
+                        wp.setLongitude(wpDto.getLongitude());
+                        wp.setSequenceOrder(wpDto.getSequenceOrder());
+                        wp.setName(wpDto.getName());
+                        wp.setRideRequest(request);
+                        return wp;
+                    })
+                    .collect(Collectors.toList());
+
+            request.setWaypoints(waypoints);
+        }
 
         customer.setActive(true);
         customerRepository.save(customer);
