@@ -77,6 +77,7 @@ public class RideSimulationService {
 
     public RideSimulation changePoints(Long id, SimulationPointsControl simPointsControl) {
         RideSimulation sim = getSimulationById(id);
+        sim.setCurrentIndex(simPointsControl.getCurrentIndex());
         sim.setStartLocationName(simPointsControl.getStartLocationName());
         sim.setDestinationLocationName(simPointsControl.getDestinationLocationName());
         sim.getRideOffer().getRideRequest().setWaypoints(simPointsControl.getWaypoints());
