@@ -37,34 +37,71 @@
       <span class="value grey-italic">{{ request.requestID }}</span>
     </div>
 
-    <div class="location-cards-container">
+    <div class="info" *ngIf="request.stopovers?.length">
+      <mat-icon>info</mat-icon>
+      <span style="margin-left: 8px;">This Request contains Stopovers</span>
+      <button mat-mini-fab (click)="showStopovers = !showStopovers" class="info-btn">
+        {{ showStopovers ? 'Hide' : 'Show' }}
+      </button>
+    </div>
+
+    <div *ngIf="!showStopovers" class="location-cards-container">
       <app-location-card label="Pickup at" [location]="request.pickup"></app-location-card>
       <app-location-card label="Drop off at" [location]="request.dropoff"></app-location-card>
     </div>
 
-<!--todo edit-->
-    <div *ngIf="request.stopovers?.length">
-      <h3>Stopovers</h3>
-      <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse;">
-        <thead>
-        <tr>
-          <th>Address</th>
-          <th>Name</th>
-          <th>Latitude</th>
-          <th>Longitude</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let stopover of request.stopovers">
-          <td>{{ stopover.address }}</td>
-          <td>{{ stopover.name }}</td>
-          <td>{{ stopover.latitude }}</td>
-          <td>{{ stopover.longitude }}</td>
-        </tr>
-        </tbody>
-      </table>
+    <div *ngIf="showStopovers">
+      <app-location-card label="Pickup at" [location]="request.pickup"></app-location-card>
+      <br>
+
+      <mat-card class="card big" appearance="outlined">
+        <mat-card-content>
+          <div class="header">
+            <mat-icon>location_on</mat-icon>
+            <span class="label">Stop By</span>
+          </div>
+
+          <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+            <ng-container matColumnDef="position">
+              <th mat-header-cell *matHeaderCellDef> # </th>
+              <td mat-cell *matCellDef="let element"> {{ element.position }} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef> Name </th>
+              <td mat-cell *matCellDef="let element" class="name"> {{element.name}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="address">
+              <th mat-header-cell *matHeaderCellDef> Address </th>
+              <td mat-cell *matCellDef="let element"> {{element.address}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="latitude">
+              <th mat-header-cell *matHeaderCellDef> Lat. </th>
+              <td mat-cell *matCellDef="let element" class="coord"> {{element.latitude | number:'1.2-2' }} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="longitude">
+              <th mat-header-cell *matHeaderCellDef> Lng. </th>
+              <td mat-cell *matCellDef="let element" class="coord"> {{element.longitude | number:'1.2-2' }} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns" class="header-row"></tr>
+            <tr
+              mat-row
+              *matRowDef="let row; let i = index; columns: displayedColumns;"
+            ></tr>
+
+          </table>
+
+        </mat-card-content>
+      </mat-card>
+      <br>
+      <app-location-card label="Drop off at" [location]="request.dropoff"></app-location-card>
+      <br>
     </div>
-<!--end edit-->
 
     <div class="button-container">
       <button

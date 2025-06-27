@@ -15,3 +15,35 @@ app-location-card {
     width: 260px;
   }
 }
+
+.header-row {
+  font-weight: 500;
+  color: #555;
+  width: 90px;
+}
+
+.name {
+  font-weight: 700;
+}
+
+.coord {
+  font-style: italic;
+  color: #888;
+}
+
+.info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  background: #DAE2F9  ;
+  color: #003F88   ;
+}
+
+.info-btn {
+  font-size: 15px;
+  margin-left: auto; width: 100px; font-weight: bold
+}

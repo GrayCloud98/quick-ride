@@ -33,7 +33,8 @@ import { OfferCardComponent } from './components/offer-card/offer-card.component
 import {OfferService} from './services/offer.service';
 import {NotificationComponent} from './components/notification/notification.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-
+import {MatTableModule} from '@angular/material/table';
+import {MatButtonModule} from '@angular/material/button';
 
 @NgModule({
   declarations: [
@@ -48,7 +49,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     GoogleMapsModule, GoogleMap,
     MatAutocompleteModule, MatInputModule, MatFormFieldModule, MatRadioModule,
     MatButton, MatFabButton, MatIconButton, MatIcon, MatTooltip, MatCard, MatCardContent, MatCardTitle,
-    MatSnackBarModule, NotificationComponent
+    MatSnackBarModule, NotificationComponent,
+    MatTableModule, MatButtonModule
   ],
   providers: [
     GeolocationService,
