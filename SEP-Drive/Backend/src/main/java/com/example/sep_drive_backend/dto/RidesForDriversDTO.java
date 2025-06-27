@@ -4,6 +4,7 @@ import com.example.sep_drive_backend.constants.VehicleClassEnum;
 import com.example.sep_drive_backend.models.RideRequest;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 public class RidesForDriversDTO {
@@ -21,7 +22,7 @@ public class RidesForDriversDTO {
     private Double destinationLatitude;
     private Double destinationLongitude;
     private VehicleClassEnum requestedVehicleClass;
-
+    private List<WaypointDTO> waypoints;
 
     public RidesForDriversDTO(RideRequest rideRequest) {
         if (Objects.equals(rideRequest.getStartLocationName(), "My Location")) {
@@ -42,6 +43,9 @@ public class RidesForDriversDTO {
         this.startLongitude = rideRequest.getStartLongitude();
         this.destinationLatitude = rideRequest.getDestinationLatitude();
         this.destinationLongitude = rideRequest.getDestinationLongitude();
+        this.waypoints = rideRequest.getWaypoints().stream()
+                .map(WaypointDTO::new)
+                .toList();
     }
 
 
@@ -147,5 +151,12 @@ public class RidesForDriversDTO {
 
     public void setRequestedVehicleClass(VehicleClassEnum requestedVehicleClass) {
         this.requestedVehicleClass = requestedVehicleClass;
+    }
+
+    public List<WaypointDTO> getWaypoints() {
+        return waypoints;
+    }
+    public void setWaypoints(List<WaypointDTO> waypoints) {
+        this.waypoints = waypoints;
     }
 }
