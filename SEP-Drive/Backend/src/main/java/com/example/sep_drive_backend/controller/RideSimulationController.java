@@ -4,6 +4,7 @@ import com.example.sep_drive_backend.constants.RideStatus;
 import com.example.sep_drive_backend.constants.TripsStatus;
 import com.example.sep_drive_backend.dto.RideSimulationUpdate;
 import com.example.sep_drive_backend.dto.SimulationControlMessage;
+import com.example.sep_drive_backend.dto.SimulationPointsControl;
 import com.example.sep_drive_backend.models.Customer;
 import com.example.sep_drive_backend.models.Driver;
 import com.example.sep_drive_backend.models.RideSimulation;
@@ -79,6 +80,13 @@ public class RideSimulationController {
     @MessageMapping("/simulation/speed")
     public void changeSpeed(@Payload SpeedChangeMessage msg) {
         RideSimulation sim = rideSimulationService.changeDuration(msg.getRideSimulationId(), msg.getDuration());
+        broadcastUpdate(sim);
+    }
+
+    @MessageMapping("/simulation/changePoints")
+    public void changePoints(@Payload SimulationPointsControl msg) {
+
+        RideSimulation sim = rideSimulationService.changePoints(msg.getRideSimulationId(), msg.getWaypoints());
         broadcastUpdate(sim);
     }
 

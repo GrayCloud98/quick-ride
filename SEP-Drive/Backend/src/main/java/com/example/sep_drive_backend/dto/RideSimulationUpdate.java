@@ -2,6 +2,14 @@ package com.example.sep_drive_backend.dto;
 
 import com.example.sep_drive_backend.constants.RideStatus;
 import com.example.sep_drive_backend.models.RideSimulation;
+import com.example.sep_drive_backend.models.Waypoint;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RideSimulationUpdate {
 
@@ -16,6 +24,15 @@ public class RideSimulationUpdate {
     private String startLocationName;
     private String destinationLocationName;
     private int currentIndex;
+    private List<Waypoint> waypoints = new ArrayList<>();
+
+    public List<Waypoint> getWaypoints() {
+        return waypoints;
+    }
+
+    public void setWaypoints(List<Waypoint> waypoints) {
+        this.waypoints = waypoints;
+    }
 
     public int getCurrentIndex() {
         return currentIndex;

@@ -4,6 +4,7 @@ import com.example.sep_drive_backend.dto.RideSimulationUpdate;
 import com.example.sep_drive_backend.models.Customer;
 import com.example.sep_drive_backend.models.Driver;
 import com.example.sep_drive_backend.models.RideSimulation;
+import com.example.sep_drive_backend.models.Waypoint;
 import com.example.sep_drive_backend.repository.CustomerRepository;
 import com.example.sep_drive_backend.repository.DriverRepository;
 import com.example.sep_drive_backend.repository.RideSimulationRepository;
@@ -11,6 +12,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -72,6 +74,12 @@ public class RideSimulationService {
         return simOpt.get();
     }
 
+    public RideSimulation changePoints(Long id, List<Waypoint> waypoints) {
+        RideSimulation sim = getSimulationById(id);
+        rideSimulationRepository.save(sim);
+        return sim;
+    }
+
     public RideSimulationUpdate toDto(RideSimulation sim) {
         RideSimulationUpdate dto = new RideSimulationUpdate();
         dto.setRideSimulationId(sim.getId());
@@ -84,6 +92,7 @@ public class RideSimulationService {
         dto.setStartPoint(sim.getStartPoint());
         dto.setRideStatus(sim.getRideStatus());
         dto.setEndPoint(sim.getEndPoint());
+        dto.setWaypoints(sim.getWaypoints());
         return dto;
     }
 
@@ -98,6 +107,7 @@ public class RideSimulationService {
         dto.setStartLocationName(sim.getStartLocationName());
         dto.setCurrentIndex(sim.getCurrentIndex());
         dto.setDestinationLocationName(sim.getDestinationLocationName());
+        dto.setWaypoints(sim.getWaypoints());
         dto.setRideStatus(RideStatus.COMPLETED);
         return dto;
     }

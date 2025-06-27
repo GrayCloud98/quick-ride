@@ -1,8 +1,11 @@
 package com.example.sep_drive_backend.models;
 import com.example.sep_drive_backend.constants.RideStatus;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -17,6 +20,10 @@ public class RideSimulation {
     private boolean paused = true;
     private boolean hasStarted = false;
     private int currentIndex = 0;
+    @OneToMany(mappedBy = "rideRequest", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("sequenceOrder ASC")
+    @JsonManagedReference
+    private List<Waypoint> waypoints = new ArrayList<>();
 
     @Embedded
     @AttributeOverrides({
@@ -24,6 +31,14 @@ public class RideSimulation {
             @AttributeOverride(name = "lng", column = @Column(name = "start_lng"))
     })
     private Point startPoint;
+
+    public List<Waypoint> getWaypoints() {
+        return waypoints;
+    }
+
+    public void setWaypoints(List<Waypoint> waypoints) {
+        this.waypoints = waypoints;
+    }
 
     @Embedded
     @AttributeOverrides({
