@@ -11,4 +11,5 @@ export interface Request {
   desiredVehicleClass: VehicleClass;
   pickup: Location;
   dropoff: Location;
+  stopovers: Location[];
 }

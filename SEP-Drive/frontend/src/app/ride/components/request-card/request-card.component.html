@@ -42,6 +42,30 @@
       <app-location-card label="Drop off at" [location]="request.dropoff"></app-location-card>
     </div>
 
+<!--todo edit-->
+    <div *ngIf="request.stopovers?.length">
+      <h3>Stopovers</h3>
+      <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+        <thead>
+        <tr>
+          <th>Address</th>
+          <th>Name</th>
+          <th>Latitude</th>
+          <th>Longitude</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let stopover of request.stopovers">
+          <td>{{ stopover.address }}</td>
+          <td>{{ stopover.name }}</td>
+          <td>{{ stopover.latitude }}</td>
+          <td>{{ stopover.longitude }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+<!--end edit-->
+
     <div class="button-container">
       <button
         *ngIf="offerState === OfferState.NONE"
