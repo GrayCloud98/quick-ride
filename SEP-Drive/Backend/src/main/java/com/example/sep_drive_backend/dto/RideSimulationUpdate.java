@@ -25,6 +25,15 @@ public class RideSimulationUpdate {
     private String destinationLocationName;
     private int currentIndex;
     private List<Waypoint> waypoints = new ArrayList<>();
+    private boolean hasChanged;
+
+    public boolean isHasChanged() {
+        return hasChanged;
+    }
+
+    public void setHasChanged(boolean hasChanged) {
+        this.hasChanged = hasChanged;
+    }
 
     public List<Waypoint> getWaypoints() {
         return waypoints;

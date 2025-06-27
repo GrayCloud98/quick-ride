@@ -15,7 +15,7 @@ public class RideSimulation {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-
+    private boolean hasChanged = false;
     private double duration = 30.0;
     private boolean paused = true;
     private boolean hasStarted = false;
@@ -131,6 +131,16 @@ public class RideSimulation {
     public void markStarted() {
         if (!this.hasStarted) {
             this.hasStarted = true;
+        }
+    }
+
+    public boolean getHasChanged() {
+        return hasChanged;
+    }
+
+    public void markChanged() {
+        if (!this.hasChanged) {
+            this.hasChanged = true;
         }
     }
 

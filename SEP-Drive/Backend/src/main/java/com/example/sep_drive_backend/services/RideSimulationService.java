@@ -82,6 +82,7 @@ public class RideSimulationService {
         sim.getRideOffer().getRideRequest().setWaypoints(simPointsControl.getWaypoints());
         sim.setStartPoint(simPointsControl.getStartPoint());
         sim.setEndPoint(simPointsControl.getEndPoint());
+        sim.markChanged();
         rideSimulationRepository.save(sim);
         return sim;
     }
@@ -99,6 +100,7 @@ public class RideSimulationService {
         dto.setRideStatus(sim.getRideStatus());
         dto.setEndPoint(sim.getEndPoint());
         dto.setWaypoints(sim.getRideOffer().getRideRequest().getWaypoints());
+        dto.setHasChanged(sim.getHasChanged());
         return dto;
     }
 
@@ -114,6 +116,7 @@ public class RideSimulationService {
         dto.setCurrentIndex(sim.getCurrentIndex());
         dto.setDestinationLocationName(sim.getDestinationLocationName());
         dto.setWaypoints(sim.getRideOffer().getRideRequest().getWaypoints());
+        dto.setHasChanged(sim.getHasChanged());
         dto.setRideStatus(RideStatus.COMPLETED);
         return dto;
     }
