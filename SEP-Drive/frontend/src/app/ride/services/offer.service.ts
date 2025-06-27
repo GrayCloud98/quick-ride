@@ -34,7 +34,15 @@ export class OfferService {
             longitude: request.destinationLongitude,
             address: request.destinationAddress,
             name: request.destinationLocationName
-          }
+          },
+          stopovers: (request.waypoints ?? []).map(
+            (wp: any) => ({
+              address: wp.address,
+              name: wp.name,
+              latitude: wp.latitude,
+              longitude: wp.longitude
+            })
+          )
         })
       ))
     );

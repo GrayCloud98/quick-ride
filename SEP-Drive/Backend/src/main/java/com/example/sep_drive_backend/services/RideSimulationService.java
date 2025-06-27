@@ -1,9 +1,11 @@
 package com.example.sep_drive_backend.services;
 import com.example.sep_drive_backend.constants.RideStatus;
 import com.example.sep_drive_backend.dto.RideSimulationUpdate;
+import com.example.sep_drive_backend.dto.SimulationPointsControl;
 import com.example.sep_drive_backend.models.Customer;
 import com.example.sep_drive_backend.models.Driver;
 import com.example.sep_drive_backend.models.RideSimulation;
+import com.example.sep_drive_backend.models.Waypoint;
 import com.example.sep_drive_backend.repository.CustomerRepository;
 import com.example.sep_drive_backend.repository.DriverRepository;
 import com.example.sep_drive_backend.repository.RideSimulationRepository;
@@ -11,6 +13,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -72,6 +75,19 @@ public class RideSimulationService {
         return simOpt.get();
     }
 
+    public RideSimulation changePoints(Long id, SimulationPointsControl simPointsControl) {
+        RideSimulation sim = getSimulationById(id);
+        sim.setCurrentIndex(simPointsControl.getCurrentIndex());
+        sim.setStartLocationName(simPointsControl.getStartLocationName());
+        sim.setDestinationLocationName(simPointsControl.getDestinationLocationName());
+        sim.getRideOffer().getRideRequest().setWaypoints(simPointsControl.getWaypoints());
+        sim.setStartPoint(simPointsControl.getStartPoint());
+        sim.setEndPoint(simPointsControl.getEndPoint());
+        sim.markChanged();
+        rideSimulationRepository.save(sim);
+        return sim;
+    }
+
     public RideSimulationUpdate toDto(RideSimulation sim) {
         RideSimulationUpdate dto = new RideSimulationUpdate();
         dto.setRideSimulationId(sim.getId());
@@ -84,6 +100,8 @@ public class RideSimulationService {
         dto.setStartPoint(sim.getStartPoint());
         dto.setRideStatus(sim.getRideStatus());
         dto.setEndPoint(sim.getEndPoint());
+        dto.setWaypoints(sim.getRideOffer().getRideRequest().getWaypoints());
+        dto.setHasChanged(sim.getHasChanged());
         return dto;
     }
 
@@ -98,6 +116,8 @@ public class RideSimulationService {
         dto.setStartLocationName(sim.getStartLocationName());
         dto.setCurrentIndex(sim.getCurrentIndex());
         dto.setDestinationLocationName(sim.getDestinationLocationName());
+        dto.setWaypoints(sim.getRideOffer().getRideRequest().getWaypoints());
+        dto.setHasChanged(sim.getHasChanged());
         dto.setRideStatus(RideStatus.COMPLETED);
         return dto;
     }

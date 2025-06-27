@@ -1,8 +1,11 @@
 package com.example.sep_drive_backend.models;
 import com.example.sep_drive_backend.constants.RideStatus;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -12,7 +15,7 @@ public class RideSimulation {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-
+    private boolean hasChanged = false;
     private double duration = 30.0;
     private boolean paused = true;
     private boolean hasStarted = false;
@@ -24,6 +27,7 @@ public class RideSimulation {
             @AttributeOverride(name = "lng", column = @Column(name = "start_lng"))
     })
     private Point startPoint;
+
 
     @Embedded
     @AttributeOverrides({
@@ -127,6 +131,16 @@ public class RideSimulation {
     public void markStarted() {
         if (!this.hasStarted) {
             this.hasStarted = true;
+        }
+    }
+
+    public boolean getHasChanged() {
+        return hasChanged;
+    }
+
+    public void markChanged() {
+        if (!this.hasChanged) {
+            this.hasChanged = true;
         }
     }
 

@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {FormControl, Validators} from '@angular/forms';
+import {FormArray, FormControl, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 
 import {Location} from '../../models/location.model'
@@ -11,39 +11,42 @@ import { DistanceService } from '../../services/distance.service';
 import {RideStateService} from '../../services/ride-state.service';
 
 enum updateType {
-pickup,
-dropoff,
+  pickup = -2,
+  dropoff = -1,
 }
 
 @Component({
-selector: 'ride-form',
-standalone: false,
-templateUrl: './ride-form.component.html',
-styleUrl: './ride-form.component.scss',
+  selector: 'ride-form',
+  standalone: false,
+  templateUrl: './ride-form.component.html',
+  styleUrl: './ride-form.component.scss',
 })
 export class RideFormComponent implements OnInit {
 
-username!: string
-vehicles = Object.values(VehicleClass);
+  username!: string
+  vehicles = Object.values(VehicleClass);
 
-pickupPicked: boolean = false;
-dropoffPicked: boolean = false;
+  pickupPicked: boolean = false;
+  dropoffPicked: boolean = false;
 
-protected readonly updateType = updateType;
+  protected readonly updateType = updateType;
 
-pickupControl = new FormControl<Location | string>('', [Validators.required]);
-dropoffControl = new FormControl<Location | string>('', [Validators.required]);
+  pickupControl = new FormControl<Location | string>('', [Validators.required]);
+  dropoffControl = new FormControl<Location | string>('', [Validators.required]);
+  stopoversControl = new FormArray<FormControl<Location | string>>([]);
 
-ride: Ride = {
-pickup: { latitude: 0, longitude: 0 },
-dropoff: { latitude: 0, longitude: 0 },
-vehicleClass: VehicleClass.SMALL,
-active: false,
-distance: 0,
-duration: 0,
-estimatedPrice: 0
-};
+  ride: Ride = {
+    pickup: { latitude: 0, longitude: 0 },
+    dropoff: { latitude: 0, longitude: 0 },
+    stopovers: [],
+    vehicleClass: VehicleClass.SMALL,
+    active: false,
+    distance: 0,
+    duration: 0,
+    estimatedPrice: 0
+  };
 
+submitFailed = false;
 
 constructor(
     private rideService: RideRequestService,
@@ -98,6 +101,10 @@ constructor(
           lng: location.longitude
         })
         break;
+
+      default:
+        this.ride.stopovers![type] = location;
+        this.stopoversControl.at(type).setValue(location);
     }
     this.updateDistanceInfo();
   }
@@ -108,7 +115,7 @@ constructor(
       this.rideService.updateActiveRideStatus();
       void this.router.navigate(['/ride/active']);
     },
-    error: err => console.error(err)
+    error: () => this.submitFailed = true
   });
 }
 
@@ -125,5 +132,15 @@ constructor(
         })
         .catch(err => console.error('Google Distance API error', err));
     }
+  }
+
+  addStopover() {
+    const control = new FormControl<Location | string>('', { validators: [Validators.required], nonNullable: true });
+    this.stopoversControl.push(control);
+  }
+
+  removeStopover(index: number) {
+    this.stopoversControl.removeAt(index);
+    this.ride.stopovers!.splice(index, 1);
   }
 }

@@ -20,8 +20,10 @@ export class SelectLocationComponent implements OnInit, OnChanges {
   @Input() placeholder: string = '';
   @Input() control!: FormControl;
   @Input() geoLocationButton: boolean = false;
+  @Input() removable: boolean = false;
   @Input() isSimulationPaused: boolean = true;
   @Output() locationSelected = new EventEmitter<Location>();
+  @Output() onRemove = new EventEmitter<void>();
 
   manualMode = false;
   latitude = new FormControl<number | null>(null, [
@@ -95,5 +97,9 @@ export class SelectLocationComponent implements OnInit, OnChanges {
       this.locationSelected.emit(loc);
       this.manualMode = false;
     }
+  }
+
+  remove(){
+    this.onRemove.emit();
   }
 }

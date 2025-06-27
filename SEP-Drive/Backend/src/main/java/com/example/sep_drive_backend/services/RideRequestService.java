@@ -22,6 +22,7 @@ public class RideRequestService {
     private final RideOfferRepository rideOfferRepository;
     private final RideRequestRepository rideRequestRepository;
     private final RideSimulationRepository rideSimulationRepository;
+    private final TripRepository tripRepository;
 
     @Autowired
     public RideRequestService(
@@ -31,7 +32,7 @@ public class RideRequestService {
             RideOfferRepository rideOfferRepository,
             RideRequestRepository rideRequestRepository,
             WalletRepository walletRepository,
-            RideSimulationRepository rideSimulationRepository) {
+            RideSimulationRepository rideSimulationRepository, TripRepository tripRepository) {
 
         this.customerRepository = customerRepository;
         this.driverRepository = driverRepository;
@@ -40,6 +41,7 @@ public class RideRequestService {
         this.rideRequestRepository = rideRequestRepository;
         this.walletRepository = walletRepository;
         this.rideSimulationRepository = rideSimulationRepository;
+        this.tripRepository = tripRepository;
     }
 
 
@@ -64,22 +66,37 @@ public class RideRequestService {
             throw new IllegalStateException("Customer does not have enough funds for this ride. " +
                     "Available: " + (walletBalanceCents / 100.0) + "€, Required: " + dto.getEstimatedPrice() + "€");
         }
+        RideRequest request = new RideRequest();
+        request.setCustomer(customer);
+        request.setStartAddress(dto.getStartAddress());
+        request.setStartLatitude(dto.getStartLatitude());
+        request.setStartLongitude(dto.getStartLongitude());
+        request.setDestinationAddress(dto.getDestinationAddress());
+        request.setDestinationLatitude(dto.getDestinationLatitude());
+        request.setDestinationLongitude(dto.getDestinationLongitude());
+        request.setVehicleClass(dto.getVehicleClass()); // now uses enum
+        request.setStartLocationName(dto.getStartLocationName());
+        request.setDestinationLocationName(dto.getDestinationLocationName());
+        request.setDistance(dto.getDistance());
+        request.setDuration(dto.getDuration());
+        request.setEstimatedPrice(dto.getEstimatedPrice());
 
-        RideRequest request = new RideRequest(
-                customer,
-                dto.getStartAddress(),
-                dto.getStartLatitude(),
-                dto.getStartLongitude(),
-                dto.getStartLocationName(),
-                dto.getDestinationLocationName(),
-                dto.getDestinationAddress(),
-                dto.getDestinationLatitude(),
-                dto.getDestinationLongitude(),
-                dto.getDistance(),
-                dto.getDuration(),
-                dto.getEstimatedPrice(),
-                dto.getVehicleClass()
-        );
+        if (dto.getWaypoints() != null && !dto.getWaypoints().isEmpty()) {
+            List<Waypoint> waypoints = dto.getWaypoints().stream()
+                    .map(wpDto -> {
+                        Waypoint wp = new Waypoint();
+                        wp.setAddress(wpDto.getAddress());
+                        wp.setLatitude(wpDto.getLatitude());
+                        wp.setLongitude(wpDto.getLongitude());
+                        wp.setSequenceOrder(wpDto.getSequenceOrder());
+                        wp.setName(wpDto.getName());
+                        wp.setRideRequest(request);
+                        return wp;
+                    })
+                    .collect(Collectors.toList());
+
+            request.setWaypoints(waypoints);
+        }
 
         customer.setActive(true);
         customerRepository.save(customer);
@@ -285,6 +302,8 @@ public class RideRequestService {
         rideSimulation.setStartLocationName(rideRequest.getStartLocationName());
         rideSimulation.setDestinationLocationName(rideRequest.getDestinationLocationName());
         rideSimulation.setCurrentIndex(0);
+
+
         rideRequest.setRideStatus(RideStatus.IN_PROGRESS);
         selectedOffer.setRideStatus(RideStatus.IN_PROGRESS);
         rideSimulation.setRideStatus(RideStatus.CREATED);
@@ -352,6 +371,10 @@ public class RideRequestService {
     public void rateCustomer(Long rideSimulationId, int rate) {
         Optional<RideSimulation> rideSimulation = rideSimulationRepository.findById(rideSimulationId);
         rideSimulation.get().getRideOffer().getRideRequest().setCustomerRating(rate);
+        Long rideReqId = rideSimulation.get().getRideOffer().getRideRequest().getId();
+        Optional<Trips> trip = tripRepository.findById(rideReqId);
+        trip.get().setCustomerRating(rate);
+        tripRepository.save(trip.get());
         if (rideSimulation.isPresent()) {
             Optional<Customer> customer = customerRepository.findByUsername(
                     rideSimulation.get().getCustomer().getUsername());
@@ -374,6 +397,10 @@ public class RideRequestService {
     public void rateDriver(Long rideSimulationId, int rate) {
         Optional<RideSimulation> rideSimulation = rideSimulationRepository.findById(rideSimulationId);
         rideSimulation.get().getRideOffer().getRideRequest().setDriverRating(rate);
+        Long rideReqId = rideSimulation.get().getRideOffer().getRideRequest().getId();
+        Optional<Trips> trip = tripRepository.findById(rideReqId);
+        trip.get().setDriverRating(rate);
+        tripRepository.save(trip.get());
         if (rideSimulation.isPresent()) {
             Optional<Driver> driver = driverRepository.findByUsername(
                     rideSimulation.get().getDriver().getUsername());
@@ -409,8 +436,8 @@ public class RideRequestService {
                         dto.setCustomerUsername(request.getCustomer().getUsername());
                         dto.setFees(request.getEstimatedPrice());
                         dto.setEndTime(request.getEndedAt());
-                        dto.setDriverRating(request.getCustomerRating());
-                        dto.setCustomerRating(request.getDriverRating());
+                        dto.setDriverRating(request.getDriverRating());
+                        dto.setCustomerRating(request.getCustomerRating());
                         dto.setDriverUsername(offer.getDriver().getUsername());
                         dto.setDriverName(offer.getDriver().getFirstName() + " " + offer.getDriver().getLastName());
                         return dto;
@@ -434,8 +461,8 @@ public class RideRequestService {
                         dto.setCustomerUsername(request.getCustomer().getUsername());
                         dto.setFees(request.getEstimatedPrice());
                         dto.setEndTime(request.getEndedAt());
-                        dto.setDriverRating(request.getCustomerRating());
-                        dto.setCustomerRating(request.getDriverRating());
+                        dto.setDriverRating(request.getDriverRating());
+                        dto.setCustomerRating(request.getCustomerRating());
 
                         Optional<RideOffer> offerOpt = rideOfferRepository.findByRideRequestId(request.getId());
                         if (offerOpt.isPresent() && offerOpt.get().getRideStatus() == RideStatus.COMPLETED) {

@@ -8,6 +8,12 @@
     </app-location-card>
 
     <app-location-card
+      *ngFor="let stopover of activeRide.stopovers; let i = index"
+      [location]="stopover"
+      [label]="'Stopover ' + (i + 1)">
+    </app-location-card>
+
+    <app-location-card
       [location]="activeRide.dropoff"
       label="Drop off at">
     </app-location-card>

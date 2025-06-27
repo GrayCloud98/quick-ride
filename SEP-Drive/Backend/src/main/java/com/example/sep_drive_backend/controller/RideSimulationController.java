@@ -1,11 +1,14 @@
 package com.example.sep_drive_backend.controller;
 
 import com.example.sep_drive_backend.constants.RideStatus;
+import com.example.sep_drive_backend.constants.TripsStatus;
 import com.example.sep_drive_backend.dto.RideSimulationUpdate;
 import com.example.sep_drive_backend.dto.SimulationControlMessage;
+import com.example.sep_drive_backend.dto.SimulationPointsControl;
 import com.example.sep_drive_backend.models.Customer;
 import com.example.sep_drive_backend.models.Driver;
 import com.example.sep_drive_backend.models.RideSimulation;
+import com.example.sep_drive_backend.models.Trips;
 import com.example.sep_drive_backend.repository.*;
 import com.example.sep_drive_backend.services.LoginService;
 import com.example.sep_drive_backend.services.RideSimulationService;
@@ -29,9 +32,10 @@ public class RideSimulationController {
     private final LoginService loginService;
     private final CustomerRepository customerRepository;
     private final DriverRepository driverRepository;
+    private final TripRepository tripRepository;
 
     public RideSimulationController(RideSimulationService rideSimulationService,
-                                    SimpMessagingTemplate messagingTemplate, RideSimulationRepository rideSimulationRepository, RideOfferRepository rideOfferRepository, RideRequestRepository rideRequestRepository, LoginService loginService, CustomerRepository customerRepository, DriverRepository driverRepository) {
+                                    SimpMessagingTemplate messagingTemplate, RideSimulationRepository rideSimulationRepository, RideOfferRepository rideOfferRepository, RideRequestRepository rideRequestRepository, LoginService loginService, CustomerRepository customerRepository, DriverRepository driverRepository, TripRepository tripRepository) {
         this.rideSimulationService = rideSimulationService;
         this.messagingTemplate = messagingTemplate;
         this.rideSimulationRepository = rideSimulationRepository;
@@ -40,6 +44,7 @@ public class RideSimulationController {
         this.loginService = loginService;
         this.customerRepository = customerRepository;
         this.driverRepository = driverRepository;
+        this.tripRepository = tripRepository;
     }
 
     @MessageMapping("/simulation/fetch")
@@ -78,6 +83,12 @@ public class RideSimulationController {
         broadcastUpdate(sim);
     }
 
+    @MessageMapping("/simulation/change-points")
+    public void changePoints(@Payload SimulationPointsControl msg) {
+        RideSimulation sim = rideSimulationService.changePoints(msg.getRideSimulationId(), msg);
+        broadcastUpdate(sim);
+    }
+
     @Transactional
     @MessageMapping("/simulation/complete")
     public void completeSimulation(@Payload SimulationControlMessage msg) {
@@ -101,9 +112,6 @@ public class RideSimulationController {
         String customerUsername = simulation.getCustomer().getUsername();
         Long driverUserId = simulation.getDriver().getId();
         rideSimulationService.transferFees(customerUsername, driverUserId, priceCents);
-
-
-
         Customer customer = simulation.getCustomer();
         int customerOldTotalRides = customer.getTotalRides();
         customer.setTotalRides(customerOldTotalRides + 1);
@@ -117,6 +125,19 @@ public class RideSimulationController {
         driver.setActive(false);
         driverRepository.save(driver);
 
+        Trips trip = new Trips();
+        trip.setDriver(driver);
+        trip.setCustomer(customer);
+        trip.setStatus(TripsStatus.COMPLETED);
+        trip.setEndTime(simulation.getRideOffer().getRideRequest().getEndedAt());
+        trip.setDistanceKm(simulation.getRideOffer().getRideRequest().getDistance());
+        trip.setDurationMin(simulation.getRideOffer().getRideRequest().getDuration());
+        trip.setPriceEuro(simulation.getRideOffer().getRideRequest().getEstimatedPrice());
+        trip.setDriverFullName(simulation.getRideOffer().getDriver().getFirstName() + " " + simulation.getRideOffer().getDriver().getLastName());
+        trip.setCustomerFullName(simulation.getRideOffer().getRideRequest().getCustomer().getFirstName() + " " + simulation.getCustomer().getLastName());
+        trip.setId(simulation.getRideOffer().getRideRequest().getId());
+        trip.setCustomerUsername(simulation.getCustomer().getUsername());
+        tripRepository.save(trip);
         rideSimulationRepository.save(simulation);
         rideOfferRepository.save(simulation.getRideOffer());
         rideRequestRepository.save(simulation.getRideOffer().getRideRequest());

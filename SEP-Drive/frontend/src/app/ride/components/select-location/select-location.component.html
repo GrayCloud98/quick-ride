@@ -9,6 +9,13 @@
            [attr.aria-label]="label"
            [disabled]="!isSimulationPaused">
 
+    <button mat-icon-button matSuffix *ngIf="removable"
+            (click)="remove()" type="button" class="delete-btn"
+            matTooltip="Remove Stopover"
+            matTooltipPosition="right">
+      <mat-icon>delete</mat-icon>
+    </button>
+
     <button mat-icon-button matSuffix *ngIf="geoLocationButton"
             (click)="myLocation()" type="button"
             [disabled]="!isSimulationPaused"

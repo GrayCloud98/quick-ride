@@ -8,23 +8,54 @@
   </select-location>
 
   <select-location
+    *ngFor="let control of stopoversControl.controls; let i = index"
+    [label]="'Stopover ' + (i + 1)"
+    [placeholder]="'I want to stop by ...'"
+    [control]="control"
+    [removable]="true"
+    (onRemove)="removeStopover(i)"
+    (locationSelected)="onLocationSelected($event, i)"
+    >
+  </select-location>
+
+  <div class="button-container">
+    <button mat-fab extended class="btn" type="button" (click)="addStopover()">
+      Add Stopover
+    </button>
+  </div>
+
+  <select-location
     [label]="'Drop-off Location'"
     [placeholder]="'Cinema'"
     [control]="dropoffControl"
     (locationSelected)="onLocationSelected($event, updateType.dropoff)">
   </select-location>
 
-  <div class="form-label">Select a vehicle class:</div>
-  <mat-radio-group [(ngModel)]="ride.vehicleClass" name="vehicleClass" (change)="updateDistanceInfo()">
-    <mat-radio-button *ngFor="let car of vehicles" [value]="car">
-      {{ car }}
+  <div class="label">Select a vehicle class:</div>
+  <mat-radio-group
+    [(ngModel)]="ride.vehicleClass"
+    name="vehicleClass"
+    (change)="updateDistanceInfo()"
+    class="radio-group"
+  >
+    <mat-radio-button
+      *ngFor="let car of vehicles"
+      [value]="car"
+      class="radio"
+    >
+      <span class="value">{{ car }}</span>
     </mat-radio-button>
   </mat-radio-group>
+  <br>
 
   <div class="button-container">
-    <button mat-fab extended class="full-width" (click)="submit()" [disabled]="isFormInvalid">
-      Submit Ride Request
+    <button mat-fab extended class="btn" (click)="submit()" [disabled]="isFormInvalid">
+      Submit Request
     </button>
+  </div>
+
+  <div class="alert error" *ngIf="submitFailed" >
+    You do not have enough Balance for this Request.
   </div>
 
   <div class="alert error" *ngIf="ride.active">

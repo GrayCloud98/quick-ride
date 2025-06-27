@@ -1,5 +1,14 @@
 package com.example.sep_drive_backend.dto;
 
+import com.example.sep_drive_backend.models.Waypoint;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class SimulationControlMessage {
     private Long rideSimulationId;
     private int currentIndex;
