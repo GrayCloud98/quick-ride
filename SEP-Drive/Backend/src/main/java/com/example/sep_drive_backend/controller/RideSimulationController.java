@@ -156,6 +156,10 @@ public class RideSimulationController {
         RideSimulationUpdate update = rideSimulationService.completedToDto(sim);
         messagingTemplate.convertAndSend("/topic/simulation/" + sim.getId(), update);
     }
+    private void broadcastChangedUpdate(RideSimulation sim) {
+        RideSimulationUpdate update = rideSimulationService.changedToDto(sim);
+        messagingTemplate.convertAndSend("/topic/simulation/" + sim.getId(), update);
+    }
 
 
 

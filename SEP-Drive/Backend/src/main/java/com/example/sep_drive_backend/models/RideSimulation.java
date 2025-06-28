@@ -138,10 +138,12 @@ public class RideSimulation {
         return hasChanged;
     }
 
-    public void markChanged() {
-        if (!this.hasChanged) {
-            this.hasChanged = true;
-        }
+    public boolean isHasChanged() {
+        return hasChanged;
+    }
+
+    public void setHasChanged(boolean hasChanged) {
+        this.hasChanged = hasChanged;
     }
 
     public Long getId() {

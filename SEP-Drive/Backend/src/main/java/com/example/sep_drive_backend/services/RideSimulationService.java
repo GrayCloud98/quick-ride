@@ -95,7 +95,8 @@ public class RideSimulationService {
         sim.getRideOffer().getRideRequest().setWaypoints(mappedWaypoints);
         sim.setStartPoint(simPointsControl.getStartPoint());
         sim.setEndPoint(simPointsControl.getEndPoint());
-        sim.markChanged();
+
+
         rideSimulationRepository.save(sim);
         return sim;
     }
@@ -165,5 +166,38 @@ public class RideSimulationService {
         dto.setRideStatus(RideStatus.COMPLETED);
         return dto;
     }
+
+    public RideSimulationUpdate changedToDto(RideSimulation sim) {
+        RideSimulationUpdate dto = new RideSimulationUpdate();
+        dto.setRideSimulationId(sim.getId());
+        dto.setPaused(sim.isPaused());
+        dto.setHasStarted(sim.isHasStarted());
+        dto.setDuration(sim.getDuration());
+        dto.setStartLocationName(sim.getStartLocationName());
+        dto.setDestinationLocationName(sim.getDestinationLocationName());
+        dto.setCurrentIndex(sim.getCurrentIndex());
+        dto.setStartPoint(sim.getStartPoint());
+        dto.setRideStatus(sim.getRideStatus());
+        dto.setEndPoint(sim.getEndPoint());
+        dto.setHasChanged(true);
+
+        List<WaypointDTO> waypointDTOs = sim.getRideOffer().getRideRequest().getWaypoints()
+                .stream()
+                .map(w -> {
+                    WaypointDTO wpDto = new WaypointDTO();
+                    wpDto.setName(w.getName());
+                    wpDto.setAddress(w.getAddress());
+                    wpDto.setLatitude(w.getLatitude());
+                    wpDto.setLongitude(w.getLongitude());
+                    wpDto.setSequenceOrder(w.getSequenceOrder());
+                    return wpDto;
+                })
+                .collect(Collectors.toList());
+
+        dto.setWaypoints(waypointDTOs);
+
+        return dto;
+    }
+
 
 }
