@@ -1,11 +1,11 @@
 import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import { Control, SimulationService, Update } from '../simulation.service';
-import { MatDialog } from '@angular/material/dialog';
-import { RatingPopupComponent } from '../rating-popup/rating-popup.component';
-import { FormControl, Validators } from '@angular/forms';
-import { Location } from '../../ride/models/location.model';
-import { DistanceService} from '../../ride/services/distance.service';
-import { VehicleClass } from '../../ride/models/ride.model';
+import {Control, SimulationService, Update} from '../simulation.service';
+import {MatDialog} from '@angular/material/dialog';
+import {RatingPopupComponent} from '../rating-popup/rating-popup.component';
+import {FormControl, Validators} from '@angular/forms';
+import {Location} from '../../ride/models/location.model';
+import {DistanceService} from '../../ride/services/distance.service';
+import {VehicleClass} from '../../ride/models/ride.model';
 import {AuthService} from '../../auth/auth.service';
 
 export interface Point {
@@ -236,7 +236,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
 
       if (this.currentIndex >= totalSteps - 1) {
         this.pointer.position = this.path[totalSteps - 1];
-        this.paused = true;
+        this.simService.control(Control.PAUSE, this.currentIndex)
         return;
       }
 
