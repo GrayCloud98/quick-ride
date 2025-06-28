@@ -97,7 +97,9 @@ public class RideSimulationService {
                 }).collect(Collectors.toList());
         r.getWaypoints().addAll(mappedWaypoints);
         sim.getRideOffer().getRideRequest().setWaypoints(mappedWaypoints);
-
+        r.setDestinationLocationName(simPointsControl.getDestinationLocationName());
+        r.setDestinationLongitude(simPointsControl.getEndPoint().getLng());
+        r.setDestinationLatitude(simPointsControl.getEndPoint().getLat());
         PointDTO ep = simPointsControl.getEndPoint();
         sim.setEndPoint(new RideSimulation.Point(ep.getLat(), ep.getLng()));
 
