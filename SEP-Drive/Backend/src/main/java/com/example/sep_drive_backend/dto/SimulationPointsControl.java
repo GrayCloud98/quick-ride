@@ -14,6 +14,15 @@ public class SimulationPointsControl extends SimulationControlMessage{
     private RideSimulation.Point endPoint;
     private String startLocationName;
     private String destinationLocationName;
+    private String destinationAddress;
+
+    public String getDestinationAddress() {
+        return destinationAddress;
+    }
+
+    public void setDestinationAddress(String destinationAddress) {
+        this.destinationAddress = destinationAddress;
+    }
 
     public String getDestinationLocationName() {
         return destinationLocationName;

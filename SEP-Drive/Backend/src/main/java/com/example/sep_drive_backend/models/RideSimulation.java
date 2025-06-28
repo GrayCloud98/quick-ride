@@ -20,6 +20,24 @@ public class RideSimulation {
     private boolean paused = true;
     private boolean hasStarted = false;
     private int currentIndex = 0;
+    private String startAddress;
+    private String endAddress;
+
+    public String getStartAddress() {
+        return startAddress;
+    }
+
+    public void setStartAddress(String startAddress) {
+        this.startAddress = startAddress;
+    }
+
+    public String getEndAddress() {
+        return endAddress;
+    }
+
+    public void setEndAddress(String endAddress) {
+        this.endAddress = endAddress;
+    }
 
     @Embedded
     @AttributeOverrides({
