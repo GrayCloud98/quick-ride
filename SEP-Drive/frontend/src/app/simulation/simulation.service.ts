@@ -95,7 +95,6 @@ export class SimulationService {
     switch (control) {
       case Control.SPEED:
         payload.duration = input;
-        console.log('SPEED')
         break;
 
       case Control.CHANGE:
@@ -119,7 +118,6 @@ export class SimulationService {
 
       default:
         payload.currentIndex = input;
-        console.log('START/PAUSE/RESUME')
         break;
     }
 

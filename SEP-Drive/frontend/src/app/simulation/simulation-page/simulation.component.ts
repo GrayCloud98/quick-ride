@@ -335,9 +335,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     } else
       this.points.splice(index, 1);
 
-    void this.updateRideInfo();
-    this.renderPins();
-    this.drawRoute();
+    this.simService.control(Control.CHANGE, this.currentIndex, this.points);
   }
 
   // 🧮 Helpers
