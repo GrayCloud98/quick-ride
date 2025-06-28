@@ -106,7 +106,7 @@ export class SimulationService {
               longitude: point.lng,
               address: point.address,
               name: point.name,
-              sequenceOrder: index - 1,
+              sequenceOrder: index,
             });
 
         payload.currentIndex = input;
@@ -115,7 +115,6 @@ export class SimulationService {
         payload.startPoint = { lat: points[0].lat,lng: points[0].lng };
         payload.endPoint = { lat: points[points.length - 1].lat, lng: points[points.length - 1].lng };
         payload.waypoints = points.slice(1, points.length - 1).map((p, i) => cleanWaypoint(p, i));
-        console.log('CHANGE')
         break;
 
       default:

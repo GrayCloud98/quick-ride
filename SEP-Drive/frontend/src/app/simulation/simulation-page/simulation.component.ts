@@ -8,12 +8,12 @@ import { DistanceService} from '../../ride/services/distance.service';
 import { VehicleClass } from '../../ride/models/ride.model';
 
 export interface Point {
-  name?: string, //todo new
-  address?: string, //todo new
+  name?: string,
+  address?: string,
   lat: number,
   lng: number,
   index: number,
-  passed: boolean //todo new
+  passed: boolean
 }
 
 @Component({
@@ -37,8 +37,8 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   ride = {vehicleClass: VehicleClass.LARGE, distance: 0, duration: 0, estimatedPrice: 0} //todo new
   currentIndex = 0;
   duration = 30;
-  nextStopoverPosition = 1; //todo new
-  desiredStopoverPosition = 1; //todo new
+  nextStopoverPosition = 1;
+  desiredStopoverPosition = 1;
 
   // ⏱️ State Flags
   hasStarted = false;
@@ -60,12 +60,10 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
 
     this.simService.getSimulationUpdates().subscribe(
       (update: Update) => {
-        console.log("🎁", update); //todo delete
-
         this.duration = update.duration;
         this.currentIndex = update.currentIndex;
 
-        if (!this.metadataLoaded) {
+        if (update.hasChanged || !this.metadataLoaded) {
           this.points = [
             { name: update.startLocationName, address: '', lat: update.startPoint.lat, lng: update.startPoint.lng, index: 0, passed: true },
             ...update.waypoints.map(wp => ({ name: wp.name, address: wp.address, lat: wp.latitude, lng: wp.longitude, index: 0, passed: false })),
@@ -78,10 +76,14 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
           return;
         }
 
-        // hopefully working logic :<
         if (!this.hasStarted && update.hasStarted){
           this.start();
           this.hasStarted = true;
+        }
+        else if (update.hasChanged){
+          void this.updateRideInfo();
+          this.renderPins()
+          this.drawRoute()
         }
         else {
           if (this.paused !== update.paused) {
@@ -92,18 +94,6 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
             this.paused = update.paused;
           }
         }
-
-        // use this in case you fucked up
-        // if (update.hasStarted !== this.hasStarted || update.paused !== this.paused) {
-        //   if (update.hasStarted) {
-        //     if (!this.hasStarted) this.start();
-        //     else if (update.paused) this.pause();
-        //     else if (!update.paused) this.resume();
-        //   }
-        //
-        //   this.hasStarted = update.hasStarted;
-        //   this.paused = update.paused;
-        // }
 
         if (!this.metadataLoaded) {
           this.initializeMap();
@@ -126,7 +116,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     };
 
     this.map = new google.maps.Map(this.mapContainer.nativeElement, mapOptions);
-    void this.updateRideInfo(); // todo retrieve from back end on init
+    void this.updateRideInfo();
     this.renderPins();
     this.drawRoute();
   }
@@ -200,6 +190,8 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
 
     this.assignStopoverIndices();
     this.points.forEach(p => p.passed = p.index <= this.currentIndex);
+    this.desiredStopoverPosition = this.points.findIndex(p => !p.passed);
+    this.nextStopoverPosition = this.points.findIndex(p => !p.passed);
 
     this.pointer = new google.maps.marker.AdvancedMarkerElement({
       position: this.path[this.currentIndex],
@@ -327,16 +319,12 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     else if (this.hasStarted && this.desiredStopoverPosition === this.nextStopoverPosition) {
       const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
       this.points.splice(this.desiredStopoverPosition, 0, currentPoint, newStopover);
-      this.nextStopoverPosition += 1;
-      this.desiredStopoverPosition += 1;
     }
 
     else
       this.points.splice(this.desiredStopoverPosition, 0, newStopover);
 
-    void this.updateRideInfo();
-    this.renderPins();
-    this.drawRoute();
+    this.simService.control(Control.CHANGE, this.currentIndex, this.points);
   }
 
   removeStopover(index: number) {
