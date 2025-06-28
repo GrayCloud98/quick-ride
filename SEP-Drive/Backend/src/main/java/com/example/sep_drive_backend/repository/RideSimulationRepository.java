@@ -25,4 +25,12 @@ public interface RideSimulationRepository extends JpaRepository<RideSimulation, 
             String username2, RideStatus status2
     );
 
+    @Query("SELECT sim FROM RideSimulation sim " +
+            "JOIN FETCH sim.rideOffer ro " +
+            "JOIN FETCH ro.rideRequest rr " +
+            "LEFT JOIN FETCH rr.waypoints " +
+            "WHERE sim.id = :id")
+    Optional<RideSimulation> findWithWaypointsById(@Param("id") Long id);
+
+
 }

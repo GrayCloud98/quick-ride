@@ -2,6 +2,7 @@ package com.example.sep_drive_backend.services;
 import com.example.sep_drive_backend.constants.RideStatus;
 import com.example.sep_drive_backend.dto.RideSimulationUpdate;
 import com.example.sep_drive_backend.dto.SimulationPointsControl;
+import com.example.sep_drive_backend.dto.WaypointDTO;
 import com.example.sep_drive_backend.models.Customer;
 import com.example.sep_drive_backend.models.Driver;
 import com.example.sep_drive_backend.models.RideSimulation;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -70,9 +72,8 @@ public class RideSimulationService {
     }
 
     public RideSimulation getSimulationById(Long id) {
-        Optional<RideSimulation> simOpt = rideSimulationRepository.findById(id);
-        if (simOpt.isEmpty()) throw new RuntimeException("Simulation not found");
-        return simOpt.get();
+        return rideSimulationRepository.findWithWaypointsById(id)
+                .orElseThrow(() -> new RuntimeException("Simulation not found"));
     }
 
     public RideSimulation changePoints(Long id, SimulationPointsControl simPointsControl) {
@@ -100,7 +101,22 @@ public class RideSimulationService {
         dto.setStartPoint(sim.getStartPoint());
         dto.setRideStatus(sim.getRideStatus());
         dto.setEndPoint(sim.getEndPoint());
-        dto.setWaypoints(sim.getRideOffer().getRideRequest().getWaypoints());
+
+        List<WaypointDTO> waypointDTOs = sim.getRideOffer().getRideRequest().getWaypoints()
+                .stream()
+                .map(w -> {
+                    WaypointDTO wpDto = new WaypointDTO();
+                    wpDto.setName(w.getName());
+                    wpDto.setAddress(w.getAddress());
+                    wpDto.setLatitude(w.getLatitude());
+                    wpDto.setLongitude(w.getLongitude());
+                    wpDto.setSequenceOrder(w.getSequenceOrder());
+                    return wpDto;
+                })
+                .collect(Collectors.toList());
+
+        dto.setWaypoints(waypointDTOs);
+
         dto.setHasChanged(sim.getHasChanged());
         return dto;
     }
@@ -116,7 +132,24 @@ public class RideSimulationService {
         dto.setStartLocationName(sim.getStartLocationName());
         dto.setCurrentIndex(sim.getCurrentIndex());
         dto.setDestinationLocationName(sim.getDestinationLocationName());
-        dto.setWaypoints(sim.getRideOffer().getRideRequest().getWaypoints());
+
+
+        List<WaypointDTO> waypointDTOs = sim.getRideOffer().getRideRequest().getWaypoints()
+                .stream()
+                .map(w -> {
+                    WaypointDTO wpDto = new WaypointDTO();
+                    wpDto.setName(w.getName());
+                    wpDto.setAddress(w.getAddress());
+                    wpDto.setLatitude(w.getLatitude());
+                    wpDto.setLongitude(w.getLongitude());
+                    wpDto.setSequenceOrder(w.getSequenceOrder());
+                    return wpDto;
+                })
+                .collect(Collectors.toList());
+
+        dto.setWaypoints(waypointDTOs);
+
+
         dto.setHasChanged(sim.getHasChanged());
         dto.setRideStatus(RideStatus.COMPLETED);
         return dto;
