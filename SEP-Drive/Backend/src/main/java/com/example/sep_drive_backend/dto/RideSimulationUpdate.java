@@ -24,13 +24,19 @@ public class RideSimulationUpdate {
     private String startLocationName;
     private String destinationLocationName;
     private int currentIndex;
+    private List<WaypointDTO> waypoints;
 
 
-    private List<Waypoint> waypoints = new ArrayList<>();
     private boolean hasChanged;
 
 
+    public List<WaypointDTO> getWaypoints() {
+        return waypoints;
+    }
 
+    public void setWaypoints(List<WaypointDTO> waypoints) {
+        this.waypoints = waypoints;
+    }
 
     public boolean isHasChanged() {
         return hasChanged;
@@ -40,13 +46,6 @@ public class RideSimulationUpdate {
         this.hasChanged = hasChanged;
     }
 
-    public List<Waypoint> getWaypoints() {
-        return waypoints;
-    }
-
-    public void setWaypoints(List<Waypoint> waypoints) {
-        this.waypoints = waypoints;
-    }
 
     public int getCurrentIndex() {
         return currentIndex;
