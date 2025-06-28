@@ -10,10 +10,9 @@ import java.util.List;
 public class SimulationPointsControl extends SimulationControlMessage{
 
     private List<WaypointDTO> waypoints;
-    private RideSimulation.Point startPoint;
-    private RideSimulation.Point endPoint;
-    private String startLocationName;
+    private PointDTO endPoint;
     private String destinationLocationName;
+
 
     public String getDestinationLocationName() {
         return destinationLocationName;
@@ -23,13 +22,6 @@ public class SimulationPointsControl extends SimulationControlMessage{
         this.destinationLocationName = destinationLocationName;
     }
 
-    public String getStartLocationName() {
-        return startLocationName;
-    }
-
-    public void setStartLocationName(String startLocationName) {
-        this.startLocationName = startLocationName;
-    }
 
     public List<WaypointDTO> getWaypoints() {
         return waypoints;
@@ -39,19 +31,12 @@ public class SimulationPointsControl extends SimulationControlMessage{
         this.waypoints = waypoints;
     }
 
-    public RideSimulation.Point getStartPoint() {
-        return startPoint;
-    }
 
-    public void setStartPoint(RideSimulation.Point startPoint) {
-        this.startPoint = startPoint;
-    }
-
-    public RideSimulation.Point getEndPoint() {
+    public PointDTO getEndPoint() {
         return endPoint;
     }
 
-    public void setEndPoint(RideSimulation.Point endPoint) {
+    public void setEndPoint(PointDTO endPoint) {
         this.endPoint = endPoint;
     }
 }

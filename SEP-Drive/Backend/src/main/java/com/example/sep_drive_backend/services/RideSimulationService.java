@@ -1,5 +1,6 @@
 package com.example.sep_drive_backend.services;
 import com.example.sep_drive_backend.constants.RideStatus;
+import com.example.sep_drive_backend.dto.PointDTO;
 import com.example.sep_drive_backend.dto.RideSimulationUpdate;
 import com.example.sep_drive_backend.dto.SimulationPointsControl;
 import com.example.sep_drive_backend.dto.WaypointDTO;
@@ -79,7 +80,6 @@ public class RideSimulationService {
     public RideSimulation changePoints(Long id, SimulationPointsControl simPointsControl) {
         RideSimulation sim = getSimulationById(id);
         sim.setCurrentIndex(simPointsControl.getCurrentIndex());
-        sim.setStartLocationName(simPointsControl.getStartLocationName());
         sim.setDestinationLocationName(simPointsControl.getDestinationLocationName());
         List<Waypoint> mappedWaypoints = simPointsControl.getWaypoints().stream()
                 .map(dto -> {
@@ -93,8 +93,9 @@ public class RideSimulationService {
                 }).collect(Collectors.toList());
 
         sim.getRideOffer().getRideRequest().setWaypoints(mappedWaypoints);
-        sim.setStartPoint(simPointsControl.getStartPoint());
-        sim.setEndPoint(simPointsControl.getEndPoint());
+
+        PointDTO ep = simPointsControl.getEndPoint();
+        sim.setEndPoint(new RideSimulation.Point(ep.getLat(), ep.getLng()));
 
 
         rideSimulationRepository.save(sim);
