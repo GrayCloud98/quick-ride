@@ -20,6 +20,8 @@ export interface Update {
   currentIndex: number,
   waypoints: { address: string, latitude: number, longitude: number, sequenceOrder: number, name: string }[];
   hasChanged: boolean,
+  startAddress: string,
+  destinationAddress: string,
   rideStatus: 'CREATED' | 'IN_PROGRESS' | 'COMPLETED'
 }
 

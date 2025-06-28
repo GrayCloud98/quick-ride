@@ -65,9 +65,9 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
 
         if (update.hasChanged || !this.metadataLoaded) {
           this.points = [
-            { name: update.startLocationName, address: '', lat: update.startPoint.lat, lng: update.startPoint.lng, index: 0, passed: true },
+            { name: update.startLocationName, address: update.startAddress, lat: update.startPoint.lat, lng: update.startPoint.lng, index: 0, passed: true },
             ...update.waypoints.map(wp => ({ name: wp.name, address: wp.address, lat: wp.latitude, lng: wp.longitude, index: 0, passed: false })),
-            { name: update.destinationLocationName, address: '', lat: update.endPoint.lat, lng: update.endPoint.lng, index: 0, passed: false }
+            { name: update.destinationLocationName, address: update.destinationAddress, lat: update.endPoint.lat, lng: update.endPoint.lng, index: 0, passed: false }
           ];
         }
 
