@@ -31,7 +31,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
   private animationFrameId: number | null = null;
   private directionsRenderer?: google.maps.DirectionsRenderer;
   private pins: google.maps.marker.AdvancedMarkerElement[] = [];
-  private path: google.maps.LatLngLiteral[] = [];
+  path: google.maps.LatLngLiteral[] = [];
 
   // 🚘 Route/Stopovers State
   points: Point[] = [];
@@ -197,8 +197,9 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.assignStopoverIndices();
     this.points.forEach(p => p.passed = p.index <= this.currentIndex);
-    this.desiredStopoverPosition = this.points.findIndex(p => !p.passed);
     this.nextStopoverPosition = this.points.findIndex(p => !p.passed);
+    this.nextStopoverPosition = this.nextStopoverPosition === -1 ? this.points.length : this.nextStopoverPosition;
+    this.desiredStopoverPosition = Math.max(this.desiredStopoverPosition, this.nextStopoverPosition);
 
     this.pointer = new google.maps.marker.AdvancedMarkerElement({
       position: this.path[this.currentIndex],
@@ -320,10 +321,8 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private addStopover(newStopover: Point) {
-    if (this.points[this.points.length - 1].passed)
-      this.points.splice(this.desiredStopoverPosition, 0, newStopover);
 
-    else if (this.hasStarted && this.desiredStopoverPosition === this.nextStopoverPosition) {
+    if (this.hasStarted && this.desiredStopoverPosition === this.nextStopoverPosition) {
       const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
       this.points.splice(this.desiredStopoverPosition, 0, currentPoint, newStopover);
     }
@@ -335,11 +334,15 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   removeStopover(index: number) {
-    if (this.hasStarted && index === this.nextStopoverPosition) {
-      const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
+    const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
+
+    if (this.hasStarted && index === this.nextStopoverPosition)  {
       this.points.splice(index, 1, currentPoint);
       this.nextStopoverPosition += 1;
-    } else
+    }
+    else if (index === this.points.length)
+      this.points.splice(index - 1, 1, currentPoint);
+    else
       this.points.splice(index, 1);
 
     this.simService.control(Control.CHANGE, this.currentIndex, this.points);

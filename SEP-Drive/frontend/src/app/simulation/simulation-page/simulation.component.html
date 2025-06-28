@@ -88,7 +88,7 @@
         <mat-card-content class="content-section top-border">
           <div class="button-container">
             <button *ngIf="!hasStarted" class="btn" mat-fab extended (click)="start()">Start</button>
-            <button *ngIf="hasStarted && paused" class="btn" mat-fab extended (click)="resume()">Resume</button>
+            <button *ngIf="hasStarted && paused" class="btn" mat-fab extended (click)="resume()" [disabled]="currentIndex >= path.length - 1">Resume</button>
             <button *ngIf="hasStarted && !paused" class="btn" mat-fab extended (click)="pause()">Pause</button>
             <button *ngIf="hasStarted" class="btn warn" mat-fab extended (click)="complete()" [disabled]="!paused">Complete</button>
           </div>
@@ -100,7 +100,7 @@
       <div *ngFor="let point of points; let i = index">
         <app-location-card
           [isSimulationPaused]="paused"
-          [removable]="isCustomer && !point.passed && !(nextStopoverPosition + 1 === points.length)"
+          [removable]="isCustomer && !point.passed"
           [location]="{ latitude: point.lat, longitude: point.lng, name: point.name, address: point.address }"
           [label]="i === 0 ? 'Pick up' : i === points.length - 1 ? 'Drop off' : 'Stopover ' + i"
           (onRemove)="removeStopover(i)">
