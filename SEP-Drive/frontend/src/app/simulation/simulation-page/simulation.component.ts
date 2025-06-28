@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import { Control, SimulationService, Update } from '../simulation.service';
 import { MatDialog } from '@angular/material/dialog';
 import { RatingPopupComponent } from '../rating-popup/rating-popup.component';
@@ -6,6 +6,7 @@ import { FormControl, Validators } from '@angular/forms';
 import { Location } from '../../ride/models/location.model';
 import { DistanceService} from '../../ride/services/distance.service';
 import { VehicleClass } from '../../ride/models/ride.model';
+import {AuthService} from '../../auth/auth.service';
 
 export interface Point {
   name?: string,
@@ -22,7 +23,7 @@ export interface Point {
   templateUrl: './simulation.component.html',
   styleUrl: './simulation.component.scss'
 })
-export class SimulationComponent implements AfterViewInit, OnDestroy {
+export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
   // 🗺️ Map and Animation
   @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef;
   private map!: google.maps.Map;
@@ -48,11 +49,17 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
 
   // 🧩 Form Controls
   newStopoverControl = new FormControl<Location | string>('', [Validators.required]);
+  isCustomer = false;
 
   // 🛠️ Constructor
   constructor(private dialog: MatDialog,
+              private authService: AuthService,
               private distanceService: DistanceService,
               private simService: SimulationService) {}
+
+  ngOnInit(): void {
+    this.isCustomer = this.authService.currentUserValue.role === 'Customer'
+  }
 
   // 🔄 Lifecycle
   ngAfterViewInit(): void {

@@ -7,7 +7,6 @@ import {AuthService} from '../auth/auth.service';
 import {Point} from './simulation-page/simulation.component'
 
 export interface Update {
-  //todo address for start- and end points? :(
   //todo driver vehicle type?
   rideSimulationId: number,
   paused: boolean,
