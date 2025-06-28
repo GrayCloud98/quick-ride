@@ -4,6 +4,7 @@ import SockJS from 'sockjs-client';
 import {BehaviorSubject, Observable, Subject, switchMap} from 'rxjs';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {AuthService} from '../auth/auth.service';
+import {Point} from './simulation-page/simulation.component'
 
 export interface Update {
   //todo address for start- and end points? :(
@@ -28,6 +29,7 @@ export enum Control {
   PAUSE = 'pause',
   RESUME = 'resume',
   SPEED = 'speed',
+  CHANGE = 'change-points',
   COMPLETE = 'complete'
 }
 @Injectable({
@@ -80,18 +82,47 @@ export class SimulationService {
     }
   }
 
- /* input:
-  * START, PAUSE, RESUME = currentIndex
-  * SPEED = duration
-  * FETCH, COMPLETE = *leave empty*
-  */
-  control(control: Control, input?: number): void {
+  /**
+   * @param control - The control action to be triggered (e.g., START, PAUSE, SPEED, etc.).
+   * @param input - Optional numeric input:
+   *                - `currentIndex` for START/PAUSE/RESUME/CHANGE.
+   *                - `duration` for SPEED.
+   * @param points - Optional array of route points, required for CHANGE command.
+   */
+  control(control: Control, input?: number, points?: Point[]): void {
     const payload: any = { rideSimulationId: this.simulationId };
 
-    if (control === Control.SPEED)
-      payload.duration = input;
-    else
-      payload.currentIndex = input;
+    switch (control) {
+      case Control.SPEED:
+        payload.duration = input;
+        console.log('SPEED')
+        break;
+
+      case Control.CHANGE:
+        if (!points || points.length < 2) return;
+
+        const cleanWaypoint = (point: Point, index: number) => ({
+              latitude: point.lat,
+              longitude: point.lng,
+              address: point.address,
+              name: point.name,
+              sequenceOrder: index - 1,
+            });
+
+        payload.currentIndex = input;
+        payload.startLocationName = points[0].name;
+        payload.destinationLocationName = points[points.length - 1].name;
+        payload.startPoint = { lat: points[0].lat,lng: points[0].lng };
+        payload.endPoint = { lat: points[points.length - 1].lat, lng: points[points.length - 1].lng };
+        payload.waypoints = points.slice(1, points.length - 1).map((p, i) => cleanWaypoint(p, i));
+        console.log('CHANGE')
+        break;
+
+      default:
+        payload.currentIndex = input;
+        console.log('START/PAUSE/RESUME')
+        break;
+    }
 
     this.client.publish({
       destination: `/app/simulation/${control}`,

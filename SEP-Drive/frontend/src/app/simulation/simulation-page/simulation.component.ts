@@ -7,7 +7,7 @@ import { Location } from '../../ride/models/location.model';
 import { DistanceService} from '../../ride/services/distance.service';
 import { VehicleClass } from '../../ride/models/ride.model';
 
-interface Point {
+export interface Point {
   name?: string, //todo new
   address?: string, //todo new
   lat: number,
