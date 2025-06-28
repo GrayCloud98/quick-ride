@@ -81,7 +81,18 @@ public class RideSimulationService {
         sim.setCurrentIndex(simPointsControl.getCurrentIndex());
         sim.setStartLocationName(simPointsControl.getStartLocationName());
         sim.setDestinationLocationName(simPointsControl.getDestinationLocationName());
-        sim.getRideOffer().getRideRequest().setWaypoints(simPointsControl.getWaypoints());
+        List<Waypoint> mappedWaypoints = simPointsControl.getWaypoints().stream()
+                .map(dto -> {
+                    Waypoint w = new Waypoint();
+                    w.setName(dto.getName());
+                    w.setAddress(dto.getAddress());
+                    w.setLatitude(dto.getLatitude());
+                    w.setLongitude(dto.getLongitude());
+                    w.setSequenceOrder(dto.getSequenceOrder());
+                    return w;
+                }).collect(Collectors.toList());
+
+        sim.getRideOffer().getRideRequest().setWaypoints(mappedWaypoints);
         sim.setStartPoint(simPointsControl.getStartPoint());
         sim.setEndPoint(simPointsControl.getEndPoint());
         sim.markChanged();
