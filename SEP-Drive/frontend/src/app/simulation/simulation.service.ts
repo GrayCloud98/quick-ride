@@ -6,17 +6,22 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {AuthService} from '../auth/auth.service';
 
 export interface Update {
+  //todo address for start- and end points? :(
+  //todo driver vehicle type?
   rideSimulationId: number,
   paused: boolean,
   hasStarted: boolean,
-  currentIndex: number,
   duration: number,
-  startPoint: {lat: number, lng: number},
-  endPoint: {lat: number, lng: number}
+  startPoint: { lat: number, lng: number },
+  endPoint: { lat: number, lng: number }
   startLocationName: string,
   destinationLocationName: string,
+  currentIndex: number,
+  waypoints: { address: string, latitude: number, longitude: number, sequenceOrder: number, name: string }[];
+  hasChanged: boolean,
   rideStatus: 'CREATED' | 'IN_PROGRESS' | 'COMPLETED'
 }
+
 export enum Control {
   FETCH = 'fetch',
   START = 'start',
@@ -50,7 +55,7 @@ export class SimulationService {
           this.simulationId = id;
           this.client.subscribe(
             `/topic/simulation/${this.simulationId}`,
-            (message: IMessage) => this.simulationUpdateSubject.next(JSON.parse(message.body))
+            (message: IMessage) => this.simulationUpdateSubject.next( JSON.parse(message.body) )
           );
           this.control(Control.FETCH);
         },

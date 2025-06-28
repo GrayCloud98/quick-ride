@@ -33,9 +33,8 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   private path: google.maps.LatLngLiteral[] = [];
 
   // 🚘 Route/Stopovers State
-  // points: google.maps.LatLngLiteral[] = []; // todo uncomment
+  points: Point[] = [];
   ride = {vehicleClass: VehicleClass.LARGE, distance: 0, duration: 0, estimatedPrice: 0} //todo new
-  points: Point[] = [ { lat: 52.52, lng: 13.405, passed: true, index: 0, name: 'Berlin', address: 'Berlin, Germany' }, { lat: 53.5511, lng: 9.9937, passed: false, index: 1, name: 'Hamburg', address: 'Hamburg, Germany' }, { lat: 51.3397, lng: 12.3731, passed: false, index: 2, name: 'Leipzig', address: 'Leipzig, Germany' }, { lat: 48.1351, lng: 11.582, passed: false, index: 3, name: 'Munich', address: 'Munich, Germany' } ];
   currentIndex = 0;
   duration = 30;
   nextStopoverPosition = 1; //todo new
@@ -58,14 +57,21 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
   // 🔄 Lifecycle
   ngAfterViewInit(): void {
     this.simService.connect();
-    this.initializeMap(); // todo delete
+
     this.simService.getSimulationUpdates().subscribe(
       (update: Update) => {
         console.log("🎁", update); //todo delete
 
         this.duration = update.duration;
         this.currentIndex = update.currentIndex;
-        // this.points = [ update.startPoint, update.endPoint ]; //todo uncomment
+
+        if (!this.metadataLoaded) {
+          this.points = [
+            { name: update.startLocationName, address: '', lat: update.startPoint.lat, lng: update.startPoint.lng, index: 0, passed: true },
+            ...update.waypoints.map(wp => ({ name: wp.name, address: wp.address, lat: wp.latitude, lng: wp.longitude, index: 0, passed: false })),
+            { name: update.destinationLocationName, address: '', lat: update.endPoint.lat, lng: update.endPoint.lng, index: 0, passed: false }
+          ];
+        }
 
         if (update.rideStatus === 'COMPLETED' && !this.hasCompleted) {
           this.complete();
@@ -193,6 +199,7 @@ export class SimulationComponent implements AfterViewInit, OnDestroy {
     }
 
     this.assignStopoverIndices();
+    this.points.forEach(p => p.passed = p.index <= this.currentIndex);
 
     this.pointer = new google.maps.marker.AdvancedMarkerElement({
       position: this.path[this.currentIndex],
