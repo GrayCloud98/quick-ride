@@ -302,7 +302,8 @@ public class RideRequestService {
         rideSimulation.setStartLocationName(rideRequest.getStartLocationName());
         rideSimulation.setDestinationLocationName(rideRequest.getDestinationLocationName());
         rideSimulation.setCurrentIndex(0);
-
+        rideSimulation.setStartAddress(rideRequest.getStartAddress());
+        rideSimulation.setEndAddress(rideRequest.getDestinationAddress());
 
         rideRequest.setRideStatus(RideStatus.IN_PROGRESS);
         selectedOffer.setRideStatus(RideStatus.IN_PROGRESS);

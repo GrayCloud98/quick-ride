@@ -12,6 +12,15 @@ public class SimulationPointsControl extends SimulationControlMessage{
     private List<WaypointDTO> waypoints;
     private PointDTO endPoint;
     private String destinationLocationName;
+    private String destinationAddress;
+
+    public String getDestinationAddress() {
+        return destinationAddress;
+    }
+
+    public void setDestinationAddress(String destinationAddress) {
+        this.destinationAddress = destinationAddress;
+    }
 
 
     public String getDestinationLocationName() {
