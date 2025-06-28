@@ -3,16 +3,16 @@ package com.example.sep_drive_backend.dto;
 import java.util.List;
 
 public class DriverStatsDto {
-    private List<Float> rating;
+    private List<Integer> rating;
     private List<Double> totalTravelledDistance;
     private List<Double> totalTravelledTime;
     private List<Double> earnings;
 
-    public List<Float> getRating() {
+    public List<Integer> getRating() {
         return rating;
     }
 
-    public void setRating(List<Float> rating) {
+    public void setRating(List<Integer> rating) {
         this.rating = rating;
     }
 

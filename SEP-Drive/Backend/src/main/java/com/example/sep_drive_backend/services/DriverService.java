@@ -77,7 +77,22 @@ public class DriverService {
             }
             dto.setTotalTravelledDistance(distances);
             dto.setTotalTravelledTime(durations);
-            //dto.setRating(); add the month's ratings
+
+            List<Integer> monthlyRatings = new ArrayList<>();
+
+            for (int month = 1; month <= 12; month++) {
+                List<RideRequest> monthlyRides = grouped.getOrDefault(month, Collections.emptyList());
+
+                double averageRating = monthlyRides.stream()
+                        .mapToInt(RideRequest::getDriverRating)
+                        .average()
+                        .orElse(0.0);
+
+                monthlyRatings.add((int) Math.round(averageRating));
+            }
+
+            dto.setRating(monthlyRatings);
+
         }
         return dto;
 
