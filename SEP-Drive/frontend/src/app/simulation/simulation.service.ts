@@ -110,8 +110,8 @@ export class SimulationService {
             });
 
         payload.currentIndex = input;
-        payload.startLocationName = points[0].name;
         payload.destinationLocationName = points[points.length - 1].name;
+        payload.destinationAddress = points[points.length - 1].address;
         payload.startPoint = { lat: points[0].lat,lng: points[0].lng };
         payload.endPoint = { lat: points[points.length - 1].lat, lng: points[points.length - 1].lng };
         payload.waypoints = points.slice(1, points.length - 1).map((p, i) => cleanWaypoint(p, i));
