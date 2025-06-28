@@ -8,11 +8,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SimulationPointsControl extends SimulationControlMessage{
-
+    private Double distance;
+    private double duration;
     private List<WaypointDTO> waypoints;
     private PointDTO endPoint;
     private String destinationLocationName;
     private String destinationAddress;
+
+    public double getDuration() {
+        return duration;
+    }
+
+    public void setDuration(double duration) {
+        this.duration = duration;
+    }
+
+    public Double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(Double distance) {
+        this.distance = distance;
+    }
 
     public String getDestinationAddress() {
         return destinationAddress;

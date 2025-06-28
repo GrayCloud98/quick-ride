@@ -1,5 +1,6 @@
 package com.example.sep_drive_backend.services;
 import com.example.sep_drive_backend.constants.RideStatus;
+import com.example.sep_drive_backend.constants.VehicleClassEnum;
 import com.example.sep_drive_backend.dto.PointDTO;
 import com.example.sep_drive_backend.dto.RideSimulationUpdate;
 import com.example.sep_drive_backend.dto.SimulationPointsControl;
@@ -104,6 +105,18 @@ public class RideSimulationService {
         PointDTO ep = simPointsControl.getEndPoint();
         sim.setEndPoint(new RideSimulation.Point(ep.getLat(), ep.getLng()));
 
+        r.setDistance(simPointsControl.getDistance());
+        r.setDuration(simPointsControl.getDuration());
+        double estimatedPrice = 0.0;
+        if (sim.getDriver().getVehicleClass() == VehicleClassEnum.Large){
+            estimatedPrice = simPointsControl.getDistance() * 10;
+        } else if (sim.getDriver().getVehicleClass() == VehicleClassEnum.Medium) {
+            estimatedPrice = simPointsControl.getDistance() * 2;
+
+        } else if (sim.getDriver().getVehicleClass() == VehicleClassEnum.Small) {
+            estimatedPrice = simPointsControl.getDistance() * 1;
+        }
+        r.setEstimatedPrice(estimatedPrice);
         rideRequestRepository.save(r);
         rideSimulationRepository.save(sim);
         return sim;
