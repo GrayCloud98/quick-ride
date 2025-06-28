@@ -4,12 +4,10 @@ import com.example.sep_drive_backend.dto.PointDTO;
 import com.example.sep_drive_backend.dto.RideSimulationUpdate;
 import com.example.sep_drive_backend.dto.SimulationPointsControl;
 import com.example.sep_drive_backend.dto.WaypointDTO;
-import com.example.sep_drive_backend.models.Customer;
-import com.example.sep_drive_backend.models.Driver;
-import com.example.sep_drive_backend.models.RideSimulation;
-import com.example.sep_drive_backend.models.Waypoint;
+import com.example.sep_drive_backend.models.*;
 import com.example.sep_drive_backend.repository.CustomerRepository;
 import com.example.sep_drive_backend.repository.DriverRepository;
+import com.example.sep_drive_backend.repository.RideRequestRepository;
 import com.example.sep_drive_backend.repository.RideSimulationRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +25,16 @@ public class RideSimulationService {
     private final DriverRepository driverRepository;
     private final CustomerRepository customerRepository;
     private final WalletService walletService;
+    private final RideRequestRepository rideRequestRepository;
 
 
     @Autowired
-    public RideSimulationService(RideSimulationRepository rideSimulationRepository, DriverRepository driverRepository, CustomerRepository customerRepository, WalletService walletService) {
+    public RideSimulationService(RideSimulationRepository rideSimulationRepository, DriverRepository driverRepository, CustomerRepository customerRepository, WalletService walletService, RideRequestRepository rideRequestRepository) {
         this.rideSimulationRepository = rideSimulationRepository;
         this.driverRepository = driverRepository;
         this.customerRepository = customerRepository;
         this.walletService = walletService;
+        this.rideRequestRepository = rideRequestRepository;
     }
 
     public RideSimulation startSimulation(Long id) {
@@ -78,7 +78,10 @@ public class RideSimulationService {
     }
 
     public RideSimulation changePoints(Long id, SimulationPointsControl simPointsControl) {
+
         RideSimulation sim = getSimulationById(id);
+        RideRequest r = sim.getRideOffer().getRideRequest();
+        r.getWaypoints().clear();
         sim.setCurrentIndex(simPointsControl.getCurrentIndex());
         sim.setDestinationLocationName(simPointsControl.getDestinationLocationName());
         List<Waypoint> mappedWaypoints = simPointsControl.getWaypoints().stream()
@@ -89,15 +92,16 @@ public class RideSimulationService {
                     w.setLatitude(dto.getLatitude());
                     w.setLongitude(dto.getLongitude());
                     w.setSequenceOrder(dto.getSequenceOrder());
+                    w.setRideRequest(r);
                     return w;
                 }).collect(Collectors.toList());
-
+        r.getWaypoints().addAll(mappedWaypoints);
         sim.getRideOffer().getRideRequest().setWaypoints(mappedWaypoints);
 
         PointDTO ep = simPointsControl.getEndPoint();
         sim.setEndPoint(new RideSimulation.Point(ep.getLat(), ep.getLng()));
 
-
+        rideRequestRepository.save(r);
         rideSimulationRepository.save(sim);
         return sim;
     }

@@ -162,7 +162,6 @@ public class RideSimulationController {
     }
 
 
-
     public static class SpeedChangeMessage {
         private Long rideSimulationId;
         private double duration;
