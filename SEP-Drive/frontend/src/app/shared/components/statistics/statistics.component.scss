@@ -1,0 +1,18 @@
+/* statistics.component.scss */
+.dashboard-card {
+  max-width: 900px;
+  margin: 24px auto;
+  padding: 24px;
+}
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+.dashboard-filters {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}

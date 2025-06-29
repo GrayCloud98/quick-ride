@@ -32,6 +32,14 @@ import {
   MatTable
 } from '@angular/material/table';
 import { StatisticsComponent } from './components/statistics/statistics.component';
+import {MatCard} from '@angular/material/card';
+import {MatRadioButton} from '@angular/material/radio';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectModule } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
+
 
 @NgModule({
   declarations: [
@@ -83,7 +91,14 @@ import { StatisticsComponent } from './components/statistics/statistics.componen
     MatHeaderRow,
     MatRowDef,
     MatHeaderRowDef,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatCard,
+    MatRadioButton,
+    MatCardModule,
+    MatButtonToggleModule,
+    MatRadioModule,
+    MatSelectModule,
+    MatOptionModule
   ],
   exports: [
     ButtonComponent,
