@@ -47,6 +47,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.pickupSub?.unsubscribe();
     this.dropoffSub?.unsubscribe();
+    this.directionsRenderer.setDirections(null);
+    this.pickupMarker?.setMap(null);
+    this.dropoffMarker?.setMap(null);
+    this.rideStateService.resetLocations();
   }
 
   initMap(): void {
