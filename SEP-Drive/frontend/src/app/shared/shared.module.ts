@@ -31,6 +31,7 @@ import {
   MatRow, MatRowDef,
   MatTable
 } from '@angular/material/table';
+import { StatisticsComponent } from './components/statistics/statistics.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import {
     LoginDialogComponent,
     UserNotFoundComponent,
     RidehistoryComponent,
+    StatisticsComponent,
   ],
   imports: [
     MatSortModule,

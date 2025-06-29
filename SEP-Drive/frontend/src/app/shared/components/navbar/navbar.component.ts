@@ -8,6 +8,7 @@ import {AuthService} from '../../../auth/auth.service';
 import {RideRequestService} from '../../../ride/services/ride-request.service';
 import {RidehistoryComponent} from '../ridehistory/ridehistory.component';
 import {SimulationService} from '../../../simulation/simulation.service';
+import {StatisticsComponent} from '../statistics/statistics.component';
 
 @Component({
   selector: 'app-navbar',
@@ -88,7 +89,9 @@ export class NavbarComponent implements OnInit {
   goToridehistory(){
     this.router.navigate([`/history`])
   }
-
+  goToStatistics(){
+    this.router.navigate([`/statistics`])
+  }
   goHome() {
     this.router.navigate(['/']);
   }

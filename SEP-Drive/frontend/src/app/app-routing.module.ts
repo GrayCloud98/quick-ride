@@ -8,6 +8,7 @@ import { RegisterComponent } from './auth/register/register.component';
 import {UserNotFoundComponent} from './shared/components/user-not-found/user-not-found.component';
 import {RidehistoryComponent} from './shared/components/ridehistory/ridehistory.component';
 import {SimulationComponent} from './simulation/simulation-page/simulation.component';
+import {StatisticsComponent} from './shared/components/statistics/statistics.component';
 
 const routes: Routes = [
   { path: 'ride', loadChildren: () => RideRoutingModule },
@@ -17,6 +18,7 @@ const routes: Routes = [
   { path: 'wallet', component: WalletPageComponent },
   { path: 'user-not-found', component: UserNotFoundComponent },
   { path: 'history', component:RidehistoryComponent},
+  { path: 'statistics', component:StatisticsComponent},
   { path: ':username', component: ProfilePageComponent }
 ];
 
