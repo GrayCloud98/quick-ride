@@ -20,11 +20,15 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   pickupLocation: { lat: number, lng: number } | null = null;
   dropoffLocation: { lat: number, lng: number } | null = null;
 
+
   pickupSub!: Subscription;
   dropoffSub!: Subscription;
   pickupMarker!: google.maps.Marker;
   dropoffMarker!: google.maps.Marker;
   userLocationMarker!: google.maps.Marker;
+  stopoversSub!: Subscription;
+  stopovers: { lat: number, lng: number }[] = [];
+  stopoverMarkers: google.maps.Marker[] = [];
 
   constructor(
     private rideStateService: RideStateService,
@@ -42,6 +46,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       this.dropoffLocation = location;
       this.tryDrawRoute();
     });
+    this.stopoversSub = this.rideStateService.stopovers$.subscribe(stops => {
+      this.stopovers = stops;
+      this.tryDrawRoute();
+    });
   }
 
   ngOnDestroy(): void {
@@ -51,6 +59,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.pickupMarker?.setMap(null);
     this.dropoffMarker?.setMap(null);
     this.rideStateService.resetLocations();
+    this.stopoversSub?.unsubscribe();
   }
 
   initMap(): void {
@@ -99,7 +108,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
           lng: location.longitude
         };
         this.map.setCenter(userLocation);
-        this.map.setZoom(12);
+        this.map.setZoom(14);
 
         this.userLocationMarker?.setMap(null);
         this.userLocationMarker = new google.maps.Marker({
@@ -129,20 +138,24 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   drawRoute(): void {
     if (!this.map || !this.pickupLocation || !this.dropoffLocation) return;
 
-    // Clear route and previous markers
     this.directionsRenderer.setDirections(null);
     this.pickupMarker?.setMap(null);
     this.dropoffMarker?.setMap(null);
+    this.stopoverMarkers.forEach(marker => marker.setMap(null));
+    this.stopoverMarkers = [];
 
     this.directionsService.route({
       origin: this.pickupLocation,
       destination: this.dropoffLocation,
+      waypoints: this.stopovers.map(loc => ({
+        location: loc,
+        stopover: true
+      })),
       travelMode: google.maps.TravelMode.DRIVING,
     })
       .then(result => {
         this.directionsRenderer.setDirections(result);
 
-        // Add custom markers
         this.pickupMarker = new google.maps.Marker({
           position: this.pickupLocation,
           map: this.map,
@@ -160,6 +173,23 @@ export class MapComponent implements AfterViewInit, OnDestroy {
             url: 'data:image/svg+xml;utf-8,<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="18" fill="tomato" stroke="white" stroke-width="3"/><path d="M14 27 L14 13 L28 16 L28 24 Z" fill="white" stroke="white" stroke-width="1"/></svg>',
             scaledSize: new google.maps.Size(40, 40)
           }
+        });
+        this.stopovers.forEach((stop, index) => {
+          const marker = new google.maps.Marker({
+            position: stop,
+            map: this.map,
+            title: `Stopover ${index + 1}`,
+            icon: {
+              url: 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+                    <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="18" cy="18" r="16" fill="#14B8A6" stroke="white" stroke-width="3"/>
+                    <text x="18" y="23" text-anchor="middle" fill="white" font-size="14" font-family="Arial" font-weight="bold">${index + 1}</text>
+                    </svg>
+              `),
+              scaledSize: new google.maps.Size(36, 36)
+            }
+          });
+          this.stopoverMarkers.push(marker);
         });
       })
       .catch(err => {
