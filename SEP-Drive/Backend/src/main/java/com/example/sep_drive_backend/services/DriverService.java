@@ -44,11 +44,11 @@ public class DriverService {
 
         return rawResults.stream()
                 .map(row -> new DriverStatsDto(
-                        ((Number) row[0]).intValue(),
-                        row[1] != null ? ((Number) row[1]).doubleValue() : 0.0,
-                        row[2] != null ? ((Number) row[2]).doubleValue() : 0.0,
-                        row[3] != null ? ((Number) row[3]).doubleValue() : 0.0,
-                        row[4] != null ? ((Number) row[4]).doubleValue() : 0.0
+                        ((Number) row[0]),
+                        (Number) row[1],
+                        (Number) row[2],
+                        (Number) row[3],
+                        (Number) row[4]
                 ))
                 .collect(Collectors.toList());
     }

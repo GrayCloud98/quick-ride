@@ -8,12 +8,12 @@ public class DriverStatsDto {
     private Double averageRating;
     private Double totalTravelledTime;
 
-    public DriverStatsDto(Number month, Number totalDistance, Number totalPrice, Number averageRating, Double totalTravelledTime) {
+    public DriverStatsDto(Number month, Number totalDistance, Number totalPrice, Number averageRating, Number totalTravelledTime) {
         this.month = month != null ? month.intValue() : null;
         this.totalDistance = totalDistance != null ? totalDistance.doubleValue() : 0.0;
         this.totalPrice = totalPrice != null ? totalPrice.doubleValue() : 0.0;
         this.averageRating = averageRating != null ? averageRating.doubleValue() : 0.0;
-        this.totalTravelledTime = totalTravelledTime != null ? totalTravelledTime : 0.0;
+        this.totalTravelledTime = totalTravelledTime != null ? totalTravelledTime.doubleValue() : 0.0;
     }
 
     public Double getTotalTravelledTime() {
