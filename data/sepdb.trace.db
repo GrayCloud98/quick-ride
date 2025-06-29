@@ -1,4 +1,4 @@
-2025-06-26 11:51:51.676429+02:00 jdbc[3]: exception
+2025-06-29 18:41:54.668798+02:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Duplicate column name "ACTIVE"; SQL statement:
 create global temporary table HTE_driver(active boolean, active boolean, rating float(24), rn_ integer not null, total_rides integer, birth_date timestamp(6), id bigint, total_travelled_distance float(53), wallet_id bigint, email varchar(255), first_name varchar(255), last_name varchar(255), password varchar(255), profile_picture varchar(255), username varchar(255), role enum ('Customer','Driver'), vehicle_class enum ('Large','Medium','Small'), primary key (rn_)) TRANSACTIONAL [42121-232]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
@@ -52,7 +52,7 @@ create global temporary table HTE_driver(active boolean, active boolean, rating 
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
 	at com.example.sep_drive_backend.SepDriveBackendApplication.main(SepDriveBackendApplication.java:10)
-2025-06-26 11:51:51.820373+02:00 jdbc[3]: exception
+2025-06-29 18:41:55.273799+02:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Constraint "UKOB8KQYQQGMEFL0ACO34AKDTPE" already exists; SQL statement:
 alter table if exists driver add constraint UKob8kqyqqgmefl0aco34akdtpe unique (email) [90045-232]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:644)
@@ -78,7 +78,7 @@ alter table if exists driver add constraint UKob8kqyqqgmefl0aco34akdtpe unique (
 	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:112)
 	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:280)
 	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
-	at java.base/java.util.HashMap.forEach(HashMap.java:1430)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
 	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
 	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
 	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
@@ -107,7 +107,7 @@ alter table if exists driver add constraint UKob8kqyqqgmefl0aco34akdtpe unique (
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
 	at com.example.sep_drive_backend.SepDriveBackendApplication.main(SepDriveBackendApplication.java:10)
-2025-06-26 11:51:51.821675+02:00 jdbc[3]: exception
+2025-06-29 18:41:55.277801+02:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Constraint "UKSB8BBOUER5WAK8VYIIY4PF2BX" already exists; SQL statement:
 alter table if exists driver add constraint UKsb8bbouer5wak8vyiiy4pf2bx unique (username) [90045-232]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:644)
@@ -133,7 +133,7 @@ alter table if exists driver add constraint UKsb8bbouer5wak8vyiiy4pf2bx unique (
 	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:112)
 	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:280)
 	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
-	at java.base/java.util.HashMap.forEach(HashMap.java:1430)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
 	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
 	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
 	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
@@ -162,7 +162,7 @@ alter table if exists driver add constraint UKsb8bbouer5wak8vyiiy4pf2bx unique (
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
 	at com.example.sep_drive_backend.SepDriveBackendApplication.main(SepDriveBackendApplication.java:10)
-2025-06-26 11:51:51.822805+02:00 jdbc[3]: exception
+2025-06-29 18:41:55.279799+02:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Constraint "UKQDAJOJ4ECBJJ1U8SQ5FQRA57G" already exists; SQL statement:
 alter table if exists driver add constraint UKqdajoj4ecbjj1u8sq5fqra57g unique (wallet_id) [90045-232]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:644)
@@ -188,7 +188,7 @@ alter table if exists driver add constraint UKqdajoj4ecbjj1u8sq5fqra57g unique (
 	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:112)
 	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:280)
 	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
-	at java.base/java.util.HashMap.forEach(HashMap.java:1430)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
 	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
 	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
 	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
@@ -217,7 +217,7 @@ alter table if exists driver add constraint UKqdajoj4ecbjj1u8sq5fqra57g unique (
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
 	at com.example.sep_drive_backend.SepDriveBackendApplication.main(SepDriveBackendApplication.java:10)
-2025-06-27 14:50:31.490206+02:00 jdbc[3]: exception
+2025-06-29 18:47:39.493374+02:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Duplicate column name "ACTIVE"; SQL statement:
 create global temporary table HTE_driver(active boolean, active boolean, rating float(24), rn_ integer not null, total_rides integer, birth_date timestamp(6), id bigint, total_travelled_distance float(53), wallet_id bigint, email varchar(255), first_name varchar(255), last_name varchar(255), password varchar(255), profile_picture varchar(255), username varchar(255), role enum ('Customer','Driver'), vehicle_class enum ('Large','Medium','Small'), primary key (rn_)) TRANSACTIONAL [42121-232]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
@@ -271,7 +271,7 @@ create global temporary table HTE_driver(active boolean, active boolean, rating 
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
 	at com.example.sep_drive_backend.SepDriveBackendApplication.main(SepDriveBackendApplication.java:10)
-2025-06-27 14:56:08.042004+02:00 jdbc[3]: exception
+2025-06-29 18:50:44.013544+02:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Duplicate column name "ACTIVE"; SQL statement:
 create global temporary table HTE_driver(active boolean, active boolean, rating float(24), rn_ integer not null, total_rides integer, birth_date timestamp(6), id bigint, total_travelled_distance float(53), wallet_id bigint, email varchar(255), first_name varchar(255), last_name varchar(255), password varchar(255), profile_picture varchar(255), username varchar(255), role enum ('Customer','Driver'), vehicle_class enum ('Large','Medium','Small'), primary key (rn_)) TRANSACTIONAL [42121-232]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
@@ -325,7 +325,7 @@ create global temporary table HTE_driver(active boolean, active boolean, rating 
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
 	at com.example.sep_drive_backend.SepDriveBackendApplication.main(SepDriveBackendApplication.java:10)
-2025-06-27 15:02:06.247119+02:00 jdbc[3]: exception
+2025-06-29 18:54:14.672389+02:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Duplicate column name "ACTIVE"; SQL statement:
 create global temporary table HTE_driver(active boolean, active boolean, rating float(24), rn_ integer not null, total_rides integer, birth_date timestamp(6), id bigint, total_travelled_distance float(53), wallet_id bigint, email varchar(255), first_name varchar(255), last_name varchar(255), password varchar(255), profile_picture varchar(255), username varchar(255), role enum ('Customer','Driver'), vehicle_class enum ('Large','Medium','Small'), primary key (rn_)) TRANSACTIONAL [42121-232]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
@@ -379,7 +379,7 @@ create global temporary table HTE_driver(active boolean, active boolean, rating 
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
 	at com.example.sep_drive_backend.SepDriveBackendApplication.main(SepDriveBackendApplication.java:10)
-2025-06-27 15:09:12.495926+02:00 jdbc[3]: exception
+2025-06-29 18:59:15.476805+02:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Duplicate column name "ACTIVE"; SQL statement:
 create global temporary table HTE_driver(active boolean, active boolean, rating float(24), rn_ integer not null, total_rides integer, birth_date timestamp(6), id bigint, total_travelled_distance float(53), wallet_id bigint, email varchar(255), first_name varchar(255), last_name varchar(255), password varchar(255), profile_picture varchar(255), username varchar(255), role enum ('Customer','Driver'), vehicle_class enum ('Large','Medium','Small'), primary key (rn_)) TRANSACTIONAL [42121-232]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
@@ -433,7 +433,7 @@ create global temporary table HTE_driver(active boolean, active boolean, rating 
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
 	at com.example.sep_drive_backend.SepDriveBackendApplication.main(SepDriveBackendApplication.java:10)
-2025-06-27 21:55:25.822794+02:00 jdbc[3]: exception
+2025-06-29 19:00:54.078969+02:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Duplicate column name "ACTIVE"; SQL statement:
 create global temporary table HTE_driver(active boolean, active boolean, rating float(24), rn_ integer not null, total_rides integer, birth_date timestamp(6), id bigint, total_travelled_distance float(53), wallet_id bigint, email varchar(255), first_name varchar(255), last_name varchar(255), password varchar(255), profile_picture varchar(255), username varchar(255), role enum ('Customer','Driver'), vehicle_class enum ('Large','Medium','Small'), primary key (rn_)) TRANSACTIONAL [42121-232]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
@@ -487,7 +487,7 @@ create global temporary table HTE_driver(active boolean, active boolean, rating 
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
 	at com.example.sep_drive_backend.SepDriveBackendApplication.main(SepDriveBackendApplication.java:10)
-2025-06-27 21:59:20.559356+02:00 jdbc[3]: exception
+2025-06-29 19:02:16.092022+02:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Duplicate column name "ACTIVE"; SQL statement:
 create global temporary table HTE_driver(active boolean, active boolean, rating float(24), rn_ integer not null, total_rides integer, birth_date timestamp(6), id bigint, total_travelled_distance float(53), wallet_id bigint, email varchar(255), first_name varchar(255), last_name varchar(255), password varchar(255), profile_picture varchar(255), username varchar(255), role enum ('Customer','Driver'), vehicle_class enum ('Large','Medium','Small'), primary key (rn_)) TRANSACTIONAL [42121-232]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
@@ -541,7 +541,7 @@ create global temporary table HTE_driver(active boolean, active boolean, rating 
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
 	at com.example.sep_drive_backend.SepDriveBackendApplication.main(SepDriveBackendApplication.java:10)
-2025-06-27 21:59:34.273898+02:00 jdbc[3]: exception
+2025-06-29 19:08:36.947125+02:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Duplicate column name "ACTIVE"; SQL statement:
 create global temporary table HTE_driver(active boolean, active boolean, rating float(24), rn_ integer not null, total_rides integer, birth_date timestamp(6), id bigint, total_travelled_distance float(53), wallet_id bigint, email varchar(255), first_name varchar(255), last_name varchar(255), password varchar(255), profile_picture varchar(255), username varchar(255), role enum ('Customer','Driver'), vehicle_class enum ('Large','Medium','Small'), primary key (rn_)) TRANSACTIONAL [42121-232]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
@@ -595,7 +595,7 @@ create global temporary table HTE_driver(active boolean, active boolean, rating 
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
 	at com.example.sep_drive_backend.SepDriveBackendApplication.main(SepDriveBackendApplication.java:10)
-2025-06-28 21:38:04.503293+02:00 jdbc[3]: exception
+2025-06-29 19:10:22.599149+02:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Duplicate column name "ACTIVE"; SQL statement:
 create global temporary table HTE_driver(active boolean, active boolean, rating float(24), rn_ integer not null, total_rides integer, birth_date timestamp(6), id bigint, total_travelled_distance float(53), wallet_id bigint, email varchar(255), first_name varchar(255), last_name varchar(255), password varchar(255), profile_picture varchar(255), username varchar(255), role enum ('Customer','Driver'), vehicle_class enum ('Large','Medium','Small'), primary key (rn_)) TRANSACTIONAL [42121-232]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)

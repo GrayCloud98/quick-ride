@@ -1,6 +1,7 @@
 package com.example.sep_drive_backend.repository;
 
 import com.example.sep_drive_backend.constants.RideStatus;
+import com.example.sep_drive_backend.dto.DriverStatsDto;
 import com.example.sep_drive_backend.models.RideSimulation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,6 +11,31 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RideSimulationRepository extends JpaRepository<RideSimulation, Long> {
+
+    @Query("SELECT r FROM RideSimulation r " +
+            "WHERE r.driver.username = :username " +
+            "AND r.rideStatus = 'COMPLETED' " +
+            "AND FUNCTION('YEAR', r.endedAt) = :year")
+    List<RideSimulation> findByDriverUsernameAndYearAndCompleted(
+            @Param("username") String username,
+            @Param("year") int year
+    );
+
+
+    @Query("SELECT FUNCTION('MONTH', r.endedAt), " +
+            "SUM(rr.distance), " +
+            "SUM(rr.estimatedPrice), " +
+            "AVG(rr.driverRating), " +
+            "SUM(rr.duration) " +
+            "FROM RideSimulation r " +
+            "JOIN r.rideOffer ro " +
+            "JOIN ro.rideRequest rr " +
+            "WHERE r.driver.username = :username " +
+            "AND r.rideStatus = 'COMPLETED' " +
+            "AND FUNCTION('YEAR', r.endedAt) = :year " +
+            "GROUP BY FUNCTION('MONTH', r.endedAt) " +
+            "ORDER BY FUNCTION('MONTH', r.endedAt)")
+    List<Object[]> getRawMonthlyStats(@Param("username") String username, @Param("year") int year);
 
 
     Optional<RideSimulation> findFirstByCustomerUsernameAndRideStatusIn(String username, List<RideStatus> statuses);

@@ -136,11 +136,11 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
-    @GetMapping("/daily-stats")
+    @GetMapping("/monthly-stats")
     public ResponseEntity<?> getDriverMonthlyStats(HttpServletRequest request, @RequestParam int year) {
-        String userName = loginService.extractUsername(request);
-        DriverStatsDto driverStatsDto = driverService.getDriverMonthlyStatsForAYear(userName, year);
-        return ResponseEntity.ok(driverStatsDto);
+        String username = loginService.extractUsername(request);
+        List<DriverStatsDto> stats = driverService.getDriverMonthlyStatsForAYear(username, year);
+        return ResponseEntity.ok(stats);
     }
 
 
