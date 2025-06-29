@@ -1,6 +1,7 @@
 package com.example.sep_drive_backend.controller;
 
 import com.example.sep_drive_backend.dto.CustomerProfileResponse;
+import com.example.sep_drive_backend.dto.DriverDailyStatsDto;
 import com.example.sep_drive_backend.dto.DriverProfileResponse;
 import com.example.sep_drive_backend.dto.DriverStatsDto;
 import com.example.sep_drive_backend.models.Customer;
@@ -143,5 +144,13 @@ public class UserController {
         return ResponseEntity.ok(stats);
     }
 
+    @GetMapping("/daily-stats")
+    public ResponseEntity<?> getDriverDailyStats(HttpServletRequest request,
+                                                 @RequestParam int year,
+                                                 @RequestParam int month) {
+        String username = loginService.extractUsername(request);
+        List<DriverDailyStatsDto> stats = driverService.getDriverDailyStatsForMonth(username, year, month);
+        return ResponseEntity.ok(stats);
+    }
 
 }

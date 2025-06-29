@@ -37,6 +37,25 @@ public interface RideSimulationRepository extends JpaRepository<RideSimulation, 
             "ORDER BY FUNCTION('MONTH', r.endedAt)")
     List<Object[]> getRawMonthlyStats(@Param("username") String username, @Param("year") int year);
 
+    @Query("SELECT FUNCTION('DAY', r.endedAt), " +
+            "SUM(rr.distance), " +
+            "SUM(rr.estimatedPrice), " +
+            "AVG(rr.driverRating), " +
+            "SUM(rr.duration) " +
+            "FROM RideSimulation r " +
+            "JOIN r.rideOffer ro " +
+            "JOIN ro.rideRequest rr " +
+            "WHERE r.driver.username = :username " +
+            "AND r.rideStatus = 'COMPLETED' " +
+            "AND FUNCTION('YEAR', r.endedAt) = :year " +
+            "AND FUNCTION('MONTH', r.endedAt) = :month " +
+            "GROUP BY FUNCTION('DAY', r.endedAt) " +
+            "ORDER BY FUNCTION('DAY', r.endedAt)")
+    List<Object[]> getDailyStatsForDriverAndMonth(
+            @Param("username") String username,
+            @Param("year") int year,
+            @Param("month") int month
+    );
 
     Optional<RideSimulation> findFirstByCustomerUsernameAndRideStatusIn(String username, List<RideStatus> statuses);
     Optional<RideSimulation> findFirstByDriverUsernameAndRideStatusIn(String username, List<RideStatus> statuses);

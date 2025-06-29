@@ -1,6 +1,7 @@
 package com.example.sep_drive_backend.services;
 
 import com.example.sep_drive_backend.constants.TransactionType;
+import com.example.sep_drive_backend.dto.DriverDailyStatsDto;
 import com.example.sep_drive_backend.dto.DriverStatsDto;
 import com.example.sep_drive_backend.models.Driver;
 import com.example.sep_drive_backend.models.RideRequest;
@@ -53,6 +54,19 @@ public class DriverService {
                 .collect(Collectors.toList());
     }
 
+    public List<DriverDailyStatsDto> getDriverDailyStatsForMonth(String username, int year, int month) {
+        List<Object[]> rawResults = rideSimulationRepository.getDailyStatsForDriverAndMonth(username, year, month);
+
+        return rawResults.stream()
+                .map(row -> new DriverDailyStatsDto(
+                        (Number) row[0],
+                        (Number) row[1],
+                        (Number) row[2],
+                        (Number) row[3],
+                        (Number) row[4]
+                ))
+                .collect(Collectors.toList());
+    }
 
 
 }
