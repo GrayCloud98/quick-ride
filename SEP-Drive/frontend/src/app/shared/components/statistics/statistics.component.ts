@@ -1,13 +1,9 @@
 import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
 import Chart from 'chart.js/auto';
 
-// 1. Typ für die verfügbaren Datenkategorien
 type ChartKey = 'earnings' | 'distance' | 'duration' | 'rating';
 
-interface ChartData {
-  labels: string[];
-  data: number[];
-}
+
 
 @Component({
   selector: 'app-statistics',
@@ -19,7 +15,6 @@ export class StatisticsComponent implements OnInit {
   @ViewChild('chartCanvas', { static: true }) chartRef!: ElementRef<HTMLCanvasElement>;
   chart: Chart | undefined;
 
-  // Auswahloptionen
   chartTypeOptions = [
     { label: 'Einnahmen', value: 'earnings' },
     { label: 'Distanz', value: 'distance' },
@@ -32,15 +27,15 @@ export class StatisticsComponent implements OnInit {
   selectedYear = 2024;
   selectedMonth = 6; // Juni
 
-  years = [2022, 2023, 2024];
+  years = [2024,2025,2026];
   months = [
-    { value: 1, name: 'Januar' }, { value: 2, name: 'Februar' }, { value: 3, name: 'März' },
-    { value: 4, name: 'April' }, { value: 5, name: 'Mai' }, { value: 6, name: 'Juni' },
-    { value: 7, name: 'Juli' }, { value: 8, name: 'August' }, { value: 9, name: 'September' },
-    { value: 10, name: 'Oktober' }, { value: 11, name: 'November' }, { value: 12, name: 'Dezember' }
+    { value: 0, name: 'Januar' }, { value: 1, name: 'Februar' }, { value: 2, name: 'März' },
+    { value: 3, name: 'April' }, { value: 4, name: 'Mai' }, { value: 5, name: 'Juni' },
+    { value: 6, name: 'Juli' }, { value: 7, name: 'August' }, { value: 8, name: 'September' },
+    { value: 9, name: 'Oktober' }, { value: 10, name: 'November' }, { value: 11, name: 'Dezember' }
   ];
 
-  // 2. Typing für fakeData
+  //  Typing für fakeData
   fakeData: Record<ChartKey, { monthly: number[]; daily: number[] }> = {
     earnings: {
       monthly:   [450, 500, 480, 520, 490, 610, 700, 680, 620, 630, 550, 600],
@@ -84,34 +79,34 @@ export class StatisticsComponent implements OnInit {
     this.updateChart();
   }
 
-  getChartData(): ChartData {
-    if (this.viewMode === 'monthly') {
-      return {
-        labels: this.months.map(m => m.name),
-        data: this.fakeData[this.selectedChartType].monthly
-      };
-    } else {
-      // 30 Tage als Beispiel
-      const days = Array.from({length: 30}, (_, i) => `${i + 1}.`);
-      return {
-        labels: days,
-        data: this.fakeData[this.selectedChartType].daily
-      };
-    }
-  }
 
+  getDaysInMonth(year: number, month: number): number {
+    return new Date(year, month + 1, 0).getDate();
+  }
   updateChart() {
-    const chartData = this.getChartData();
+    let labels: string[];
+    let data: number[];
+
+    if (this.viewMode === 'monthly') {
+      labels = this.months.map(m => m.name);
+      data = this.fakeData[this.selectedChartType].monthly;
+    } else {
+      const daysInMonth = this.getDaysInMonth(this.selectedYear, this.selectedMonth);
+      labels = Array.from({ length: daysInMonth }, (_, i) => `${i + 1}.`);
+      data = Array.from({ length: daysInMonth }, (_, i) =>
+        this.fakeData[this.selectedChartType].daily[i] ?? 0
+      );
+    }
 
     const label = this.chartTypeOptions.find(opt => opt.value === this.selectedChartType)?.label ?? '';
     if (this.chart) this.chart.destroy();
     this.chart = new Chart(this.chartRef.nativeElement, {
       type: this.selectedChartType === 'rating' ? 'bar' : 'line',
       data: {
-        labels: chartData.labels,
+        labels,
         datasets: [{
           label,
-          data: chartData.data,
+          data,
           fill: true,
           tension: 0.3,
         }]
@@ -124,4 +119,5 @@ export class StatisticsComponent implements OnInit {
       }
     });
   }
+
 }
