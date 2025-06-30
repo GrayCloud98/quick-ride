@@ -58,5 +58,16 @@ public class ChatController {
         messagingTemplate.convertAndSend("/topic/chat/" + username, deletion);
         messagingTemplate.convertAndSend("/topic/chat/" + otherUsername, deletion);
     }
+    @MessageMapping("/chat/read")
+    public void markAsRead(@Payload Map<String, Object> payload, @Header("Authorization") String token) {
+        String username = jwtTokenProvider.getUsername(token.replace("Bearer ", ""));
+        Long messageId = Long.valueOf(payload.get("messageId").toString());
+
+        ChatMessageDTO updated = chatService.markMessageAsRead(messageId, username);
+
+        messagingTemplate.convertAndSend("/topic/chat/" + updated.getSenderUsername(), updated);
+        messagingTemplate.convertAndSend("/topic/chat/" + updated.getReceiverUsername(), updated);
+    }
+
 }
 

@@ -99,5 +99,21 @@ public class ChatService {
         message.setDeleted(true);
         chatMessageRepository.save(message);
     }
+    public ChatMessageDTO markMessageAsRead(Long messageId, String username) {
+        ChatMessage message = chatMessageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("Message not found"));
+
+        if (!message.getReceiverUsername().equals(username)) {
+            throw new IllegalStateException("Only receiver can mark the message as read");
+        }
+
+        if (!message.isRead()) {
+            message.setRead(true);
+            chatMessageRepository.save(message);
+        }
+
+        return new ChatMessageDTO(message);
+    }
+
 }
 
