@@ -32,9 +32,9 @@ public class RideSimulationController {
     private final CustomerRepository customerRepository;
     private final DriverRepository driverRepository;
     private final TripRepository tripRepository;
-
+    private final ChatMessageRepository chatMessageRepository;
     public RideSimulationController(RideSimulationService rideSimulationService,
-                                    SimpMessagingTemplate messagingTemplate, RideSimulationRepository rideSimulationRepository, RideOfferRepository rideOfferRepository, RideRequestRepository rideRequestRepository, LoginService loginService, CustomerRepository customerRepository, DriverRepository driverRepository, TripRepository tripRepository) {
+                                    SimpMessagingTemplate messagingTemplate, RideSimulationRepository rideSimulationRepository, RideOfferRepository rideOfferRepository, RideRequestRepository rideRequestRepository, LoginService loginService, CustomerRepository customerRepository, DriverRepository driverRepository, TripRepository tripRepository, ChatMessageRepository chatMessageRepository) {
         this.rideSimulationService = rideSimulationService;
         this.messagingTemplate = messagingTemplate;
         this.rideSimulationRepository = rideSimulationRepository;
@@ -44,6 +44,7 @@ public class RideSimulationController {
         this.customerRepository = customerRepository;
         this.driverRepository = driverRepository;
         this.tripRepository = tripRepository;
+        this.chatMessageRepository = chatMessageRepository;
     }
 
     @MessageMapping("/simulation/fetch")
@@ -136,6 +137,7 @@ public class RideSimulationController {
         rideRequestRepository.save(simulation.getRideOffer().getRideRequest());
 
         broadcastCompleteUpdate(simulation);
+        chatMessageRepository.deleteAll();
     }
 
 

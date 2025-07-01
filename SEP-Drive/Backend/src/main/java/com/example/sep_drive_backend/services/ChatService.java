@@ -98,6 +98,7 @@ public class ChatService {
 
         message.setDeleted(true);
         chatMessageRepository.save(message);
+        chatMessageRepository.delete(message);
     }
     public ChatMessageDTO markMessageAsRead(Long messageId, String username) {
         ChatMessage message = chatMessageRepository.findById(messageId)
