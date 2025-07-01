@@ -10,9 +10,8 @@ export class DistanceService {
 
   constructor() {}
 
-  getDistanceDurationAndPrice(
-    origin: string | google.maps.LatLngLiteral,
-    destination: string | google.maps.LatLngLiteral,
+  getDistanceDurationAndPriceForMultiplePoints(
+    points: google.maps.LatLngLiteral[],
     vehicleClass: VehicleClass
   ): Promise<{ distance: number; duration: number; estimatedPrice: number }> {
 
@@ -22,46 +21,66 @@ export class DistanceService {
         return;
       }
 
+      if (points.length < 2) {
+        reject('At least two points are required');
+        return;
+      }
+
       const service = new google.maps.DistanceMatrixService();
+      let totalDistance = 0;
+      let totalDuration = 0;
 
-      const request = {
-        origins: [origin],
-        destinations: [destination],
-        travelMode: google.maps.TravelMode.DRIVING,
-        unitSystem: google.maps.UnitSystem.METRIC,
-        avoidHighways: false,
-        avoidTolls: false,
-      };
+      const requests: Promise<void>[] = [];
 
-      service.getDistanceMatrix(request, (response: google.maps.DistanceMatrixResponse, status: string) => {
-        if (status !== 'OK') {
-          reject('Error from Google Distance Matrix API: ' + status);
-          return;
-        }
+      for (let i = 0; i < points.length - 1; i++) {
+        const origin = points[i];
+        const destination = points[i + 1];
 
-        if (!response.rows || response.rows.length === 0 || !response.rows[0].elements || response.rows[0].elements.length === 0) {
-          reject('Invalid response structure');
-          return;
-        }
+        const request = {
+          origins: [origin],
+          destinations: [destination],
+          travelMode: google.maps.TravelMode.DRIVING,
+          unitSystem: google.maps.UnitSystem.METRIC,
+          avoidHighways: false,
+          avoidTolls: false,
+        };
 
-        const element = response.rows[0].elements[0];
-        if (element.status !== 'OK') {
-          reject('Route not found between the specified locations');
-          return;
-        }
+        const reqPromise = new Promise<void>((res, rej) => {
+          service.getDistanceMatrix(request, (response: google.maps.DistanceMatrixResponse, status: string) => {
+            if (status !== 'OK') {
+              rej('Error from Google Distance Matrix API: ' + status);
+              return;
+            }
 
-        const distanceInKm = element.distance.value / 1000;
-        const durationInMin = element.duration.value / 60;
+            const element = response?.rows?.[0]?.elements?.[0];
+            if (!element || element.status !== 'OK') {
+              rej('Invalid response structure or route not found');
+              return;
+            }
 
-        const priceFactor = this.getPriceFactor(vehicleClass);
-        const estimatedPrice = distanceInKm * priceFactor;
-
-        resolve({
-          distance: parseFloat(distanceInKm.toFixed(2)),
-          duration: parseFloat(durationInMin.toFixed(0)),
-          estimatedPrice: parseFloat(estimatedPrice.toFixed(2)),
+            totalDistance += element.distance.value;
+            totalDuration += element.duration.value;
+            res();
+          });
         });
-      });
+
+        requests.push(reqPromise);
+      }
+
+      Promise.all(requests)
+        .then(() => {
+          const distanceInKm = totalDistance / 1000;
+          const durationInMin = totalDuration / 60;
+          const priceFactor = this.getPriceFactor(vehicleClass);
+          const estimatedPrice = distanceInKm * priceFactor;
+
+          resolve({
+            distance: parseFloat(distanceInKm.toFixed(2)),
+            duration: parseFloat(durationInMin.toFixed(0)),
+            estimatedPrice: parseFloat(estimatedPrice.toFixed(2)),
+          });
+        })
+        .catch(reject);
     });
   }
 
@@ -73,4 +92,5 @@ export class DistanceService {
       default: return 1.0;
     }
   }
+
 }

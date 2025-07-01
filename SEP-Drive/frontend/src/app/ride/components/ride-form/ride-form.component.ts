@@ -128,20 +128,40 @@ constructor(
   });
 }
 
-  updateDistanceInfo() {
-    if (this.pickupPicked && this.dropoffPicked) {
-      const origin = { lat: this.ride.pickup.latitude, lng: this.ride.pickup.longitude };
-      const destination = { lat: this.ride.dropoff.latitude, lng: this.ride.dropoff.longitude };
-
-      this.distanceService.getDistanceDurationAndPrice(origin, destination, this.ride.vehicleClass)
-        .then(res => {
-          this.ride.distance = res.distance;
-          this.ride.duration = res.duration;
-          this.ride.estimatedPrice = res.estimatedPrice;
-        })
-        .catch(err => console.error('Google Distance API error', err));
+  updateDistanceInfo(): void {
+    if (!this.ride.pickup || !this.ride.dropoff) {
+      console.warn('Pickup and dropoff must be selected.');
+      return;
     }
+
+    const points: google.maps.LatLngLiteral[] = [
+      {
+        lat: this.ride.pickup.latitude,
+        lng: this.ride.pickup.longitude,
+      },
+      ...this.ride.stopovers?.map(stop => ({
+        lat: stop.latitude,
+        lng: stop.longitude,
+      })) || [],
+      {
+        lat: this.ride.dropoff.latitude,
+        lng: this.ride.dropoff.longitude,
+      }
+    ];
+
+    this.distanceService.getDistanceDurationAndPriceForMultiplePoints(points, this.ride.vehicleClass)
+      .then(result => {
+        this.ride.distance = result.distance;
+        this.ride.duration = result.duration;
+        this.ride.estimatedPrice = result.estimatedPrice;
+      })
+      .catch(error => {
+        console.error('Failed to calculate distance/duration/price:', error);
+      });
   }
+
+
+
 
   addStopover() {
     const control = new FormControl<Location | string>('', { validators: [Validators.required], nonNullable: true });
@@ -160,5 +180,6 @@ constructor(
         }))
       );
     }
+    this.updateDistanceInfo();
   }
 }

@@ -97,7 +97,7 @@ constructor(private offerService: OfferService,
     })
   }
 
-  loadRequests(){
+  loadRequests() {
     this.offerService.driverHasActiveOffer().pipe(
       switchMap(driverHasActiveOffer => {
         if (driverHasActiveOffer) {
@@ -119,19 +119,26 @@ constructor(private offerService: OfferService,
       next: result => {
         this.allActiveRequests = result;
 
-        this.allActiveRequests.forEach(
-          request => {
-            this.distanceService.getDistanceDurationAndPrice(
-              { lat: this.currentPosition.latitude, lng: this.currentPosition.longitude },
-              { lat: request.pickup.latitude, lng: request.pickup.longitude },
-              request.desiredVehicleClass
-            ).then(res => {
+        this.allActiveRequests.forEach(request => {
+          const points = [
+            {
+              lat: this.currentPosition.latitude,
+              lng: this.currentPosition.longitude
+            },
+            {
+              lat: request.pickup.latitude,
+              lng: request.pickup.longitude
+            }
+          ];
+
+          this.distanceService.getDistanceDurationAndPriceForMultiplePoints(points, request.desiredVehicleClass)
+            .then(res => {
               request.driverToPickupDistance = res.distance;
-            }).catch(err => console.error('Google Distance API error', err));
-          }
-        );
+            })
+            .catch(err => console.error('Google Distance API error', err));
+        });
       },
       error: err => console.log(err)
     });
   }
-}
+  }
