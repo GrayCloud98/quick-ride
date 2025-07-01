@@ -27,7 +27,6 @@ export class ProfilePageComponent implements OnInit {
       const loggedInUser = this.authService.currentUserValue;
 
       if (username && loggedInUser && username === loggedInUser.username) {
-        // Viewing own profile
         this.profileService.getCurrentUserProfile().subscribe({
           next: (data) => {
             this.profileData = data;
@@ -41,7 +40,6 @@ export class ProfilePageComponent implements OnInit {
           }
         });
       } else if (username) {
-        // Viewing someone else's profile
         this.profileService.getUserByUsername(username).subscribe({
           next: (data) => {
             this.profileData = data;
@@ -52,7 +50,6 @@ export class ProfilePageComponent implements OnInit {
           },
           error: (err) => {
             if (err.status === 404) {
-              // Redirect to user-not-found page
               this.router.navigate(['/user-not-found']);
             }
             console.error('Error fetching profile data:', err);
@@ -68,6 +65,16 @@ export class ProfilePageComponent implements OnInit {
     } else {
       console.error("clearUserData not found in AuthService!");
     }
+  }
+
+  getFullStars(): number[] {
+    const rating = Math.floor(this.profileData?.rating || 0);
+    return Array(rating).fill(0);
+  }
+
+  hasHalfStar(): boolean {
+    const rating = this.profileData?.rating || 0;
+    return rating - Math.floor(rating) >= 0.5;
   }
 
 }

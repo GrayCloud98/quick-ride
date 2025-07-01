@@ -28,9 +28,12 @@
       <p><strong>Email:</strong> {{ profileData?.email }}</p>
       <p><strong>Birthdate:</strong> {{ profileData?.birthDate | date: 'MM-dd-yyyy' }}</p>
       <p><strong>Total Rides:</strong> {{ profileData?.totalRides }}</p>
-      <p><strong>Rating:</strong> ⭐⭐⭐⭐✰</p>
+      <p *ngIf="profileData?.rating !== undefined">
+        <strong>Rating:</strong>
+        <ng-container *ngFor="let star of getFullStars(); let i = index">⭐</ng-container>
+        <ng-container *ngIf="hasHalfStar()">✰</ng-container>
+      </p>
 
-      <!-- Vehicle Class only for Driver -->
       <p *ngIf="profileData?.role === 'Driver'">
         <strong>Vehicle Class:</strong> {{ profileData?.vehicleClass ? profileData.vehicleClass : 'Not specified' }}
       </p>
