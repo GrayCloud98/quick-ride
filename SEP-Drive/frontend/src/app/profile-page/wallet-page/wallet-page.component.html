@@ -1,51 +1,60 @@
-<mat-card class="wallet-card">
-  <button mat-icon-button class="back-btn" (click)="goToProfile()">
-    <mat-icon>arrow_back</mat-icon>
-  </button>
-  <div class="wallet-title">My Wallet</div>
-  <div class="wallet-balance">{{ balance | number:'1.2-2' }} €</div>
+<div class="wallet-page fancy">
+  <div class="glass wallet-card">
+    <button mat-icon-button class="back-btn" (click)="goToProfile()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
 
-  <div *ngIf="accessAllowed" class="amount-section">
-    <label>Amount:</label>
-    <mat-radio-group [(ngModel)]="selectedAmount" class="amount-radio-group">
-      <mat-radio-button [value]="10">10 €</mat-radio-button>
-      <mat-radio-button [value]="25">25 €</mat-radio-button>
-      <mat-radio-button [value]="50">50 €</mat-radio-button>
-    </mat-radio-group>
+    <div class="wallet-title">💳 My Wallet</div>
+    <div class="wallet-balance">{{ balance | number:'1.2-2' }} €</div>
+
+    <div *ngIf="accessAllowed" class="topup-section">
+      <label>Select Amount:</label>
+      <mat-radio-group [(ngModel)]="selectedAmount" class="amount-radio-group">
+        <mat-radio-button [value]="10">10 €</mat-radio-button>
+        <mat-radio-button [value]="25">25 €</mat-radio-button>
+        <mat-radio-button [value]="50">50 €</mat-radio-button>
+      </mat-radio-group>
+
+      <input
+        type="number"
+        placeholder="Or enter custom amount (€)"
+        [(ngModel)]="selectedAmount"
+        min="1"
+        max="10000"
+      />
+
+      <button mat-raised-button class="topup-button" (click)="topUp()" [disabled]="!selectedAmount || selectedAmount <= 0">
+        💰 Top-Up
+      </button>
+    </div>
+
+    <div *ngIf="success" class="success-message">{{ success }}</div>
+    <div *ngIf="error" class="error-message">{{ error }}</div>
+
+    <!--  <div *ngIf="accessAllowed"-->
+    <!--       class="transaction-history" (click)="toggleHistory()" style="cursor:pointer;">-->
+    <!--    Transaction History-->
+    <!--    <mat-icon>{{ showHistory ? 'expand_less' : 'history' }}</mat-icon>-->
+    <!--  </div>-->
+
+    <!--  <div  *ngIf="showHistory">-->
+    <!--    <table style="width:100%; margin-top: 10px;">-->
+    <!--      <tr>-->
+    <!--        <th>Datum</th>-->
+    <!--        <th>Betrag</th>-->
+    <!--      </tr>-->
+    <!--      <tr *ngFor="let tx of transactions">-->
+    <!--        <td>{{ tx.date | date:'short' }}</td>-->
+    <!--        <td>{{ (tx.amountCents / 100) | number:'1.2-2' }} €</td>-->
+    <!--      </tr>-->
+    <!--    </table>-->
+    <!--    <div *ngIf="transactions.length === 0" style="text-align:center; color:#888; margin:16px 0;">-->
+    <!--      Keine Transaktionen gefunden.-->
+    <!--    </div>-->
+    <!--  </div>-->
+
+    <div *ngIf="!accessAllowed" class="driver-message">
+      🚫 Drivers cannot top up their credit themselves.
+    </div>
   </div>
-
-  <button *ngIf="accessAllowed" mat-raised-button color="primary" (click)="topUp()" [disabled]="!selectedAmount">
-    Top-Up
-  </button>
-  <div *ngIf="success" style="color: green; text-align: center; margin: 8px 0;">
-    {{ success }}
-  </div>
-  <div *ngIf="error" style="color: red; text-align: center; margin: 8px 0;">
-    {{ error }}
-  </div>
-
-<!--  <div *ngIf="accessAllowed"-->
-<!--       class="transaction-history" (click)="toggleHistory()" style="cursor:pointer;">-->
-<!--    Transaction History-->
-<!--    <mat-icon>{{ showHistory ? 'expand_less' : 'history' }}</mat-icon>-->
-<!--  </div>-->
-
-<!--  <div  *ngIf="showHistory">-->
-<!--    <table style="width:100%; margin-top: 10px;">-->
-<!--      <tr>-->
-<!--        <th>Datum</th>-->
-<!--        <th>Betrag</th>-->
-<!--      </tr>-->
-<!--      <tr *ngFor="let tx of transactions">-->
-<!--        <td>{{ tx.date | date:'short' }}</td>-->
-<!--        <td>{{ (tx.amountCents / 100) | number:'1.2-2' }} €</td>-->
-<!--      </tr>-->
-<!--    </table>-->
-<!--    <div *ngIf="transactions.length === 0" style="text-align:center; color:#888; margin:16px 0;">-->
-<!--      Keine Transaktionen gefunden.-->
-<!--    </div>-->
-<!--  </div>-->
-  <div *ngIf="!accessAllowed" style="text-align:center; color:#666; margin:16px 0;">
-    Drivers cannot top up their credit themselves.
 </div>
-</mat-card>
