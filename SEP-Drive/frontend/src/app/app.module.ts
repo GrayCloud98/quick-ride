@@ -38,7 +38,9 @@ import { SimulationComponent } from './simulation/simulation-page/simulation.com
 import {SimulationService} from './simulation/simulation.service';
 import { RatingPopupComponent } from './simulation/rating-popup/rating-popup.component';
 import { HomeComponent } from './home/home.component';
-
+import { LeaderboardComponent } from './leaderboard/leaderboard.component';
+import { HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -50,7 +52,8 @@ import { HomeComponent } from './home/home.component';
     WalletPageComponent,
     SimulationComponent,
     RatingPopupComponent,
-    HomeComponent
+    HomeComponent,
+    LeaderboardComponent
   ],
   imports: [
     MatSortModule,
@@ -99,7 +102,9 @@ import { HomeComponent } from './home/home.component';
     MatCardActions,
     GoogleMapsModule,
     MatSlider,
-    MatSliderModule
+    MatSliderModule,
+    HttpClientModule,
+    CommonModule
   ],
 
   providers: [

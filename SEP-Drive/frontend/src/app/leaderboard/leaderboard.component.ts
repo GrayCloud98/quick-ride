@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { LeaderboardService, DriverBoard } from '../services/leaderboard.service';
+import { LeaderboardService, DriverBoard } from './leaderboard.service';
 
 @Component({
   selector: 'app-leaderboard',
