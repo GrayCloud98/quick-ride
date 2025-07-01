@@ -321,8 +321,10 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private addStopover(newStopover: Point) {
+    if(this.currentIndex >= this.path.length - 1)
+      this.points.push(newStopover);
 
-    if (this.hasStarted && this.desiredStopoverPosition === this.nextStopoverPosition) {
+    else if (this.hasStarted && this.desiredStopoverPosition === this.nextStopoverPosition) {
       const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
       this.points.splice(this.desiredStopoverPosition, 0, currentPoint, newStopover);
     }
