@@ -11,6 +11,8 @@ import com.example.sep_drive_backend.repository.TransactionRepository;
 import com.example.sep_drive_backend.models.Wallet;
 import com.example.sep_drive_backend.models.User;
 
+import java.util.List;
+
 @Service
 public class WalletService {
 
@@ -104,5 +106,12 @@ public class WalletService {
     private Wallet getWalletForUser(Long userId) {
         User user = userRepo.findById(userId).orElse(null);
         return user != null ? user.getWallet() : null;
+    }
+    public List<Transaction> getUserTransactions(String username) {
+        Wallet wallet = getWalletForUsername(username);
+        if (wallet == null) {
+            throw new IllegalArgumentException("Wallet not found for user: " + username);
+        }
+        return transactionRepo.findByWalletIdOrderByCreatedAtDesc(wallet.getId());
     }
 }
