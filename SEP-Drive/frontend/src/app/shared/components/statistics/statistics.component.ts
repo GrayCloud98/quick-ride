@@ -1,5 +1,5 @@
 import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
-import { StatisticsService } from '../../services/statistics.service'; // Pfad ggf. anpassen
+import { StatisticsService } from '../../services/statistics.service';
 import Chart from 'chart.js/auto';
 
 type ChartKey = 'totalPrice' | 'totalDistance' | 'totalTravelledTime' | 'averageRating';
@@ -30,23 +30,23 @@ export class StatisticsComponent implements OnInit {
   chart!: Chart;
 
   chartTypeOptions = [
-    { label: 'Einnahmen', value: 'totalPrice' },
-    { label: 'Distanz', value: 'totalDistance' },
-    { label: 'Fahrzeit', value: 'totalTravelledTime' },
-    { label: 'Bewertung', value: 'averageRating' }
+    { label: 'Income', value: 'totalPrice' },
+    { label: 'Distance', value: 'totalDistance' },
+    { label: 'TravelTime', value: 'totalTravelledTime' },
+    { label: 'Rating', value: 'averageRating' }
   ];
   selectedChartType: ChartKey = 'totalPrice';
 
   viewMode: 'monthly' | 'daily' = 'monthly';
   selectedYear = new Date().getFullYear();
-  selectedMonth = new Date().getMonth() + 1; // ACHTUNG: +1 für API (Januar = 1)
+  selectedMonth = new Date().getMonth() + 1;
 
-  years = [ 2024, 2025];
+  years = [2025];
   months = [
-    { value: 1, name: 'Januar' }, { value: 2, name: 'Februar' }, { value: 3, name: 'März' },
-    { value: 4, name: 'April' }, { value: 5, name: 'Mai' }, { value: 6, name: 'Juni' },
-    { value: 7, name: 'Juli' }, { value: 8, name: 'August' }, { value: 9, name: 'September' },
-    { value: 10, name: 'Oktober' }, { value: 11, name: 'November' }, { value: 12, name: 'Dezember' }
+    { value: 1, name: 'Jan' }, { value: 2, name: 'Feb' }, { value: 3, name: 'Mar' },
+    { value: 4, name: 'Apr' }, { value: 5, name: 'May' }, { value: 6, name: 'Jun' },
+    { value: 7, name: 'Jul' }, { value: 8, name: 'Aug' }, { value: 9, name: 'Sep' },
+    { value: 10, name: 'Oct' }, { value: 11, name: 'Nov' }, { value: 12, name: 'Dec' }
   ];
 
   loading = false;
@@ -83,15 +83,22 @@ export class StatisticsComponent implements OnInit {
 
     if (this.viewMode === 'monthly') {
       this.statisticsService.getMonthlyStats(this.selectedYear).subscribe((stats: DriverStatsDto[]) => {
-        const labels = stats.map(s => this.months[s.month - 1].name); // Monatsnamen holen
-        const data = stats.map(s => s[this.selectedChartType]);
+        const statByMonth = new Map(stats.map(s => [s.month, s[this.selectedChartType]]));
+
+        const labels = this.months.map(m => m.name);
+        const data = this.months.map(m => statByMonth.get(m.value) ?? 0);
+
         this.renderChart(labels, data);
         this.loading = false;
       }, () => this.loading = false);
     } else {
       this.statisticsService.getDailyStats(this.selectedYear, this.selectedMonth).subscribe((stats: DriverDailyStatsDto[]) => {
-        const labels = stats.map(s => `${s.day}.`);
-        const data = stats.map(s => s[this.selectedChartType]);
+        const statByDay = new Map(stats.map(s => [s.day, s[this.selectedChartType]]));
+        const daysInMonth = new Date(this.selectedYear, this.selectedMonth, 0).getDate();
+
+        const labels = Array.from({length: daysInMonth}, (_, i) => `${i + 1}.`);
+        const data = Array.from({length: daysInMonth}, (_, i) => statByDay.get(i + 1) ?? 0);
+
         this.renderChart(labels, data);
         this.loading = false;
       }, () => this.loading = false);
@@ -109,12 +116,57 @@ export class StatisticsComponent implements OnInit {
           data,
           fill: true,
           tension: 0.3,
+          borderColor: '#38bdf8', // optional: Linienfarbe
+          backgroundColor: 'rgba(56,189,248,0.16)', // optional: Füllung
+          pointBackgroundColor: '#22c55e', // optional: Punkte
+          pointBorderColor: '#fff'
         }]
       },
       options: {
         responsive: true,
+        plugins: {
+          legend: {
+            labels: {
+              color: '#fff', // LEGENDE weiß!
+              font: { size: 16, weight: 700 }
+            }
+          },
+          tooltip: {
+            enabled: true,
+            backgroundColor: '#222e3a',
+            titleColor: '#fff',
+            bodyColor: '#fff',
+            borderColor: '#38bdf8',
+            borderWidth: 1,
+          }
+        },
         scales: {
-          y: { beginAtZero: true }
+          x: {
+            ticks: {
+              color: '#fff',
+              font: { size: 12, weight: 400 },  // NICHT mehr bold, kleiner!
+              maxRotation: 40,                  // Labels diagonal drehen, bessere Lesbarkeit!
+              minRotation: 25,
+              autoSkip: false,                  // Alle anzeigen, oder true falls zu eng
+            },
+            grid: {
+              color: 'rgba(255,255,255,0.13)'
+            }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: {
+              color: '#fff',
+              font: { size: 12 },
+              maxRotation: 40,
+              minRotation: 25,
+              autoSkip: true,
+              maxTicksLimit: 6
+            },
+            grid: {
+              color: 'rgba(255,255,255,0.13)'
+            }
+          }
         }
       }
     });

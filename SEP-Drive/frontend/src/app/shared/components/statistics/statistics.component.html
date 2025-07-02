@@ -1,40 +1,46 @@
-<mat-card class="dashboard-card">
-  <div class="dashboard-header">
-    <span>Diagramm:</span>
-    <mat-button-toggle-group [(ngModel)]="selectedChartType" (change)="onTypeChange(selectedChartType)">
-      <mat-button-toggle *ngFor="let opt of chartTypeOptions" [value]="opt.value">
-        {{ opt.label }}
-      </mat-button-toggle>
-    </mat-button-toggle-group>
+<div class="stats-page fancy">
+  <div class="glass stats-card">
+    <div class="stats-title">
+      📊 Statistics
+    </div>
+
+    <div class="stats-controls">
+      <div class="chart-type">
+        <span>Diagram:</span>
+        <mat-button-toggle-group [(ngModel)]="selectedChartType" (change)="onTypeChange(selectedChartType)">
+          <mat-button-toggle *ngFor="let opt of chartTypeOptions" [value]="opt.value">
+            {{ opt.label }}
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+      <div class="filters">
+        <mat-radio-group [(ngModel)]="viewMode" (change)="onViewModeChange(viewMode)">
+          <mat-radio-button value="monthly" >Monthly</mat-radio-button>
+          <mat-radio-button value="daily">Daily</mat-radio-button>
+        </mat-radio-group>
+
+        <ng-container *ngIf="viewMode === 'monthly'">
+          <span>Year:</span>
+          <mat-select [(ngModel)]="selectedYear" (selectionChange)="onYearChange(selectedYear)">
+            <mat-option *ngFor="let year of years" [value]="year">{{ year }}</mat-option>
+          </mat-select>
+        </ng-container>
+
+        <ng-container *ngIf="viewMode === 'daily'">
+          <br><span>Month:</span>
+          <mat-select [(ngModel)]="selectedMonth" (selectionChange)="onMonthChange(selectedMonth)">
+            <mat-option *ngFor="let month of months" [value]="month.value">{{ month.name }}</mat-option>
+          </mat-select>
+          <span>Year:</span>
+          <mat-select [(ngModel)]="selectedYear" (selectionChange)="onYearChange(selectedYear)">
+            <mat-option *ngFor="let year of years" [value]="year">{{ year }}</mat-option>
+          </mat-select>
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="chart-area">
+      <canvas #chartCanvas></canvas>
+    </div>
   </div>
-
-  <div class="dashboard-filters">
-    <span>Ansicht:</span>
-    <mat-radio-group [(ngModel)]="viewMode" (change)="onViewModeChange(viewMode)">
-      <mat-radio-button value="monthly">Monatlich</mat-radio-button>
-      <mat-radio-button value="daily">Täglich</mat-radio-button>
-    </mat-radio-group>
-
-    <ng-container *ngIf="viewMode === 'monthly'">
-      <span>Jahr:</span>
-      <mat-select [(ngModel)]="selectedYear" (selectionChange)="onYearChange(selectedYear)">
-        <mat-option *ngFor="let year of years" [value]="year">{{ year }}</mat-option>
-      </mat-select>
-    </ng-container>
-
-    <ng-container *ngIf="viewMode === 'daily'">
-      <span>Monat:</span>
-      <mat-select [(ngModel)]="selectedMonth" (selectionChange)="onMonthChange(selectedMonth)">
-        <mat-option *ngFor="let month of months" [value]="month.value">{{ month.name }}</mat-option>
-      </mat-select>
-      <span>Jahr:</span>
-      <mat-select [(ngModel)]="selectedYear" (selectionChange)="onYearChange(selectedYear)">
-        <mat-option *ngFor="let year of years" [value]="year">{{ year }}</mat-option>
-      </mat-select>
-    </ng-container>
-  </div>
-
-  <div style="margin: 32px 0; width:100%">
-    <canvas #chartCanvas></canvas>
-  </div>
-</mat-card>
+</div>
