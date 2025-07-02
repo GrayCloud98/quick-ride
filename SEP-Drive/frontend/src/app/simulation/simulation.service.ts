@@ -83,19 +83,12 @@ export class SimulationService {
     }
   }
 
-  /**
-   * @param control - The control action to be triggered (e.g., START, PAUSE, SPEED, etc.).
-   * @param input - Optional numeric input:
-   *                - `currentIndex` for START/PAUSE/RESUME/CHANGE.
-   *                - `duration` for SPEED.
-   * @param points - Optional array of route points, required for CHANGE command.
-   */
-  control(control: Control, input?: number, points?: Point[]): void {
+  control(control: Control, currentIndexOrDuration?: number, points?: Point[], estimatedDistance?: number, estimatedDuration?: number): void {
     const payload: any = { rideSimulationId: this.simulationId };
 
     switch (control) {
       case Control.SPEED:
-        payload.duration = input;
+        payload.duration = currentIndexOrDuration;
         break;
 
       case Control.CHANGE:
@@ -109,16 +102,18 @@ export class SimulationService {
               sequenceOrder: index,
             });
 
-        payload.currentIndex = input;
+        payload.currentIndex = currentIndexOrDuration;
         payload.destinationLocationName = points[points.length - 1].name;
         payload.destinationAddress = points[points.length - 1].address;
         payload.startPoint = { lat: points[0].lat,lng: points[0].lng };
         payload.endPoint = { lat: points[points.length - 1].lat, lng: points[points.length - 1].lng };
         payload.waypoints = points.slice(1, points.length - 1).map((p, i) => cleanWaypoint(p, i));
+        payload.distance = estimatedDistance;
+        payload.duration = estimatedDuration;
         break;
 
       default:
-        payload.currentIndex = input;
+        payload.currentIndex = currentIndexOrDuration;
         break;
     }
 

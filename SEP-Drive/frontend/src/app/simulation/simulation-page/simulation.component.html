@@ -4,26 +4,6 @@
     <div class="fix">
       <mat-card appearance="outlined" class="card small">
 
-        <mat-card-content class="content-section bottom-padding">
-          <div class="header field">
-            <mat-icon>map</mat-icon>
-            <span class="label">Ride Details:</span>
-          </div>
-          <div class="field">
-            <span class="title">Price:</span>
-            <span class="value bold">{{ ride.estimatedPrice | number:'1.2-2' }} €</span>
-          </div>
-          <div class="field">
-            <span class="title">Distance:</span>
-            <span class="value">{{ ride.distance }} km</span>
-          </div>
-          <div class="field">
-            <span class="title">Duration:</span>
-            <span class="value">{{ ride.duration }} minutes</span>
-          </div>
-        </mat-card-content >
-
-
         <mat-card-content class="content-section top-border" *ngIf="isCustomer">
           <div class="header field">
             <mat-icon>explore</mat-icon>
@@ -90,7 +70,7 @@
             <button *ngIf="!hasStarted" class="btn" mat-fab extended (click)="start()">Start</button>
             <button *ngIf="hasStarted && paused" class="btn" mat-fab extended (click)="resume()" [disabled]="currentIndex >= path.length - 1">Resume</button>
             <button *ngIf="hasStarted && !paused" class="btn" mat-fab extended (click)="pause()">Pause</button>
-            <button *ngIf="hasStarted" class="btn warn" mat-fab extended (click)="complete()" [disabled]="!paused">Complete</button>
+            <button *ngIf="isCustomer && hasStarted" class="btn warn" mat-fab extended (click)="complete()" [disabled]="!paused">Complete</button>
           </div>
         </mat-card-content>
       </mat-card>

@@ -35,7 +35,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // 🚘 Route/Stopovers State
   points: Point[] = [];
-  ride = {vehicleClass: VehicleClass.LARGE, distance: 0, duration: 0, estimatedPrice: 0} //todo new
+  ride = {vehicleClass: VehicleClass.LARGE, estimatedDistance: 0, estimatedDuration: 0, estimatedPrice: 0}
   currentIndex = 0;
   duration = 30;
   nextStopoverPosition = 1;
@@ -332,7 +332,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     else
       this.points.splice(this.desiredStopoverPosition, 0, newStopover);
 
-    this.simService.control(Control.CHANGE, this.currentIndex, this.points);
+    this.simService.control(Control.CHANGE, this.currentIndex, this.points, this.ride.estimatedDistance, this.ride.estimatedDuration);
   }
 
   removeStopover(index: number) {
@@ -347,7 +347,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     else
       this.points.splice(index, 1);
 
-    this.simService.control(Control.CHANGE, this.currentIndex, this.points);
+    this.simService.control(Control.CHANGE, this.currentIndex, this.points, this.ride.estimatedDistance, this.ride.estimatedDuration);
   }
 
   // 🧮 Helpers
@@ -402,8 +402,8 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
-    this.ride.distance = totalDistance;
-    this.ride.duration = totalDuration;
+    this.ride.estimatedDistance = totalDistance;
+    this.ride.estimatedDuration = totalDuration;
     this.ride.estimatedPrice = totalEstimatedPrice;
   }
 }
