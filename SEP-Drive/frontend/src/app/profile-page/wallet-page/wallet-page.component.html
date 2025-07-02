@@ -44,7 +44,7 @@
             <th>Betrag</th>
           </tr>
           <tr *ngFor="let tx of transactions">
-            <td>{{ tx.date | date:'short' }}</td>
+            <td>{{ tx.createdAt | date:'short' }}</td>
             <td>{{ (tx.amountCents / 100) | number:'1.2-2' }} €</td>
           </tr>
         </table>
