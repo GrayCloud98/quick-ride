@@ -3,11 +3,12 @@ package com.example.sep_drive_backend.dto;
 public class LeaderboardEntryDTO {
     private String username;
     private String fullName;
-    private double totalDistance;
+    private double totalDistanceDriven;
     private double averageRating;
-    private long totalDuration;
-    private int tripCount;
-    private double totalEarnings;
+    private long totalDriveTime;
+    private int numberOfRides;
+    private double moneyEarned;
+
 
     public String getUsername() {
         return username;
@@ -25,12 +26,12 @@ public class LeaderboardEntryDTO {
         this.fullName = fullName;
     }
 
-    public double getTotalDistance() {
-        return totalDistance;
+    public double getTotalDistanceDriven() {
+        return totalDistanceDriven;
     }
 
-    public void setTotalDistance(double totalDistance) {
-        this.totalDistance = totalDistance;
+    public void setTotalDistanceDriven(double totalDistanceDriven) {
+        this.totalDistanceDriven = totalDistanceDriven;
     }
 
     public double getAverageRating() {
@@ -41,28 +42,27 @@ public class LeaderboardEntryDTO {
         this.averageRating = averageRating;
     }
 
-    public long getTotalDuration() {
-        return totalDuration;
+    public long getTotalDriveTime() {
+        return totalDriveTime;
     }
 
-    public void setTotalDuration(long totalDuration) {
-        this.totalDuration = totalDuration;
+    public void setTotalDriveTime(long totalDriveTime) {
+        this.totalDriveTime = totalDriveTime;
     }
 
-    public int getTripCount() {
-        return tripCount;
+    public int getNumberOfRides() {
+        return numberOfRides;
     }
 
-    public void setTripCount(int tripCount) {
-        this.tripCount = tripCount;
+    public void setNumberOfRides(int numberOfRides) {
+        this.numberOfRides = numberOfRides;
     }
 
-    public double getTotalEarnings() {
-        return totalEarnings;
+    public double getMoneyEarned() {
+        return moneyEarned;
     }
 
-    public void setTotalEarnings(double totalEarnings) {
-        this.totalEarnings = totalEarnings;
+    public void setMoneyEarned(double moneyEarned) {
+        this.moneyEarned = moneyEarned;
     }
-
 }
