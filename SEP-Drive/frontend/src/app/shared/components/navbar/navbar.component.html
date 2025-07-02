@@ -81,7 +81,12 @@
     (click)="openLoginDialog()">
     Login
   </button>
-
+  <div *ngIf="isLoggedIn && walletBalance !== null" class="navbar-wallet" (click)="goToWalletpage()">
+    <mat-icon>account_balance_wallet</mat-icon>
+    <span class="wallet-balance">
+    {{ walletBalance | number:'1.2-2' }} €
+  </span>
+  </div>
   <!-- If the user is logged in, show the username and photo -->
   <div *ngIf="isLoggedIn" class="user-info" (click)="goToProfile()">
     <img

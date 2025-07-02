@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 export interface Transaction {
   id: number;
   amountCents: number;
-  date: string;
+  createdAt: string;
 }
 
 @Injectable({

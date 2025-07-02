@@ -1,49 +1,49 @@
-<div class="profile-container">
-  <img
-    ngSrc="{{ profileData?.profilePicture ? profileData.profilePicture : 'assets/placeholder.png' }}"
-    alt="UserPic"
-    class="profile-photo"
-    height="200"
-    width="200"
-  />
+<div class="profile-page fancy">
+  <div class="glass profile-header">
+    <img
+      [ngSrc]="profileData?.profilePicture || 'assets/placeholder.png'"
+      alt="UserPic"
+      class="profile-photo-glow"
+      width="180"
+      height="180"
+    />
 
-  <div class="profile-info">
-    <h2>{{ profileData?.username }}</h2>
-    <h3 *ngIf="profileData?.role">{{ profileData.role }}</h3>
+    <div class="profile-basic">
+      <div class="username-badge">
+        <h1 class="username">{{ profileData?.username }}</h1>
+        <span class="role-badge" *ngIf="profileData?.role">{{ profileData.role }}</span>
+      </div>
 
-    <button
-      *ngIf="isOwnProfile"
-      mat-raised-button
-      color="primary"
-      routerLink="/wallet"
-      class="wallet-button"
-      style="margin: 12px auto 8px auto; display: flex; align-items: center;">
-      <mat-icon style="margin-right: 6px;">account_balance_wallet</mat-icon>
-      Wallet
-    </button>
+      <div class="rating" *ngIf="profileData?.rating !== undefined">
+        <span class="stars">
+          <ng-container *ngFor="let star of getFullStars()">⭐</ng-container>
+          <ng-container *ngIf="hasHalfStar()">✰</ng-container>
+        </span>
+      </div>
 
-    <div class="profile-details">
-      <p><strong>First Name:</strong> {{ profileData?.firstName }}</p>
-      <p><strong>Last Name:</strong> {{ profileData?.lastName }}</p>
-      <p><strong>Email:</strong> {{ profileData?.email }}</p>
-      <p><strong>Birthdate:</strong> {{ profileData?.birthDate | date: 'MM-dd-yyyy' }}</p>
-      <p><strong>Total Rides:</strong> {{ profileData?.totalRides }}</p>
-      <p><strong>Rating:</strong> ⭐⭐⭐⭐✰</p>
-
-      <!-- Vehicle Class only for Driver -->
-      <p *ngIf="profileData?.role === 'Driver'">
-        <strong>Vehicle Class:</strong> {{ profileData?.vehicleClass ? profileData.vehicleClass : 'Not specified' }}
-      </p>
+      <div class="action-buttons" *ngIf="isOwnProfile">
+        <button mat-raised-button routerLink="/wallet">
+          <mat-icon>account_balance_wallet</mat-icon> Wallet
+        </button>
+      </div>
     </div>
   </div>
 
-  <button
-    *ngIf="isOwnProfile"
-    mat-raised-button
-    color="warn"
-    (click)="logout()"
-    class="logout-button">
-    Logout
-  </button>
+  <div class="glass profile-details">
+    <p><strong>First Name:</strong> {{ profileData?.firstName }}</p>
+    <p><strong>Last Name:</strong> {{ profileData?.lastName }}</p>
+    <p><strong>Email:</strong> {{ profileData?.email }}</p>
+    <p><strong>Birthdate:</strong> {{ profileData?.birthDate | date: 'MM-dd-yyyy' }}</p>
+    <p><strong>Total Rides:</strong> {{ profileData?.totalRides }}</p>
+    <p *ngIf="profileData?.role === 'Driver'">
+      <strong>Vehicle Class:</strong>
+      {{ profileData?.vehicleClass || 'Not specified' }}
+    </p>
+  </div>
 
+  <div class="logout-wrapper" *ngIf="isOwnProfile">
+    <button mat-raised-button color="warn" (click)="logout()">
+      Logout
+    </button>
+  </div>
 </div>
