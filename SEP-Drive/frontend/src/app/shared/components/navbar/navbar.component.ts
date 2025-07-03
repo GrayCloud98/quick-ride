@@ -40,9 +40,11 @@ export class NavbarComponent implements OnInit {
   }
 
   loadBalance() {
-    this.walletService.getBalance().subscribe(balance => {
-      this.walletBalance = balance/100;
-    });
+    this.walletService.updateBalance();
+    this.walletService.balance$.subscribe({
+      next: balance => this.walletBalance = balance/100
+    })
+
     this.authService.currentUser.subscribe((user) => {
       if (user) {
         this.isLoggedIn = true;
