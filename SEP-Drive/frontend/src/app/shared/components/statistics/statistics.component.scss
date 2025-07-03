@@ -24,12 +24,13 @@
 .stats-title {
   font-size: 2rem;
   font-weight: 600;
-  color: #38bdf8;
+  color: #579cfd;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   margin-bottom: 18px;
+
   letter-spacing: 0.02em;
 }
 
@@ -67,17 +68,8 @@
   margin: 32px 0 0 0;
   background: transparent;
 }
-
-/* -------- Angular Material + Glass White Style -------- */
-
-/* 1. Button-Toggle Labels weiß und aktiv grün */
-.mat-button-toggle-label-content {
-  color: #fff !important;
-  font-weight: 600;
-  font-size: 1.1rem;
-}
 .mat-button-toggle-checked .mat-button-toggle-label-content {
-  color: #22c55e !important;
+  color: #0aea0a;
 }
 .mat-button-toggle-group {
   background: rgba(255,255,255,0.18) !important;
@@ -93,58 +85,12 @@
   }
   .mat-button-toggle-checked {
     background: #fff !important;
-    color: #22c55e !important;
+    color: #000000 !important;
     box-shadow: 0 2px 8px 0 rgba(34,197,94,0.11);
     border-radius: 18px !important;
   }
 }
 
-/* -------- RADIO-BUTTON: ALT + MDC (NEU ab Angular 15) -------- */
-/* Für ALLE Angular Material Varianten */
-
-.mat-radio-label-content,
-.mat-mdc-radio-label-content,
-.mdc-label {
-  color: #fff !important;
-  font-weight: 600;
-  font-size: 1.08rem;
-  letter-spacing: 0.01em;
-}
-
-/* Checked-Variante */
-.mat-radio-button.mat-accent.mat-radio-checked .mat-radio-label-content,
-.mat-mdc-radio-button.mat-accent.mat-mdc-radio-checked .mat-mdc-radio-label-content,
-.mat-mdc-radio-button.mat-accent.mat-mdc-radio-checked .mdc-label {
-  color: #22c55e !important;
-}
-
-/* Kreise */
-.mat-radio-button .mat-radio-outer-circle,
-.mat-radio-button .mat-radio-inner-circle,
-.mat-mdc-radio-button .mdc-radio__outer-circle,
-.mat-mdc-radio-button .mdc-radio__inner-circle {
-  border-color: #fff !important;
-  background: #fff !important;
-}
-.mat-radio-button.mat-radio-checked .mat-radio-inner-circle,
-.mat-mdc-radio-button.mat-mdc-radio-checked .mdc-radio__inner-circle {
-  background: #22c55e !important;
-}
-
-/* Noch sicherer für MDC Radios */
-.mat-mdc-radio-button .mdc-label {
-  color: #fff !important;
-  font-weight: 600;
-  font-size: 1.1rem;
-}
-.mat-mdc-radio-button.mat-mdc-radio-checked .mdc-label {
-  color: #22c55e !important;
-}
-
-/* 3. SELECT/DROPDOWN WHITE/GLASS STYLE */
-mat-select, .mat-select-value, .mat-select-arrow {
-  color: #fff !important;
-}
 mat-select {
   background: rgba(255,255,255,0.14) !important;
   border-radius: 10px !important;
@@ -164,23 +110,9 @@ mat-select {
   }
 }
 
-/* 4. Input-Felder (falls vorhanden) */
-input, input[type='number'] {
-  background: rgba(255,255,255,0.14);
-  border: 1px solid #fff4;
-  color: #fff !important;
-  border-radius: 8px;
-  font-weight: 600;
-  &::placeholder {
-    color: #cbd5e1;
-    opacity: 1;
-  }
-}
 
-/* 5. Material Form Field: Underline & Label */
-.mat-form-field-underline {
-  background: rgba(255,255,255,0.15) !important;
-}
+
+
 .mat-form-field-label {
   color: #fff !important;
 }
@@ -190,15 +122,10 @@ input, input[type='number'] {
   color: #fff !important;
 }
 
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(56,189,248,0.26);
-  border-radius: 10px;
-}
 
-/* 7. Responsive */
+
+
+
 @media (max-width: 850px) {
   .glass.stats-card {
     padding: 12px 2vw 14px 2vw;
@@ -211,18 +138,5 @@ input, input[type='number'] {
   }
 }
 
-/* 8. Chart-Canvas Border/Glas */
-.chart-area canvas {
-  border-radius: 18px;
-  background: rgba(24, 35, 57, 0.60);
-  box-shadow: 0 1px 8px rgba(0,0,0,0.09);
-}
 
-/* 9. Optional: Alles innerhalb deiner Card IMMER weiß! */
-.stats-card label,
-.stats-card .mat-radio-label-content,
-.stats-card .mat-mdc-radio-label-content,
-.stats-card .mdc-label {
-  color: #fff !important;
-  font-weight: 600;
-}
+

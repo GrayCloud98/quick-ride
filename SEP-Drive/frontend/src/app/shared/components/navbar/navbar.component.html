@@ -46,7 +46,7 @@
       RideHistory
     </button>
   </div>
-  <div *ngIf="isLoggedIn">
+  <div *ngIf="isLoggedIn && !isCustomer ">
     <button
       mat-raised-button
       color="accent"

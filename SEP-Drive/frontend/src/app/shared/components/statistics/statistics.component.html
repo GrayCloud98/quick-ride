@@ -15,8 +15,8 @@
       </div>
       <div class="filters">
         <mat-radio-group [(ngModel)]="viewMode" (change)="onViewModeChange(viewMode)">
-          <mat-radio-button value="monthly" >Monthly</mat-radio-button>
-          <mat-radio-button value="daily">Daily</mat-radio-button>
+          <mat-radio-button class="monthly" value="monthly" >Monthly</mat-radio-button>
+          <mat-radio-button class="daily" value="daily">Daily</mat-radio-button>
         </mat-radio-group>
 
         <ng-container *ngIf="viewMode === 'monthly'">

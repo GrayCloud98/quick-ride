@@ -117,7 +117,7 @@ export class StatisticsComponent implements OnInit {
           fill: true,
           tension: 0.3,
           borderColor: '#38bdf8', // optional: Linienfarbe
-          backgroundColor: 'rgba(56,189,248,0.16)', // optional: Füllung
+          backgroundColor: 'rgb(179,10,234)', // optional: Füllung
           pointBackgroundColor: '#22c55e', // optional: Punkte
           pointBorderColor: '#fff'
         }]
