@@ -50,7 +50,7 @@ public class WalletController {
     public ResponseEntity<List<Transaction>> getTransactions() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
-        List<Transaction> transactions = walletService.getUserTransactions(username);
+        List<Transaction> transactions = walletService.getDepositTransactions(username);
         return ResponseEntity.ok(transactions);
     }
 }

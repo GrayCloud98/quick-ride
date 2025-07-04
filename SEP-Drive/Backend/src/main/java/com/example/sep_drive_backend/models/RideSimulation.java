@@ -17,6 +17,15 @@ public class RideSimulation {
     private boolean paused = true;
     private boolean hasStarted = false;
     private int currentIndex = 0;
+    private LocalDateTime endedAt;
+
+    public LocalDateTime getEndedAt() {
+        return endedAt;
+    }
+
+    public void markEnded() {
+        this.endedAt = LocalDateTime.now();
+    }
 
     @Embedded
     @AttributeOverrides({
