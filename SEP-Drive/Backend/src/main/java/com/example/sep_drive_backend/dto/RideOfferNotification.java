@@ -10,6 +10,8 @@ public class RideOfferNotification {
     private String message;
     private Long rideOfferId;
     private VehicleClassEnum vehicleClass;
+    private String driverUsername;
+
 
     public VehicleClassEnum getVehicleClass() {
         return vehicleClass;
@@ -68,4 +70,14 @@ public class RideOfferNotification {
     public void setMessage(String message) {
         this.message = message;
     }
+
+
+    public String getDriverUsername() {
+        return driverUsername;
+    }
+
+    public void setDriverUsername(String driverUsername) {
+        this.driverUsername = driverUsername;
+    }
+
 }

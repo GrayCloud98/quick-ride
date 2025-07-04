@@ -29,9 +29,10 @@ public class ChatController {
 
     @MessageMapping("/chat/send")
     public void sendMessage(@Payload ChatMessageDTO dto) {
+        System.out.println("[RECEIVED] " + dto);
         ChatMessageDTO saved = chatService.sendMessage(dto);
         messagingTemplate.convertAndSend("/topic/chat/" + saved.getSenderUsername(), saved);
-        messagingTemplate.convertAndSend("/topic/chat/" + saved.getReceiverUsername(), saved);
+        messagingTemplate.convertAndSend("/topic/chat/" + saved.getRecipientUsername(), saved);
     }
 
     @MessageMapping("/chat/edit")
@@ -39,7 +40,7 @@ public class ChatController {
         String username = jwtTokenProvider.getUsername(token.replace("Bearer ", ""));
         ChatMessageDTO edited = chatService.editMessage(payload.getMessageId(), username, payload.getNewContent());
 
-        messagingTemplate.convertAndSend("/topic/chat/" + edited.getReceiverUsername(), edited);
+        messagingTemplate.convertAndSend("/topic/chat/" + edited.getRecipientUsername(), edited);
         messagingTemplate.convertAndSend("/topic/chat/" + edited.getSenderUsername(), edited);
     }
 
@@ -66,7 +67,7 @@ public class ChatController {
         ChatMessageDTO updated = chatService.markMessageAsRead(messageId, username);
 
         messagingTemplate.convertAndSend("/topic/chat/" + updated.getSenderUsername(), updated);
-        messagingTemplate.convertAndSend("/topic/chat/" + updated.getReceiverUsername(), updated);
+        messagingTemplate.convertAndSend("/topic/chat/" + updated.getRecipientUsername(), updated);
     }
 
 }

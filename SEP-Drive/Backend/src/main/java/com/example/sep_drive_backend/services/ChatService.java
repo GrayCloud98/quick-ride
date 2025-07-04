@@ -28,30 +28,27 @@ public class ChatService {
         this.rideRequestRepository = rideRequestRepository;
         this.driverRepository = driverRepository;
     }
+
     private void validateChatPermission(String sender, String receiver) {
+        System.out.println("[DEBUG] Validating chat between sender: " + sender + " and receiver: " + receiver);
+
         boolean offerExists = rideOfferRepository.existsByDriverUsernameAndCustomerUsername(sender, receiver)
                 || rideOfferRepository.existsByDriverUsernameAndCustomerUsername(receiver, sender);
 
-        boolean senderIsActiveDriver = driverRepository.findByUsername(sender)
-                .map(Driver::getActive)
-                .orElse(false);
-
-        boolean receiverIsActiveDriver = driverRepository.findByUsername(receiver)
-                .map(Driver::getActive)
-                .orElse(false);
-
-        if (!offerExists && !(senderIsActiveDriver || receiverIsActiveDriver)) {
-            throw new IllegalStateException("Chat not allowed: No active RideOffer between users and no active driver.");
+        // TEMPORARY: disable the driver active check to allow debugging
+        if (!offerExists) {
+            throw new IllegalStateException("Chat not allowed: No RideOffer exists between users.");
         }
     }
 
 
+
     public ChatMessageDTO sendMessage(ChatMessageDTO dto) {
-        validateChatPermission(dto.getSenderUsername(), dto.getReceiverUsername());
+        validateChatPermission(dto.getSenderUsername(), dto.getRecipientUsername());
 
         ChatMessage message = new ChatMessage();
         message.setSenderUsername(dto.getSenderUsername());
-        message.setReceiverUsername(dto.getReceiverUsername());
+        message.setReceiverUsername(dto.getRecipientUsername());
         message.setContent(dto.getContent());
         message.setRead(false);
         message.setEdited(false);

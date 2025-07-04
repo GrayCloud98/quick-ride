@@ -208,6 +208,7 @@ public class RideRequestService {
             RideOfferNotification notification = new RideOfferNotification();
             notification.setRideOfferId(offer.getId());
             notification.setDriverName(driver.getFirstName() + " " + driver.getLastName());
+            notification.setDriverUsername(driver.getUsername());
             notification.setDriverRating(driver.getRating());
             notification.setTotalRides(driver.getTotalRides());
             notification.setTotalTravelledDistance(driver.getTotalTravelledDistance());

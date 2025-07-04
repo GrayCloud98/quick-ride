@@ -13,3 +13,13 @@
     width: calc(50% - 20px);
   }
 }
+
+.chat-popup {
+  margin-top: 20px;
+  padding: 16px;
+  background: white;
+  border: 2px solid #ccc;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+}

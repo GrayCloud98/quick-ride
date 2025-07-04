@@ -39,7 +39,6 @@ import {SimulationService} from './simulation/simulation.service';
 import { RatingPopupComponent } from './simulation/rating-popup/rating-popup.component';
 import { HomeComponent } from './home/home.component';
 
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -50,7 +49,7 @@ import { HomeComponent } from './home/home.component';
     WalletPageComponent,
     SimulationComponent,
     RatingPopupComponent,
-    HomeComponent
+    HomeComponent,
   ],
   imports: [
     MatSortModule,

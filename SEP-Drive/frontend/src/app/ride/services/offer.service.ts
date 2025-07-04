@@ -53,6 +53,7 @@ export class OfferService {
       map((offers: any[]) => offers.map(
         (offer: any) => ({
           offerID: offer.rideOfferId,
+          driverUsername: offer.driverUsername,
           driverName: offer.driverName,
           driverRating: offer.driverRating,
           driverVehicle: offer.vehicleClass,

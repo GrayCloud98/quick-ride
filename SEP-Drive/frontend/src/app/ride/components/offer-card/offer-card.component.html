@@ -1,50 +1,59 @@
 <mat-card appearance="outlined" class="card big">
   <mat-card-content>
+    <div class="header field">
+      <mat-icon>person</mat-icon>
+      <span class="label">Driver Name:</span>
+      <span class="value bold">{{ offer.driverName }}</span>
+    </div>
 
-  <div class="header field">
-    <mat-icon>person</mat-icon>
-    <span class="label">Driver Name:</span>
-    <span class="value bold">{{ offer.driverName }}</span>
-  </div>
+    <div class="header field">
+      <mat-icon>star</mat-icon>
+      <span class="label">Driver Rating:</span>
+      <span class="value">{{ offer.driverRating | number:'1.2-2' }}</span>
+    </div>
 
-  <div class="header field">
-    <mat-icon>star</mat-icon>
-    <span class="label">Driver Rating:</span>
-    <span class="value">{{ offer.driverRating | number:'1.2-2' }}</span>
-  </div>
+    <div class="header field">
+      <mat-icon>commute</mat-icon>
+      <span class="label">Vehicle Class:</span>
+      <span class="value">{{ offer.driverVehicle }}</span>
+    </div>
 
-  <div class="header field">
-    <mat-icon>commute</mat-icon>
-    <span class="label">Vehicle Class:</span>
-    <span class="value">{{ offer.driverVehicle }}</span>
-  </div>
+    <div class="header field">
+      <mat-icon>assignment</mat-icon>
+      <span class="label">Rides Count:</span>
+      <span class="value grey-italic">{{ offer.ridesCount }}</span>
+    </div>
 
-  <div class="header field">
-    <mat-icon>assignment</mat-icon>
-    <span class="label">Rides Count:</span>
-    <span class="value grey-italic">{{ offer.ridesCount }}</span>
-  </div>
+    <div class="header field">
+      <mat-icon>map</mat-icon>
+      <span class="label">Travelled Distance:</span>
+      <span class="value grey-italic">{{ offer.travelledDistance | number:'1.2-2' }} km</span>
+    </div>
 
-  <div class="header field">
-    <mat-icon>map</mat-icon>
-    <span class="label">Travelled Distance:</span>
-    <span class="value grey-italic">{{ offer.travelledDistance | number:'1.2-2' }} km</span>
-  </div>
-
-  <div class="header field">
-    <mat-icon>sell</mat-icon>
+    <div class="header field">
+      <mat-icon>sell</mat-icon>
       <span class="label">Offer ID:</span>
       <span class="value grey-italic">{{ offer.offerID }}</span>
-  </div>
+    </div>
   </mat-card-content>
 
   <div class="button-container centered-box">
-    <button class="btn" mat-fab extended (click)="accept()">
-      Accept Offer
-    </button>
-    <button class="btn warn" mat-fab extended (click)="reject()">
-      Reject Offer
+    <button class="btn" mat-fab extended (click)="accept()">Accept Offer</button>
+    <button class="btn warn" mat-fab extended (click)="reject()">Reject Offer</button>
+    <button class="btn" mat-fab extended color="primary" (click)="toggleChat = !toggleChat">
+      {{ toggleChat ? 'Close Chat' : 'Chat with Driver' }}
     </button>
   </div>
+
+  <div class="chat-popup" *ngIf="toggleChat">
+    <app-chat
+      *ngIf="toggleChat && chatId && offer.driverUsername"
+      [chatId]="chatId"
+      [username]="customerUsername"
+      [recipient]="offer.driverUsername"
+      style="background: white; border: 2px solid #ccc; padding: 16px; margin-top: 20px; width: 100%; display: block;"
+    ></app-chat>
+  </div>
 </mat-card>
+
 <br>

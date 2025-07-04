@@ -1,0 +1,25 @@
+<div class="chat-container">
+  <div class="chat-messages">
+    <div
+      *ngFor="let msg of messages"
+      [ngClass]="{ 'my-msg': msg.sender === username, 'their-msg': msg.sender !== username }"
+    >
+      <div class="msg-bubble">
+        <div class="msg-content">{{ msg.content }}</div>
+        <div class="msg-meta">
+          <small>{{ msg.sender }}</small>
+          <small *ngIf="msg.edited">&nbsp;(edited)</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-input">
+    <input
+      [(ngModel)]="newMessage"
+      (keydown.enter)="send()"
+      placeholder="Type your message..."
+    />
+    <button (click)="send()">Send</button>
+  </div>
+</div>

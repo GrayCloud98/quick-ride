@@ -8,6 +8,7 @@ export enum OfferState {
 
 export interface Offer {
   offerID: number;
+  driverUsername: string;
   driverName: string;
   driverRating: number;
   driverVehicle: VehicleClass;

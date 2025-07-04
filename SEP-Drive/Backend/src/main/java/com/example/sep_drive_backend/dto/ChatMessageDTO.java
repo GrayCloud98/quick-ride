@@ -8,7 +8,7 @@ public class ChatMessageDTO {
 
     private Long id;
     private String senderUsername;
-    private String receiverUsername;
+    private String recipientUsername;
     private String content;
     private LocalDateTime timestamp;
     private boolean read;
@@ -18,7 +18,7 @@ public class ChatMessageDTO {
     public ChatMessageDTO(ChatMessage message) {
         this.id = message.getId();
         this.senderUsername = message.getSenderUsername();
-        this.receiverUsername = message.getReceiverUsername();
+        this.recipientUsername = message.getReceiverUsername();
         this.content = message.getContent();
         this.timestamp = message.getTimestamp();
         this.read = message.isRead();
@@ -38,11 +38,11 @@ public class ChatMessageDTO {
     public void setSenderUsername(String senderUsername) {
         this.senderUsername = senderUsername;
     }
-    public String getReceiverUsername() {
-        return receiverUsername;
+    public String getRecipientUsername() {
+        return recipientUsername;
     }
-    public void setReceiverUsername(String receiverUsername) {
-        this.receiverUsername = receiverUsername;
+    public void setRecipientUsername(String receiverUsername) {
+        this.recipientUsername = receiverUsername;
     }
     public String getContent() {
         return content;
