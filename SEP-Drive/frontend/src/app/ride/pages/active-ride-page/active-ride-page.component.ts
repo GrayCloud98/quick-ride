@@ -56,6 +56,12 @@ export class ActiveRidePageComponent implements OnInit {
           lat : ride.dropoff.latitude,
           lng : ride.dropoff.longitude
         });
+        this.rideStateService.setStopovers(
+          ride.stopovers.map((stop: { latitude: number; longitude: number }) => ({
+            lat: stop.latitude,
+            lng: stop.longitude
+          }))
+        );
       }),
     ).subscribe({
       error: err => console.log(err)

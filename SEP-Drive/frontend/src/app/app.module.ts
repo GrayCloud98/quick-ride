@@ -37,6 +37,7 @@ import {MatSlider, MatSliderModule} from '@angular/material/slider';
 import { SimulationComponent } from './simulation/simulation-page/simulation.component';
 import {SimulationService} from './simulation/simulation.service';
 import { RatingPopupComponent } from './simulation/rating-popup/rating-popup.component';
+import { HomeComponent } from './home/home.component';
 
 
 @NgModule({
@@ -48,7 +49,8 @@ import { RatingPopupComponent } from './simulation/rating-popup/rating-popup.com
     TwoFaComponent,
     WalletPageComponent,
     SimulationComponent,
-    RatingPopupComponent
+    RatingPopupComponent,
+    HomeComponent
   ],
   imports: [
     MatSortModule,

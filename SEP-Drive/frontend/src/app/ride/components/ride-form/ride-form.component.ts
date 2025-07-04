@@ -103,8 +103,17 @@ constructor(
         break;
 
       default:
+        if (!this.ride.stopovers) {
+          this.ride.stopovers = [];
+        }
         this.ride.stopovers![type] = location;
         this.stopoversControl.at(type).setValue(location);
+        this.rideStateService.setStopovers(
+          this.ride.stopovers.map(stop => ({
+            lat: stop.latitude,
+            lng: stop.longitude
+          }))
+        )
     }
     this.updateDistanceInfo();
   }
@@ -141,6 +150,15 @@ constructor(
 
   removeStopover(index: number) {
     this.stopoversControl.removeAt(index);
-    this.ride.stopovers!.splice(index, 1);
+    if (this.ride.stopovers) {
+      this.ride.stopovers.splice(index, 1);
+
+      this.rideStateService.setStopovers(
+        this.ride.stopovers.map(stop => ({
+          lat: stop.latitude,
+          lng: stop.longitude
+        }))
+      );
+    }
   }
 }

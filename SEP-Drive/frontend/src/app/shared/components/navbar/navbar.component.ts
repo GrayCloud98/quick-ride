@@ -8,7 +8,8 @@ import {AuthService} from '../../../auth/auth.service';
 import {RideRequestService} from '../../../ride/services/ride-request.service';
 import {RidehistoryComponent} from '../ridehistory/ridehistory.component';
 import {SimulationService} from '../../../simulation/simulation.service';
-
+import {StatisticsComponent} from '../statistics/statistics.component';
+import { WalletService } from '../../services/wallet.service';
 @Component({
   selector: 'app-navbar',
   standalone: false,
@@ -23,16 +24,27 @@ export class NavbarComponent implements OnInit {
   usernameControl = new FormControl();
   options: string[] = [];
   filteredOptions!: Observable<string[]>;
+  walletBalance: number | null = null;
 
   constructor(
     private readonly dialogue: MatDialog,
     private readonly router: Router,
     private readonly authService: AuthService,
     private readonly rideService: RideRequestService,
-    private readonly simService: SimulationService
+    private readonly simService: SimulationService,
+    private walletService: WalletService
   ) {}
 
   ngOnInit(): void {
+    this.loadBalance();
+  }
+
+  loadBalance() {
+    this.walletService.updateBalance();
+    this.walletService.balance$.subscribe({
+      next: balance => this.walletBalance = balance/100
+    })
+
     this.authService.currentUser.subscribe((user) => {
       if (user) {
         this.isLoggedIn = true;
@@ -85,10 +97,15 @@ export class NavbarComponent implements OnInit {
   goToProfile() {
     this.router.navigate([`/${(this.username)}`]);
   }
+  goToWalletpage() {
+    this.router.navigate([`/wallet`]);
+  }
   goToridehistory(){
     this.router.navigate([`/history`])
   }
-
+  goToStatistics(){
+    this.router.navigate([`/statistics`])
+  }
   goHome() {
     this.router.navigate(['/']);
   }

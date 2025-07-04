@@ -8,8 +8,11 @@ import { RegisterComponent } from './auth/register/register.component';
 import {UserNotFoundComponent} from './shared/components/user-not-found/user-not-found.component';
 import {RidehistoryComponent} from './shared/components/ridehistory/ridehistory.component';
 import {SimulationComponent} from './simulation/simulation-page/simulation.component';
+import {StatisticsComponent} from './shared/components/statistics/statistics.component';
+import {HomeComponent} from './home/home.component';
 
 const routes: Routes = [
+  { path: '', component: HomeComponent, pathMatch: 'full' },
   { path: 'ride', loadChildren: () => RideRoutingModule },
   { path: 'register', component: RegisterComponent },
   { path: 'two-factor', component: TwoFaComponent },
@@ -17,6 +20,7 @@ const routes: Routes = [
   { path: 'wallet', component: WalletPageComponent },
   { path: 'user-not-found', component: UserNotFoundComponent },
   { path: 'history', component:RidehistoryComponent},
+  { path: 'statistics', component:StatisticsComponent},
   { path: ':username', component: ProfilePageComponent }
 ];
 

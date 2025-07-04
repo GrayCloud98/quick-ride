@@ -38,6 +38,15 @@ public class RideSimulation {
     public void setEndAddress(String endAddress) {
         this.endAddress = endAddress;
     }
+    private LocalDateTime endedAt;
+
+    public LocalDateTime getEndedAt() {
+        return endedAt;
+    }
+
+    public void markEnded() {
+        this.endedAt = LocalDateTime.now();
+    }
 
     @Embedded
     @AttributeOverrides({

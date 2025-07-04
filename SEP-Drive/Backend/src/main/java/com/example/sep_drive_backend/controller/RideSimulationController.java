@@ -107,7 +107,7 @@ public class RideSimulationController {
         simulation.getRideOffer().getRideRequest().setRideStatus(RideStatus.COMPLETED);
         simulation.setPaused(true);
         simulation.getRideOffer().getRideRequest().markEnded();
-
+        simulation.markEnded();
         long priceCents = Math.round(simulation.getRideOffer().getRideRequest().getEstimatedPrice() * 100);
         String customerUsername = simulation.getCustomer().getUsername();
         Long driverUserId = simulation.getDriver().getId();
