@@ -6,7 +6,11 @@
     <tr>
       <th>#</th>
       <th>Username</th>
-      <th>Full Name</th>
+      <th (click)="sortByFullName()" class="sortable">
+        Full Name
+        <span *ngIf="sortDirection === 'asc'">🔼</span>
+        <span *ngIf="sortDirection === 'desc'">🔽</span>
+      </th>
       <th>Distance (km)</th>
       <th>Rating</th>
       <th>Drive Time (min)</th>

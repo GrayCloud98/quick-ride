@@ -47,6 +47,18 @@
     </button>
   </div>
 
+  <!--leaderboard-->
+  <div *ngIf="isLoggedIn">
+    <button
+      mat-raised-button
+      color="accent"
+      class="nav-btn"
+      (click)="goToLeaderboard()"
+    >
+      Leaderboard
+    </button>
+  </div>
+
   <span class="spacer"></span>
 
   <!-- Search Bar -->
