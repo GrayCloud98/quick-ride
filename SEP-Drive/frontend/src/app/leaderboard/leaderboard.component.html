@@ -5,17 +5,53 @@
     <thead>
     <tr>
       <th>#</th>
-      <th>Username</th>
-      <th (click)="sortByFullName()" class="sortable">
+      <th (click)="sortBy('username')" class="sortable">
+        Username
+        <span *ngIf="currentSortColumn === 'username'">
+            {{ sortDirection === 'asc' ? '🔼' : '🔽' }}
+          </span>
+      </th>
+
+      <th (click)="sortBy('fullName')" class="sortable">
         Full Name
         <span *ngIf="sortDirection === 'asc'">🔼</span>
         <span *ngIf="sortDirection === 'desc'">🔽</span>
       </th>
-      <th>Distance (km)</th>
-      <th>Rating</th>
-      <th>Drive Time (min)</th>
-      <th>Rides</th>
-      <th>Money (€)</th>
+
+      <th (click)="sortBy('totalDistanceDriven')" class="sortable">
+        Distance (km)
+        <span *ngIf="currentSortColumn === 'totalDistanceDriven'">
+            {{ sortDirection === 'asc' ? '🔼' : '🔽' }}
+          </span>
+      </th>
+
+      <th (click)="sortBy('averageRating')" class="sortable">
+        Rating
+        <span *ngIf="currentSortColumn === 'averageRating'">
+            {{ sortDirection === 'asc' ? '🔼' : '🔽' }}
+          </span>
+      </th>
+
+      <th (click)="sortBy('totalDriveTime')" class="sortable">
+        Drive Time (min)
+        <span *ngIf="currentSortColumn === 'totalDriveTime'">
+            {{ sortDirection === 'asc' ? '🔼' : '🔽' }}
+          </span>
+      </th>
+
+      <th (click)="sortBy('numberOfRides')" class="sortable">
+        Rides
+        <span *ngIf="currentSortColumn === 'numberOfRides'">
+            {{ sortDirection === 'asc' ? '🔼' : '🔽' }}
+          </span>
+      </th>
+
+      <th (click)="sortBy('moneyEarned')" class="sortable">
+        Money (€)
+        <span *ngIf="currentSortColumn === 'moneyEarned'">
+            {{ sortDirection === 'asc' ? '🔼' : '🔽' }}
+          </span>
+      </th>
     </tr>
     </thead>
     <tbody>

@@ -11,6 +11,7 @@ export class LeaderboardComponent implements OnInit {
 
   leaderboard: DriverBoard[] = [];
   sortDirection: 'asc' | 'desc' = 'asc';
+  currentSortColumn: keyof DriverBoard | '' = '';
 
   constructor(private leaderboardService: LeaderboardService) {}
 
@@ -20,16 +21,28 @@ export class LeaderboardComponent implements OnInit {
     });
   }
 
-  sortByFullName(): void {
-      this.leaderboard.sort((a, b) => {
-        const nameA = a.fullName.toLowerCase();
-        const nameB = b.fullName.toLowerCase();
-
-        if (nameA < nameB) return this.sortDirection === 'asc' ? -1 : 1;
-        if (nameA > nameB) return this.sortDirection === 'asc' ? 1 : -1;
-        return 0;
-      });
-
+  sortBy(column: keyof DriverBoard): void {
+    if (this.currentSortColumn === column) {
+      // Toggle direction if the same column is clicked again
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortDirection = 'asc';
+      this.currentSortColumn = column;
     }
+
+    this.leaderboard.sort((a, b) => {
+      let valueA = a[column];
+      let valueB = b[column];
+
+      // Convert to lowercase if strings (for case-insensitive sorting)
+      if (typeof valueA === 'string' && typeof valueB === 'string') {
+        valueA = valueA.toLowerCase();
+        valueB = valueB.toLowerCase();
+      }
+
+      if (valueA < valueB) return this.sortDirection === 'asc' ? -1 : 1;
+      if (valueA > valueB) return this.sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
 }
