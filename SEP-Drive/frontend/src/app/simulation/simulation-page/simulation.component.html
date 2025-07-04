@@ -1,31 +1,91 @@
 <div class="main-container">
   <div class="left-container">
-    <mat-card appearance="outlined" class="card big">
-      <mat-card-content>
-        <div class="header field">
-          <mat-icon>flash_on</mat-icon>
-          <span class="label">Simulation Duration:</span>
-          <span class="value bold">{{ duration }} seconds</span>
-        </div>
 
-        <input style="width: 100%;"
-               type="range"
-               min="3"
-               max="30"
-               (change)="speed()"
-               [(ngModel)]="duration"
-               [disabled]="!isPaused"
-        />
-      </mat-card-content>
-    </mat-card>
+    <div class="fix">
+      <mat-card appearance="outlined" class="card small">
 
-    <div class="button-container">
-      <button *ngIf="!isRunning" class="btn" mat-fab extended (click)="start()">Start</button>
-      <div *ngIf="isRunning" class="row-btn">
-        <button class="btn" mat-fab extended (click)="resume()" [disabled]="!isPaused">Resume</button>
-        <button class="btn" mat-fab extended (click)="pause()" [disabled]="isPaused">Pause</button>
+        <mat-card-content class="content-section top-border" *ngIf="isCustomer">
+          <div class="header field">
+            <mat-icon>explore</mat-icon>
+            <span class="label">
+              Add a new Stopover
+              {{
+                desiredStopoverPosition === points.length
+                  ? 'after'
+                  : desiredStopoverPosition === points.length - 1
+                    ? 'before'
+                    : 'before'
+              }}:
+            </span>
+            <span class="value bold">
+              {{
+                desiredStopoverPosition === points.length
+                  ? 'Drop off'
+                  : desiredStopoverPosition === points.length - 1
+                    ? 'Drop off'
+                    : 'Stopover ' + desiredStopoverPosition
+              }}
+            </span>
+          </div>
+
+          <select-location
+            class="stopover-location-select"
+            [label]="'I want to stop by ...'"
+            [placeholder]="'Train Station'"
+            [control]="newStopoverControl"
+            [isSimulationPaused]="paused"
+            (locationSelected)="onLocationSelected($event)"
+            >
+          </select-location>
+
+          <input type="range"
+                 style="width: 100%"
+                 [(ngModel)]="desiredStopoverPosition"
+                 [min]="nextStopoverPosition"
+                 [max]="points.length"
+                 [step]="1"
+                 [disabled]="!paused"
+                 required>
+        </mat-card-content>
+
+        <mat-card-content class="content-section top-border">
+          <div class="header field">
+            <mat-icon>flash_on</mat-icon>
+            <span class="label">Simulation Duration:</span>
+            <span class="value bold">{{ duration }} seconds</span>
+          </div>
+
+          <input
+            style="width: 100%"
+            type="range"
+            min="3"
+            max="30"
+            (change)="speed()"
+            [(ngModel)]="duration"
+            [disabled]="!paused">
+        </mat-card-content>
+
+        <mat-card-content class="content-section top-border">
+          <div class="button-container">
+            <button *ngIf="!hasStarted" class="btn" mat-fab extended (click)="start()">Start</button>
+            <button *ngIf="hasStarted && paused" class="btn" mat-fab extended (click)="resume()" [disabled]="currentIndex >= path.length - 1">Resume</button>
+            <button *ngIf="hasStarted && !paused" class="btn" mat-fab extended (click)="pause()">Pause</button>
+            <button *ngIf="isCustomer && hasStarted" class="btn warn" mat-fab extended (click)="complete()" [disabled]="!paused">Complete</button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="scroll">
+      <div *ngFor="let point of points; let i = index">
+        <app-location-card
+          [isSimulationPaused]="paused"
+          [removable]="isCustomer && !point.passed"
+          [location]="{ latitude: point.lat, longitude: point.lng, name: point.name, address: point.address }"
+          [label]="i === 0 ? 'Pick up' : i === points.length - 1 ? 'Drop off' : 'Stopover ' + i"
+          (onRemove)="removeStopover(i)">
+        </app-location-card>
       </div>
-      <button *ngIf="isRunning" class="btn warn" mat-fab extended (click)="complete()" [disabled]="!isPaused">Complete</button>
     </div>
   </div>
 

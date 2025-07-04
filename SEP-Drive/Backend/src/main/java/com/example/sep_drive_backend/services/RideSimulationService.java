@@ -1,17 +1,22 @@
 package com.example.sep_drive_backend.services;
 import com.example.sep_drive_backend.constants.RideStatus;
+import com.example.sep_drive_backend.constants.VehicleClassEnum;
+import com.example.sep_drive_backend.dto.PointDTO;
 import com.example.sep_drive_backend.dto.RideSimulationUpdate;
-import com.example.sep_drive_backend.models.Customer;
-import com.example.sep_drive_backend.models.Driver;
-import com.example.sep_drive_backend.models.RideSimulation;
+import com.example.sep_drive_backend.dto.SimulationPointsControl;
+import com.example.sep_drive_backend.dto.WaypointDTO;
+import com.example.sep_drive_backend.models.*;
 import com.example.sep_drive_backend.repository.CustomerRepository;
 import com.example.sep_drive_backend.repository.DriverRepository;
+import com.example.sep_drive_backend.repository.RideRequestRepository;
 import com.example.sep_drive_backend.repository.RideSimulationRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -21,14 +26,16 @@ public class RideSimulationService {
     private final DriverRepository driverRepository;
     private final CustomerRepository customerRepository;
     private final WalletService walletService;
+    private final RideRequestRepository rideRequestRepository;
 
 
     @Autowired
-    public RideSimulationService(RideSimulationRepository rideSimulationRepository, DriverRepository driverRepository, CustomerRepository customerRepository, WalletService walletService) {
+    public RideSimulationService(RideSimulationRepository rideSimulationRepository, DriverRepository driverRepository, CustomerRepository customerRepository, WalletService walletService, RideRequestRepository rideRequestRepository) {
         this.rideSimulationRepository = rideSimulationRepository;
         this.driverRepository = driverRepository;
         this.customerRepository = customerRepository;
         this.walletService = walletService;
+        this.rideRequestRepository = rideRequestRepository;
     }
 
     public RideSimulation startSimulation(Long id) {
@@ -67,9 +74,52 @@ public class RideSimulationService {
     }
 
     public RideSimulation getSimulationById(Long id) {
-        Optional<RideSimulation> simOpt = rideSimulationRepository.findById(id);
-        if (simOpt.isEmpty()) throw new RuntimeException("Simulation not found");
-        return simOpt.get();
+        return rideSimulationRepository.findWithWaypointsById(id)
+                .orElseThrow(() -> new RuntimeException("Simulation not found"));
+    }
+
+    public RideSimulation changePoints(Long id, SimulationPointsControl simPointsControl) {
+
+        RideSimulation sim = getSimulationById(id);
+        RideRequest r = sim.getRideOffer().getRideRequest();
+        r.getWaypoints().clear();
+        sim.setCurrentIndex(simPointsControl.getCurrentIndex());
+        sim.setDestinationLocationName(simPointsControl.getDestinationLocationName());
+        sim.setEndAddress(simPointsControl.getDestinationAddress());
+        List<Waypoint> mappedWaypoints = simPointsControl.getWaypoints().stream()
+                .map(dto -> {
+                    Waypoint w = new Waypoint();
+                    w.setName(dto.getName());
+                    w.setAddress(dto.getAddress());
+                    w.setLatitude(dto.getLatitude());
+                    w.setLongitude(dto.getLongitude());
+                    w.setSequenceOrder(dto.getSequenceOrder());
+                    w.setRideRequest(r);
+                    return w;
+                }).collect(Collectors.toList());
+        r.getWaypoints().addAll(mappedWaypoints);
+        sim.getRideOffer().getRideRequest().setWaypoints(mappedWaypoints);
+        r.setDestinationLocationName(simPointsControl.getDestinationLocationName());
+        r.setDestinationLongitude(simPointsControl.getEndPoint().getLng());
+        r.setDestinationLatitude(simPointsControl.getEndPoint().getLat());
+        PointDTO ep = simPointsControl.getEndPoint();
+        sim.setEndPoint(new RideSimulation.Point(ep.getLat(), ep.getLng()));
+
+        r.setDistance(simPointsControl.getDistance());
+        r.setDuration(simPointsControl.getDuration());
+        double estimatedPrice = 0.0;
+        if (sim.getDriver().getVehicleClass() == VehicleClassEnum.Large){
+            estimatedPrice = simPointsControl.getDistance() * 10;
+        } else if (sim.getDriver().getVehicleClass() == VehicleClassEnum.Medium) {
+            estimatedPrice = simPointsControl.getDistance() * 2;
+
+        } else if (sim.getDriver().getVehicleClass() == VehicleClassEnum.Small) {
+            estimatedPrice = simPointsControl.getDistance() * 1;
+        }
+        r.setEstimatedPrice(estimatedPrice);
+        rideRequestRepository.save(r);
+        rideSimulationRepository.save(sim);
+        return sim;
     }
 
     public RideSimulationUpdate toDto(RideSimulation sim) {
@@ -84,6 +134,24 @@ public class RideSimulationService {
         dto.setStartPoint(sim.getStartPoint());
         dto.setRideStatus(sim.getRideStatus());
         dto.setEndPoint(sim.getEndPoint());
+        dto.setStartAddress(sim.getStartAddress());
+        dto.setDestinationAddress(sim.getEndAddress());
+        List<WaypointDTO> waypointDTOs = sim.getRideOffer().getRideRequest().getWaypoints()
+                .stream()
+                .map(w -> {
+                    WaypointDTO wpDto = new WaypointDTO();
+                    wpDto.setName(w.getName());
+                    wpDto.setAddress(w.getAddress());
+                    wpDto.setLatitude(w.getLatitude());
+                    wpDto.setLongitude(w.getLongitude());
+                    wpDto.setSequenceOrder(w.getSequenceOrder());
+                    return wpDto;
+                })
+                .collect(Collectors.toList());
+
+        dto.setWaypoints(waypointDTOs);
+
+        dto.setHasChanged(sim.getHasChanged());
         return dto;
     }
 
@@ -98,8 +166,63 @@ public class RideSimulationService {
         dto.setStartLocationName(sim.getStartLocationName());
         dto.setCurrentIndex(sim.getCurrentIndex());
         dto.setDestinationLocationName(sim.getDestinationLocationName());
+        dto.setDestinationAddress(sim.getEndAddress());
+        dto.setStartAddress(sim.getStartAddress());
+
+
+        List<WaypointDTO> waypointDTOs = sim.getRideOffer().getRideRequest().getWaypoints()
+                .stream()
+                .map(w -> {
+                    WaypointDTO wpDto = new WaypointDTO();
+                    wpDto.setName(w.getName());
+                    wpDto.setAddress(w.getAddress());
+                    wpDto.setLatitude(w.getLatitude());
+                    wpDto.setLongitude(w.getLongitude());
+                    wpDto.setSequenceOrder(w.getSequenceOrder());
+                    return wpDto;
+                })
+                .collect(Collectors.toList());
+
+        dto.setWaypoints(waypointDTOs);
+
+
+        dto.setHasChanged(sim.getHasChanged());
         dto.setRideStatus(RideStatus.COMPLETED);
         return dto;
     }
+
+    public RideSimulationUpdate changedToDto(RideSimulation sim) {
+        RideSimulationUpdate dto = new RideSimulationUpdate();
+        dto.setRideSimulationId(sim.getId());
+        dto.setPaused(sim.isPaused());
+        dto.setHasStarted(sim.isHasStarted());
+        dto.setDuration(sim.getDuration());
+        dto.setStartLocationName(sim.getStartLocationName());
+        dto.setDestinationLocationName(sim.getDestinationLocationName());
+        dto.setCurrentIndex(sim.getCurrentIndex());
+        dto.setStartPoint(sim.getStartPoint());
+        dto.setRideStatus(sim.getRideStatus());
+        dto.setEndPoint(sim.getEndPoint());
+        dto.setHasChanged(true);
+        dto.setStartAddress(sim.getStartAddress());
+        dto.setDestinationAddress(sim.getEndAddress());
+        List<WaypointDTO> waypointDTOs = sim.getRideOffer().getRideRequest().getWaypoints()
+                .stream()
+                .map(w -> {
+                    WaypointDTO wpDto = new WaypointDTO();
+                    wpDto.setName(w.getName());
+                    wpDto.setAddress(w.getAddress());
+                    wpDto.setLatitude(w.getLatitude());
+                    wpDto.setLongitude(w.getLongitude());
+                    wpDto.setSequenceOrder(w.getSequenceOrder());
+                    return wpDto;
+                })
+                .collect(Collectors.toList());
+
+        dto.setWaypoints(waypointDTOs);
+
+        return dto;
+    }
+
 
 }

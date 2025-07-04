@@ -25,6 +25,7 @@ export class GeolocationService {
     return this.http.post<any>(this.apiUrl, body, { headers }).pipe(
       map(response => ({
         name: "My Location",
+        address: 'undefined',
         latitude: response.location.lat,
         longitude: response.location.lng
       }))

@@ -4,25 +4,33 @@ import SockJS from 'sockjs-client';
 import {BehaviorSubject, Observable, Subject, switchMap} from 'rxjs';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {AuthService} from '../auth/auth.service';
+import {Point} from './simulation-page/simulation.component'
 
 export interface Update {
+  //todo driver vehicle type?
   rideSimulationId: number,
   paused: boolean,
   hasStarted: boolean,
-  currentIndex: number,
   duration: number,
-  startPoint: {lat: number, lng: number},
-  endPoint: {lat: number, lng: number}
+  startPoint: { lat: number, lng: number },
+  endPoint: { lat: number, lng: number }
   startLocationName: string,
   destinationLocationName: string,
+  currentIndex: number,
+  waypoints: { address: string, latitude: number, longitude: number, sequenceOrder: number, name: string }[];
+  hasChanged: boolean,
+  startAddress: string,
+  destinationAddress: string,
   rideStatus: 'CREATED' | 'IN_PROGRESS' | 'COMPLETED'
 }
+
 export enum Control {
   FETCH = 'fetch',
   START = 'start',
   PAUSE = 'pause',
   RESUME = 'resume',
   SPEED = 'speed',
+  CHANGE = 'change-points',
   COMPLETE = 'complete'
 }
 @Injectable({
@@ -50,7 +58,7 @@ export class SimulationService {
           this.simulationId = id;
           this.client.subscribe(
             `/topic/simulation/${this.simulationId}`,
-            (message: IMessage) => this.simulationUpdateSubject.next(JSON.parse(message.body))
+            (message: IMessage) => this.simulationUpdateSubject.next( JSON.parse(message.body) )
           );
           this.control(Control.FETCH);
         },
@@ -75,18 +83,39 @@ export class SimulationService {
     }
   }
 
- /* input:
-  * START, PAUSE, RESUME = currentIndex
-  * SPEED = duration
-  * FETCH, COMPLETE = *leave empty*
-  */
-  control(control: Control, input?: number): void {
+  control(control: Control, currentIndexOrDuration?: number, points?: Point[], estimatedDistance?: number, estimatedDuration?: number): void {
     const payload: any = { rideSimulationId: this.simulationId };
 
-    if (control === Control.SPEED)
-      payload.duration = input;
-    else
-      payload.currentIndex = input;
+    switch (control) {
+      case Control.SPEED:
+        payload.duration = currentIndexOrDuration;
+        break;
+
+      case Control.CHANGE:
+        if (!points || points.length < 2) return;
+
+        const cleanWaypoint = (point: Point, index: number) => ({
+              latitude: point.lat,
+              longitude: point.lng,
+              address: point.address,
+              name: point.name,
+              sequenceOrder: index,
+            });
+
+        payload.currentIndex = currentIndexOrDuration;
+        payload.destinationLocationName = points[points.length - 1].name;
+        payload.destinationAddress = points[points.length - 1].address;
+        payload.startPoint = { lat: points[0].lat,lng: points[0].lng };
+        payload.endPoint = { lat: points[points.length - 1].lat, lng: points[points.length - 1].lng };
+        payload.waypoints = points.slice(1, points.length - 1).map((p, i) => cleanWaypoint(p, i));
+        payload.distance = estimatedDistance;
+        payload.duration = estimatedDuration;
+        break;
+
+      default:
+        payload.currentIndex = currentIndexOrDuration;
+        break;
+    }
 
     this.client.publish({
       destination: `/app/simulation/${control}`,

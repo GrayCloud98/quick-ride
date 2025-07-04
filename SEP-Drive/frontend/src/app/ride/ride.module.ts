@@ -77,6 +77,10 @@ import { MatTableModule } from '@angular/material/table';
     RideRequestService,
     OfferService
   ],
-  exports: [NotificationComponent]
+  exports: [
+    NotificationComponent,
+    SelectLocationComponent,
+    LocationCardComponent
+  ]
 })
 export class RideModule {}

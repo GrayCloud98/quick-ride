@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 
 import {Observable, of} from 'rxjs';
@@ -15,12 +15,13 @@ import {Location} from '../../models/location.model';
   templateUrl: './select-location.component.html',
   styleUrls: ['./select-location.component.scss']
 })
-export class SelectLocationComponent implements OnInit {
+export class SelectLocationComponent implements OnInit, OnChanges {
   @Input() label: string = '';
   @Input() placeholder: string = '';
   @Input() control!: FormControl;
   @Input() geoLocationButton: boolean = false;
   @Input() removable: boolean = false;
+  @Input() isSimulationPaused: boolean = true;
   @Output() locationSelected = new EventEmitter<Location>();
   @Output() onRemove = new EventEmitter<void>();
 
@@ -40,6 +41,13 @@ export class SelectLocationComponent implements OnInit {
     private geolocationService: GeolocationService,
     private placesService: PlacesService
   ) {
+  }
+
+  ngOnChanges(): void {
+    if (this.isSimulationPaused)
+      this.control.enable({ emitEvent: false });
+    else
+      this.control.disable({ emitEvent: false });
   }
 
   ngOnInit(): void {
@@ -84,6 +92,7 @@ export class SelectLocationComponent implements OnInit {
         latitude: this.latitude.value!,
         longitude: this.longitude.value!,
         name: 'Manual Location',
+        address: 'undefined'
       };
       this.locationSelected.emit(loc);
       this.manualMode = false;
