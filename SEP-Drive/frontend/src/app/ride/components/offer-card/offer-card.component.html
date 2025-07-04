@@ -40,19 +40,14 @@
   <div class="button-container centered-box">
     <button class="btn" mat-fab extended (click)="accept()">Accept Offer</button>
     <button class="btn warn" mat-fab extended (click)="reject()">Reject Offer</button>
-    <button class="btn" mat-fab extended color="primary" (click)="toggleChat = !toggleChat">
-      {{ toggleChat ? 'Close Chat' : 'Chat with Driver' }}
-    </button>
   </div>
 
-  <div class="chat-popup" *ngIf="toggleChat">
-    <app-chat
-      *ngIf="toggleChat && chatId && offer.driverUsername"
-      [chatId]="chatId"
-      [username]="customerUsername"
-      [recipient]="offer.driverUsername"
-      style="background: white; border: 2px solid #ccc; padding: 16px; margin-top: 20px; width: 100%; display: block;"
-    ></app-chat>
+  <div class="chat-button-container centered-box">
+    <button mat-raised-button (click)="openChat()" class="chat-btn chat-btn-with-badge">
+      <mat-icon>chat</mat-icon>
+      Chat
+      <span *ngIf="hasUnreadMessages" class="chat-badge"></span>
+    </button>
   </div>
 </mat-card>
 

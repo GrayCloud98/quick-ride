@@ -3,110 +3,83 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SharedModule } from './shared/shared.module';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { RideModule } from './ride/ride.module';
-import {ReactiveFormsModule} from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+
 import { RegisterComponent } from './auth/register/register.component';
-import {TwoFaComponent} from  './shared/components/two-fa/two-fa.component';
-import {MatRadioButton, MatRadioGroup} from '@angular/material/radio';
-import {MatFormField, MatInput, MatLabel} from '@angular/material/input';
+import { TwoFaComponent } from './shared/components/two-fa/two-fa.component';
+import { ProfilePageComponent } from './profile-page/profile-page.component';
+import { WalletPageComponent } from './profile-page/wallet-page/wallet-page.component';
+import { SimulationComponent } from './simulation/simulation-page/simulation.component';
+import { RatingPopupComponent } from './simulation/rating-popup/rating-popup.component';
+import { HomeComponent } from './home/home.component';
+
+import { GoogleMapsModule } from '@angular/google-maps';
+
+import { SimulationService } from './simulation/simulation.service';
+import { AuthInterceptor } from './auth/services/auth.interceptor';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
+
+// Angular Material modules
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatIconModule } from '@angular/material/icon';
-import {MatButton, MatIconButton} from '@angular/material/button';
-import { FormsModule } from '@angular/forms';
-import { MatCardModule }       from '@angular/material/card';
-import { MatButtonModule }     from '@angular/material/button';
-import { MatSelectModule }     from '@angular/material/select';
-import {
-  MatDatepicker,
-  MatDatepickerInput,
-  MatDatepickerModule,
-  MatDatepickerToggle
-} from '@angular/material/datepicker';
-import {MatOption, provideNativeDateAdapter} from '@angular/material/core';
-import {MatSelect} from '@angular/material/select';
-import { ProfilePageComponent } from './profile-page/profile-page.component';
-import {MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
-import {MatCard, MatCardActions, MatCardContent, MatCardHeader} from '@angular/material/card';
-import { GoogleMapsModule } from '@angular/google-maps';
-import { WalletPageComponent } from './profile-page/wallet-page/wallet-page.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatCardModule } from '@angular/material/card';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatSortModule } from '@angular/material/sort';
-import {MatSlider, MatSliderModule} from '@angular/material/slider';
-import { SimulationComponent } from './simulation/simulation-page/simulation.component';
-import {SimulationService} from './simulation/simulation.service';
-import { RatingPopupComponent } from './simulation/rating-popup/rating-popup.component';
-import { HomeComponent } from './home/home.component';
+import { MatSliderModule } from '@angular/material/slider';
+import { ChatModalComponent } from './chat/chat-modal.component';
+import { provideNativeDateAdapter } from '@angular/material/core';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ProfilePageComponent,
-    AppComponent,
     RegisterComponent,
     TwoFaComponent,
+    ProfilePageComponent,
     WalletPageComponent,
     SimulationComponent,
     RatingPopupComponent,
     HomeComponent,
+    ChatModalComponent
   ],
   imports: [
-    MatSortModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatRadioModule,
-    MatSelectModule,
-    MatIconModule,
     BrowserModule,
     AppRoutingModule,
     SharedModule,
     RideModule,
+    ReactiveFormsModule,
     FormsModule,
-    MatRadioGroup,
-    MatRadioButton,
-    ReactiveFormsModule,
-    MatFormField,
-    MatLabel,
-    MatFormField,
-    MatInput,
-    MatLabel,
-    MatFormField,
-    ReactiveFormsModule,
+    GoogleMapsModule,
+
+    // Material modules
     MatFormFieldModule,
     MatInputModule,
     MatRadioModule,
     MatIconModule,
-    MatIconButton,
-    MatDatepickerInput,
-    MatDatepickerToggle,
-    MatDatepicker,
-    MatFormFieldModule,
-    MatInputModule,
+    MatButtonModule,
+    MatSelectModule,
     MatDatepickerModule,
-    MatButton,
-    MatOption,
-    MatSelect,
-    MatDialogActions,
-    MatDialogContent,
-    MatDialogTitle,
-    MatCard,
-    MatCardHeader,
-    MatCardContent,
-    MatCardActions,
-    GoogleMapsModule,
-    MatSlider,
-    MatSliderModule
+    MatCardModule,
+    MatDialogModule,
+    MatSortModule,
+    MatSliderModule,
+    HttpClientModule
   ],
-
   providers: [
-    provideHttpClient(withInterceptorsFromDi()),
     provideNativeDateAdapter(),
-    SimulationService
+    SimulationService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true,
+    }
   ],
-
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

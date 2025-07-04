@@ -19,6 +19,7 @@ export class OfferService {
         (request: any) => ({
           requestID: request.id,
           createdAt: request.createdAt,
+          customerUsername: request.customerUsername,
           customerName: request.customerName,
           customerRating: request.customerRating,
           driverToPickupDistance: 0,

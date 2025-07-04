@@ -1,0 +1,13 @@
+<h2 mat-dialog-title>Chat with {{ data.recipient }}</h2>
+
+<mat-dialog-content>
+  <app-chat
+    [chatId]="data.chatId"
+    [username]="data.username"
+    [recipient]="data.recipient"
+  ></app-chat>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="dialogRef.close()">Close</button>
+</mat-dialog-actions>

@@ -32,15 +32,16 @@ public class ChatService {
     private void validateChatPermission(String sender, String receiver) {
         System.out.println("[DEBUG] Validating chat between sender: " + sender + " and receiver: " + receiver);
 
-        boolean offerExists = rideOfferRepository.existsByDriverUsernameAndCustomerUsername(sender, receiver)
-                || rideOfferRepository.existsByDriverUsernameAndCustomerUsername(receiver, sender);
+        boolean existsInEitherDirection =
+                rideOfferRepository.existsByDriverUsernameAndCustomerUsername(sender, receiver) ||
+                        rideOfferRepository.existsByDriverUsernameAndCustomerUsername(receiver, sender);
 
-        // TEMPORARY: disable the driver active check to allow debugging
-        if (!offerExists) {
+        if (!existsInEitherDirection) {
             throw new IllegalStateException("Chat not allowed: No RideOffer exists between users.");
         }
-    }
 
+        System.out.println("[DEBUG] Chat permission granted between " + sender + " and " + receiver);
+    }
 
 
     public ChatMessageDTO sendMessage(ChatMessageDTO dto) {

@@ -54,7 +54,7 @@ DRIVER: is active when they create an offer, till it's completed, rejected, or c
         try {
             String token = jwtTokenProvider.resolveToken(request);
             String username = jwtTokenProvider.getUsername(token);
-            dto.setUserName(username);
+            dto.setCustomerUsername(username);
 
             RideRequest rideRequest = rideRequestService.createRideRequest(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(rideRequest);

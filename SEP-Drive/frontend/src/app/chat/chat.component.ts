@@ -42,13 +42,20 @@ export class ChatComponent implements OnInit, OnDestroy {
   send(): void {
     if (!this.newMessage.trim()) return;
 
+    console.log('[CHAT DEBUG]', {
+      chatId: this.chatId,
+      senderUsername: this.username,
+      recipientUsername: this.recipient,
+      content: this.newMessage
+    });
+
     const payload = {
-      chatId: `offer-${this.username}-${this.recipient}`,
+      chatId: this.chatId,
       senderUsername: this.username,
       recipientUsername: this.recipient,
       content: this.newMessage
     };
-    console.log('[SEND]', payload);
+
     this.chatSocketService.sendMessage(payload);
     this.newMessage = '';
   }

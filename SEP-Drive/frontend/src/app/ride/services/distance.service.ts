@@ -10,6 +10,17 @@ export class DistanceService {
 
   constructor() {}
 
+  getDistanceDurationAndPrice(
+    origin: google.maps.LatLngLiteral,
+    destination: google.maps.LatLngLiteral,
+    vehicleClass: VehicleClass
+  ): Promise<{ distance: number; duration: number; estimatedPrice: number }> {
+    return this.getDistanceDurationAndPriceForMultiplePoints(
+      [origin, destination],
+      vehicleClass
+    );
+  }
+
   getDistanceDurationAndPriceForMultiplePoints(
     points: google.maps.LatLngLiteral[],
     vehicleClass: VehicleClass

@@ -47,8 +47,8 @@ public class RideRequestService {
 
 
     public RideRequest createRideRequest(RideRequestDTO dto) {
-        Customer customer = customerRepository.findByUsername(dto.getUserName())
-                .orElseThrow(() -> new IllegalArgumentException("Customer with username " + dto.getUserName() + " not found"));
+        Customer customer = customerRepository.findByUsername(dto.getCustomerUsername())
+                .orElseThrow(() -> new IllegalArgumentException("Customer with username " + dto.getCustomerUsername() + " not found"));
 
         boolean hasActiveRequest = rideRequestRepository.existsByCustomerUsernameAndRideStatusIn(
                 customer.getUsername(),
