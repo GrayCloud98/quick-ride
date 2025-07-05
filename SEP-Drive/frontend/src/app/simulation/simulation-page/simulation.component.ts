@@ -132,20 +132,22 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.pins.forEach(marker => marker.map = null);
     this.pins = [];
 
-    this.points.forEach((position, index) => {
-      let color = 'blue';
-      if (index === 0) color = 'darkgreen';
-      else if (index === this.points.length - 1) color = 'red';
+    this.points.forEach((point, index) => {
+      let type: 'pickup' | 'dropoff' | 'stopover' = 'stopover';
+
+      if (index === 0) type = 'pickup';
+      else if (index === this.points.length - 1) type = 'dropoff';
 
       const marker = new google.maps.marker.AdvancedMarkerElement({
         map: this.map,
-        position,
-        title: `Point ${index + 1}`,
-        content: this.createPin(color)
+        position: point,
+        title: point.name,
+        content: this.createStyledMarker(type, index)
       });
       this.pins.push(marker);
     });
   }
+
 
   private drawRoute(): void {
     if (this.directionsRenderer) {
@@ -204,7 +206,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.pointer = new google.maps.marker.AdvancedMarkerElement({
       position: this.path[this.currentIndex],
       map: this.map,
-      title: 'Moving pointer',
+      title: 'You',
       content: this.createCar()
     });
   }
@@ -366,9 +368,20 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private createPin(color: string): HTMLElement {
-    const pin = document.createElement('pin');
-    pin.innerHTML = `<svg width="32" height="32" viewBox="0 0 24 24" fill="${color}" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>`;
+  private createStyledMarker(type: 'pickup' | 'dropoff' | 'stopover', index: number): HTMLElement {
+    const pin = document.createElement('div');
+
+    let svg;
+    if (type === 'pickup')
+      svg = `<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"> <circle cx="20" cy="20" r="18" fill="limegreen" stroke="white" stroke-width="3"/> <polygon points="16,13 28,20 16,27" fill="white"/> </svg>`;
+    else if (type === 'dropoff')
+      svg = `<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"> <circle cx="20" cy="20" r="18" fill="tomato" stroke="white" stroke-width="3"/> <path d="M14 27 L14 13 L28 16 L28 24 Z" fill="white" stroke="white" stroke-width="1"/> </svg>`;
+    else
+      svg = `<svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"> <circle cx="18" cy="18" r="16" fill="#14B8A6" stroke="white" stroke-width="3"/> <text x="18" y="23" text-anchor="middle" fill="white" font-size="14" font-family="Arial" font-weight="bold">${index}</text> </svg>`;
+
+    pin.innerHTML = svg;
+    pin.style.position = 'absolute';
+    pin.style.transform = 'translate(-50%, -50%)';
     return pin;
   }
 
