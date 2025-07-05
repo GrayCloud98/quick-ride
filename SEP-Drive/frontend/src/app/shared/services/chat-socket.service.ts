@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Client, IMessage, Stomp } from '@stomp/stompjs';
-import  SockJS from 'sockjs-client';
+import SockJS from 'sockjs-client';
 import { Subject } from 'rxjs';
 
 @Injectable({
@@ -9,10 +9,12 @@ import { Subject } from 'rxjs';
 export class ChatSocketService {
   private stompClient!: Client;
   private messageSubject = new Subject<any>();
+  private connectedSubject = new Subject<void>();
 
   public messages$ = this.messageSubject.asObservable();
+  public connected$ = this.connectedSubject.asObservable();
 
-  connect(chatId: string): void {
+  connect(sender: string, recipient: string): void {
     this.stompClient = new Client({
       webSocketFactory: () => new SockJS('/ws'),
       reconnectDelay: 5000,
@@ -21,11 +23,19 @@ export class ChatSocketService {
 
     this.stompClient.onConnect = () => {
       console.log('[WebSocket] Connected');
-      this.stompClient.subscribe(`/topic/chat/${chatId}`, (message: IMessage) => {
-        const body = JSON.parse(message.body);
-        console.log('[RECEIVED]', body);
-        this.messageSubject.next(body);
+
+      const topic1 = `/topic/chat/offer-${sender}-${recipient}`;
+      const topic2 = `/topic/chat/offer-${recipient}-${sender}`;
+
+      [topic1, topic2].forEach(topic => {
+        this.stompClient.subscribe(topic, (message: IMessage) => {
+          const body = JSON.parse(message.body);
+          console.log(`[RECEIVED][${topic}]`, body);
+          this.messageSubject.next(body);
+        });
       });
+
+      this.connectedSubject.next();
     };
 
     this.stompClient.onStompError = (frame) => {
@@ -58,6 +68,23 @@ export class ChatSocketService {
   deleteMessage(payload: any): void {
     this.stompClient.publish({
       destination: '/app/chat.deleteMessage',
+      body: JSON.stringify(payload)
+    });
+  }
+
+  markMessageAsRead(messageId: number): void {
+    const token = localStorage.getItem('authToken');
+    if (!this.stompClient || !this.stompClient.connected || !token) return;
+
+    const payload = {
+      messageId,
+      token
+    };
+
+    console.log('[MARK READ] Sending payload:', payload);
+
+    this.stompClient.publish({
+      destination: '/app/chat/read',
       body: JSON.stringify(payload)
     });
   }

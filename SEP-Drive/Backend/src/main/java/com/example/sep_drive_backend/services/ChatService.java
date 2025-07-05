@@ -99,16 +99,24 @@ public class ChatService {
         chatMessageRepository.delete(message);
     }
     public ChatMessageDTO markMessageAsRead(Long messageId, String username) {
+        System.out.println("[🔥 markMessageAsRead CALLED] msgId=" + messageId + " by " + username);
         ChatMessage message = chatMessageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("Message not found"));
 
+        System.out.println("[MARK READ] Attempt by: " + username + " for msg " + messageId);
+
         if (!message.getReceiverUsername().equals(username)) {
+            System.out.println("[MARK READ] ❌ Not recipient: " + message.getReceiverUsername());
             throw new IllegalStateException("Only receiver can mark the message as read");
         }
 
         if (!message.isRead()) {
             message.setRead(true);
-            chatMessageRepository.save(message);
+            ChatMessage updated = chatMessageRepository.save(message);
+            System.out.println("[MARK READ] ✅ Updated: " + updated.isRead());
+            return new ChatMessageDTO(updated);
+        } else {
+            System.out.println("[MARK READ] Already marked as read");
         }
 
         return new ChatMessageDTO(message);

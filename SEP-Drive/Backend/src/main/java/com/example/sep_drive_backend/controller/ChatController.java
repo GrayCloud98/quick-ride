@@ -27,21 +27,25 @@ public class ChatController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    private void sendToBothUsers(String sender, String recipient, Object payload) {
+        String topic1 = "/topic/chat/offer-" + sender + "-" + recipient;
+        String topic2 = "/topic/chat/offer-" + recipient + "-" + sender;
+        messagingTemplate.convertAndSend(topic1, payload);
+        messagingTemplate.convertAndSend(topic2, payload);
+    }
+
     @MessageMapping("/chat/send")
     public void sendMessage(@Payload ChatMessageDTO dto) {
         System.out.println("[RECEIVED] " + dto);
         ChatMessageDTO saved = chatService.sendMessage(dto);
-        messagingTemplate.convertAndSend("/topic/chat/" + saved.getSenderUsername(), saved);
-        messagingTemplate.convertAndSend("/topic/chat/" + saved.getRecipientUsername(), saved);
+        sendToBothUsers(saved.getSenderUsername(), saved.getRecipientUsername(), saved);
     }
 
     @MessageMapping("/chat/edit")
     public void editMessage(@Payload EditMessagePayload payload, @Header("Authorization") String token) {
         String username = jwtTokenProvider.getUsername(token.replace("Bearer ", ""));
         ChatMessageDTO edited = chatService.editMessage(payload.getMessageId(), username, payload.getNewContent());
-
-        messagingTemplate.convertAndSend("/topic/chat/" + edited.getRecipientUsername(), edited);
-        messagingTemplate.convertAndSend("/topic/chat/" + edited.getSenderUsername(), edited);
+        sendToBothUsers(edited.getSenderUsername(), edited.getRecipientUsername(), edited);
     }
 
     @MessageMapping("/chat/delete")
@@ -56,19 +60,18 @@ public class ChatController {
         deletion.put("messageId", messageId);
         deletion.put("action", "delete");
 
-        messagingTemplate.convertAndSend("/topic/chat/" + username, deletion);
-        messagingTemplate.convertAndSend("/topic/chat/" + otherUsername, deletion);
+        sendToBothUsers(username, otherUsername, deletion);
     }
+
     @MessageMapping("/chat/read")
-    public void markAsRead(@Payload Map<String, Object> payload, @Header("Authorization") String token) {
+    public void markAsRead(@Payload Map<String, Object> payload) {
+        System.out.println("[WS PAYLOAD] >>> " + payload);
+
+        String token = (String) payload.get("token");
         String username = jwtTokenProvider.getUsername(token.replace("Bearer ", ""));
         Long messageId = Long.valueOf(payload.get("messageId").toString());
 
         ChatMessageDTO updated = chatService.markMessageAsRead(messageId, username);
-
-        messagingTemplate.convertAndSend("/topic/chat/" + updated.getSenderUsername(), updated);
-        messagingTemplate.convertAndSend("/topic/chat/" + updated.getRecipientUsername(), updated);
+        sendToBothUsers(updated.getSenderUsername(), updated.getRecipientUsername(), updated);
     }
-
 }
-

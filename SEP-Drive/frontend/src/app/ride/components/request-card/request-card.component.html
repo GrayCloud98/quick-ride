@@ -126,7 +126,10 @@
       </button>
     </div>
     <div class="chat-button-container centered-box">
-      <button mat-raised-button (click)="openChat()" class="chat-btn-with-badge">
+      <button mat-raised-button
+              (click)="openChat()"
+              [disabled]="offerState !== OfferState.OFFERED || request.requestID !== RequestIdOfOffer"
+              class="chat-btn-with-badge">
         <mat-icon>chat</mat-icon>
         Chat
         <span *ngIf="hasUnreadMessages" class="chat-badge"></span>

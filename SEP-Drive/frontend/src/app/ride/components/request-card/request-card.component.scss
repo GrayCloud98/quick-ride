@@ -83,3 +83,10 @@ app-location-card {
   background-color: red;
   border-radius: 50%;
 }
+
+.chat-btn-with-badge:disabled {
+  background-color: #ccc !important;
+  color: #666 !important;
+  cursor: not-allowed !important;
+  opacity: 1 !important;
+}

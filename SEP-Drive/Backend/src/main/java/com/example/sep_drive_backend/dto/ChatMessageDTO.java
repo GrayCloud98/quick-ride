@@ -10,6 +10,7 @@ public class ChatMessageDTO {
     private String senderUsername;
     private String recipientUsername;
     private String content;
+    private String chatId;
     private LocalDateTime timestamp;
     private boolean read;
     private boolean edited;
@@ -24,7 +25,13 @@ public class ChatMessageDTO {
         this.read = message.isRead();
         this.edited = message.isEdited();
         this.deleted = message.isDeleted();
+        this.chatId = computeChatId(this.senderUsername, this.recipientUsername);
     }
+
+    private String computeChatId(String user1, String user2) {
+        return "offer-" + (user1.compareToIgnoreCase(user2) < 0 ? user1 + "-" + user2 : user2 + "-" + user1);
+    }
+
     public ChatMessageDTO() {}
     public Long getId() {
         return id;
@@ -73,6 +80,9 @@ public class ChatMessageDTO {
     }
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+    public String getChatId() {
+        return chatId;
     }
 }
 
