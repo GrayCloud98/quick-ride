@@ -52,15 +52,9 @@ public class ChatController {
     public void deleteMessage(@Payload Map<String, Object> payload, @Header("Authorization") String token) {
         String username = jwtTokenProvider.getUsername(token.replace("Bearer ", ""));
         Long messageId = Long.valueOf(payload.get("messageId").toString());
-        String otherUsername = payload.get("otherUsername").toString();
 
-        chatService.deleteMessage(messageId, username);
-
-        Map<String, Object> deletion = new HashMap<>();
-        deletion.put("messageId", messageId);
-        deletion.put("action", "delete");
-
-        sendToBothUsers(username, otherUsername, deletion);
+        ChatMessageDTO updated = chatService.deleteMessage(messageId, username);
+        sendToBothUsers(updated.getSenderUsername(), updated.getRecipientUsername(), updated);
     }
 
     @MessageMapping("/chat/read")

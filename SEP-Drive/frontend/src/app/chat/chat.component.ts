@@ -25,11 +25,12 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   messages: any[] = [];
   newMessage = '';
+  editingMessageId: number | null = null;
   private messageSub!: Subscription;
 
   constructor(
-      private chatSocketService: ChatSocketService,
-      private http: HttpClient
+    private chatSocketService: ChatSocketService,
+    private http: HttpClient
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -40,29 +41,20 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.loadChatHistory();
 
     this.messageSub = this.chatSocketService.messages$.subscribe((msg: any) => {
+      if (msg.action === 'delete' && msg.messageId) {
+        const target = this.messages.find(m => m.id === msg.messageId);
+        if (target) target.deleted = true;
+        return;
+      }
+
       msg.sender = msg.senderUsername;
       msg.read = Boolean(msg.read);
 
-      console.log('[DEBUG] Incoming message:', {
-        id: msg.id,
-        sender: msg.senderUsername,
-        recipient: msg.recipientUsername,
-        read: msg.read,
-        localUser: this.username
-      });
-
       const isRecipient =
-          msg.recipientUsername?.toLowerCase() === this.username?.toLowerCase();
+        msg.recipientUsername?.toLowerCase() === this.username?.toLowerCase();
 
       if (isRecipient && !msg.read) {
-        console.log('[CHECK] I am the recipient — marking as read:', msg.id);
         this.chatSocketService.markMessageAsRead(msg.id);
-      } else {
-        console.log('[SKIP] Not recipient or already read:', {
-          recipient: msg.recipientUsername,
-          me: this.username,
-          read: msg.read
-        });
       }
 
       const existingIndex = this.messages.findIndex(m => m.id === msg.id);
@@ -88,16 +80,53 @@ export class ChatComponent implements OnInit, OnDestroy {
     const trimmed = this.newMessage.trim();
     if (!trimmed) return;
 
-    const payload = {
-      chatId: this.chatId,
-      senderUsername: this.username,
-      recipientUsername: this.recipient,
-      content: trimmed,
-      timestamp: new Date().toISOString()
-    };
+    const token = localStorage.getItem('authToken');
+    if (!token) return;
 
-    this.chatSocketService.sendMessage(payload);
+    if (this.editingMessageId !== null) {
+      const payload = {
+        messageId: this.editingMessageId,
+        newContent: trimmed
+      };
+      this.chatSocketService.editMessage(payload, token);
+      this.editingMessageId = null;
+    } else {
+      const payload = {
+        chatId: this.chatId,
+        senderUsername: this.username,
+        recipientUsername: this.recipient,
+        content: trimmed,
+        timestamp: new Date().toISOString()
+      };
+      this.chatSocketService.sendMessage(payload);
+    }
+
     this.newMessage = '';
+  }
+
+  cancelEdit(): void {
+    this.editingMessageId = null;
+    this.newMessage = '';
+  }
+
+  startEdit(msg: any): void {
+    this.editingMessageId = msg.id;
+    this.newMessage = msg.content;
+  }
+
+  deleteMessage(msg: any): void {
+    const token = localStorage.getItem('authToken');
+    if (!token) return;
+
+    const payload = {
+      messageId: msg.id,
+      otherUsername: this.recipient
+    };
+    this.chatSocketService.deleteMessage(payload, token);
+  }
+
+  canEditOrDelete(msg: any): boolean {
+    return msg.sender === this.username && !msg.read && !msg.deleted;
   }
 
   private loadChatHistory(): void {
@@ -117,24 +146,14 @@ export class ChatComponent implements OnInit, OnDestroy {
           read: Boolean(msg.read)
         }));
 
-        console.table(this.messages.map(m => ({
-          id: m.id,
-          from: m.senderUsername,
-          to: m.recipientUsername,
-          read: m.read,
-          me: this.username
-        })));
-
         this.messages.forEach(msg => {
           const isRecipient = msg.recipientUsername?.toLowerCase() === this.username?.toLowerCase();
           if (isRecipient && !msg.read) {
-            console.log('[AUTO-READ] Marking unread message on load:', msg.id);
             this.chatSocketService.markMessageAsRead(msg.id);
           }
         });
 
         this.scrollToBottom();
-        console.log('[CHAT] History loaded:', this.messages.length, 'messages');
       },
       error: (err) => {
         console.error('[CHAT] Failed to load chat history:', err);

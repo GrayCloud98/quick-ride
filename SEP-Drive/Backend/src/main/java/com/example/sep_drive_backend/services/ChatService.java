@@ -83,7 +83,7 @@ public class ChatService {
         return new ChatMessageDTO(chatMessageRepository.save(message));
     }
 
-    public void deleteMessage(Long messageId, String username) {
+    public ChatMessageDTO deleteMessage(Long messageId, String username) {
         ChatMessage message = chatMessageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("Message not found"));
 
@@ -95,9 +95,10 @@ public class ChatService {
         }
 
         message.setDeleted(true);
-        chatMessageRepository.save(message);
-        chatMessageRepository.delete(message);
+        ChatMessage saved = chatMessageRepository.save(message);
+        return new ChatMessageDTO(saved);
     }
+
     public ChatMessageDTO markMessageAsRead(Long messageId, String username) {
         System.out.println("[🔥 markMessageAsRead CALLED] msgId=" + messageId + " by " + username);
         ChatMessage message = chatMessageRepository.findById(messageId)
@@ -121,6 +122,4 @@ public class ChatService {
 
         return new ChatMessageDTO(message);
     }
-
 }
-

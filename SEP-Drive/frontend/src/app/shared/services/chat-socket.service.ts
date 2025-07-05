@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Client, IMessage, Stomp } from '@stomp/stompjs';
+import { Client, IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { Subject } from 'rxjs';
 
@@ -58,17 +58,23 @@ export class ChatSocketService {
     });
   }
 
-  editMessage(payload: any): void {
+  editMessage(payload: any, token: string): void {
     this.stompClient.publish({
-      destination: '/app/chat.editMessage',
-      body: JSON.stringify(payload)
+      destination: '/app/chat/edit',
+      body: JSON.stringify(payload),
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
   }
 
-  deleteMessage(payload: any): void {
+  deleteMessage(payload: any, token: string): void {
     this.stompClient.publish({
-      destination: '/app/chat.deleteMessage',
-      body: JSON.stringify(payload)
+      destination: '/app/chat/delete',
+      body: JSON.stringify(payload),
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
   }
 
