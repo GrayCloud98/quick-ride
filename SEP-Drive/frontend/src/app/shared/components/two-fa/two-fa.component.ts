@@ -39,26 +39,19 @@ export class TwoFaComponent {
       return;
     }
 
-    // 🔐 Call the service to verify the code
     this.authService.verifyCode(username, this.verificationCode).subscribe({
       next: (response) => {
         console.log('✅ Verification successful:', response);
 
-        // ✅ Store the token separately
         if (response.token != null) {
           localStorage.setItem('authToken', response.token);
         }
-
-        // ✅ Fetch the user info from backend
         this.authService.getUserInfo(username).subscribe({
           next: (user) => {
             console.log("✅ User Info Fetched:", user);
-
-            // ✅ Store user info in Local Storage
+            localStorage.setItem('username', username);
             localStorage.setItem('currentUser', JSON.stringify(user));
             this.authService.storeUserData(user);
-
-            // ✅ Close dialog and redirect
             this.dialogRef.close();
             window.location.href = "/";
           },
