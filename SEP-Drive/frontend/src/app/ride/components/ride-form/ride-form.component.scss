@@ -1,20 +1,53 @@
 .button-container {
-  padding-bottom: 16px;
+  padding-bottom: 24px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
 }
 
 .label {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #3f51b5;
+  color: #38bdf8;
+  letter-spacing: 0.5px;
+  text-align: center;
+  margin-bottom: 12px;
+  text-shadow: 0 0 4px rgba(56, 189, 248, 0.4);
 }
 
 .radio-group {
   display: flex;
+  justify-content: center;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
+  padding: 16px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .radio {
   flex: 1 1 0;
   text-align: center;
+  font-weight: 500;
+  color: #f8fafc;
+  transition: all 0.3s ease;
+
+  .mat-radio-button {
+    color: #38bdf8;
+
+    .mat-radio-inner-circle {
+      background-color: #38bdf8 !important;
+    }
+
+    .mat-radio-outer-circle {
+      border-color: #38bdf8 !important;
+    }
+  }
+
+  &:hover {
+    transform: scale(1.05);
+    color: #0ea5e9;
+  }
 }
-
-

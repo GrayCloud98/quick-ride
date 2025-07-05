@@ -1,20 +1,75 @@
+.rating-dialog {
+  background: rgba(17, 24, 39, 0.95);
+  backdrop-filter: blur(14px);
+  border-radius: 20px;
+  padding: 28px;
+  color: #f8fafc;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+  animation: fadeIn 0.4s ease;
+  text-align: center;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.rating-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  background: linear-gradient(90deg, #3b82f6, #0ea5e9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .stars {
   display: flex;
-  gap: 4px;
-  font-size: 32px;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 24px;
   cursor: pointer;
 }
 
 mat-icon {
-  font-size: 50px;
-  height: 50px;
-  width: 50px;
-  line-height: 50px;
-  color: grey;
-  transition: color 0.2s ease-in-out;
+  font-size: 48px;
+  height: 48px;
+  width: 48px;
+  color: #4b5563;
+  transition: color 0.3s ease, transform 0.2s ease;
+
+  &.filled {
+    color: #facc15;
+    filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.5));
+  }
+
+  &:hover {
+    transform: scale(1.2);
+  }
 }
 
+.submit-rating-btn {
+  margin-top: 12px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+  padding: 12px 28px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 28px;
+  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
+  transition: all 0.3s ease;
 
-mat-icon.filled {
-  color: gold;
+  &:hover {
+    background: linear-gradient(135deg, #15803d, #166534);
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+    transform: scale(1.05);
+  }
 }

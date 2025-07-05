@@ -1,158 +1,91 @@
+<div class="register-page">
+  <div class="form-container">
+    <mat-card class="register-card">
+      <mat-card-header>
+        <mat-card-title>Register</mat-card-title>
+      </mat-card-header>
 
-<div class="form-container">
+      <mat-card-content>
+        <form (ngSubmit)="onRegister()" #form="ngForm">
+          <div class="form-fields">
 
-  <mat-card class="register-card">
-    <mat-card-header>
-      <mat-card-title>Register</mat-card-title>
-    </mat-card-header>
+            <mat-radio-group [(ngModel)]="role" [formControl]="RoleControl" aria-label="Select a role" name="role" required>
+              <mat-radio-button value="Driver">Driver</mat-radio-button>
+              <mat-radio-button value="Customer">Customer</mat-radio-button>
+            </mat-radio-group>
 
-    <mat-card-content>
-      <form (ngSubmit)="onRegister()" #form="ngForm">
-  <mat-radio-group [(ngModel)]="role" [formControl]="RoleControl" aria-label="Select a role"  name="role" required>
-    <mat-error *ngIf="f.invalid && (f.dirty || f.touched)">First name is required</mat-error>
-    <mat-radio-button value="Driver">Driver</mat-radio-button>
-    <mat-radio-button value="Customer">Customer</mat-radio-button>
+            <mat-form-field appearance="fill" class="car-select">
+              <mat-label>Choose a vehicleClass</mat-label>
+              <mat-select [(ngModel)]="vehicleClass" [formControl]="CarControl" required>
+                <mat-option value="Small">Small</mat-option>
+                <mat-option value="Medium">Medium</mat-option>
+                <mat-option value="Large">Large</mat-option>
+              </mat-select>
+            </mat-form-field>
 
-  </mat-radio-group>
-  <br>
-  <mat-form-field appearance="fill" class="car-select">
-    <mat-label>Choose a vehicleClass</mat-label>
-    <mat-select  [(ngModel)]="vehicleClass" [formControl]="CarControl" required>
-      <mat-error *ngIf="f.invalid && (f.dirty || f.touched)">First name is required</mat-error>
-      <mat-option value="Small">Small</mat-option>
-      <mat-option value="Medium">Medium</mat-option>
-      <mat-option value="Large">Large</mat-option>
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Username*</mat-label>
+              <input matInput type="text" name="username" placeholder="Username" [(ngModel)]="username" required #u="ngModel">
+              <mat-error *ngIf="u.invalid && (u.dirty || u.touched)">Username is required</mat-error>
+            </mat-form-field>
 
-    </mat-select>
-  </mat-form-field>
-  <br>
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>Username*</mat-label>
-          <input
-            matInput
-            type="text"
-            name="username"
-            placeholder="Username"
-            [(ngModel)]="username"
-            required
-            #u="ngModel">
-          <mat-error *ngIf="u.invalid && (u.dirty || u.touched)">Username is required</mat-error>
-        </mat-form-field>
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>First name*</mat-label>
+              <input matInput type="text" name="firstName" placeholder="First name" [(ngModel)]="firstName" required #f="ngModel">
+              <mat-error *ngIf="f.invalid && (f.dirty || f.touched)">First name is required</mat-error>
+            </mat-form-field>
 
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>First name*</mat-label>
-          <input
-            matInput
-            type="text"
-            name="firstName"
-            placeholder="First name"
-            [(ngModel)]="firstName"
-            required
-            #f="ngModel">
-          <mat-error *ngIf="f.invalid && (f.dirty || f.touched)">First name is required</mat-error>
-        </mat-form-field>
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Last name*</mat-label>
+              <input matInput type="text" name="lastName" placeholder="Last name" [(ngModel)]="lastName" required #l="ngModel">
+              <mat-error *ngIf="l.invalid && (l.dirty || l.touched)">Last name is required</mat-error>
+            </mat-form-field>
 
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Email*</mat-label>
+              <input matInput type="email" name="email" placeholder="Ex. pat@example.com" [(ngModel)]="email" required #e="ngModel">
+              <mat-error *ngIf="e.invalid && (e.dirty || e.touched)">Valid email is required</mat-error>
+            </mat-form-field>
 
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>Last name*</mat-label>
-          <input
-            matInput
-            type="text"
-            name="lastName"
-            placeholder="Last name"
-            [(ngModel)]="lastName"
-            required
-            #l="ngModel">
-          <mat-error *ngIf="l.invalid && (l.dirty || l.touched)">Last name is required</mat-error>
-        </mat-form-field>
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Password*</mat-label>
+              <input matInput [type]="hidePassword ? 'password' : 'text'" name="password" placeholder="Password" [(ngModel)]="password" required #p="ngModel">
+              <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()" tabindex="-1">
+                <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              <mat-error *ngIf="p.invalid && (p.dirty || p.touched)">Password is required</mat-error>
+            </mat-form-field>
 
+            <mat-form-field class="full-width" appearance="outline">
+              <mat-label>Birthday*</mat-label>
+              <input matInput [matDatepicker]="picker" name="birthDate" [(ngModel)]="birthDate" required #b="ngModel">
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+              <mat-error *ngIf="b.invalid && (b.dirty || b.touched)">Birthday is required</mat-error>
+            </mat-form-field>
 
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>Email*</mat-label>
-          <input
-            matInput
-            type="email"
-            name="email"
-            placeholder="Ex. pat@example.com"
-            [(ngModel)]="email"
-            required
-            #e="ngModel">
-          <mat-error *ngIf="e.invalid && (e.dirty || e.touched)">Valid email is required</mat-error>
-        </mat-form-field>
+            <div class="file-upload">
+              <label for="fileInput" class="upload-label">select ProfilePicture (optional) <br>(JPEG only)</label>
+              <input #fileInput id="fileInput" type="file" accept=".jpg, .jpeg" (change)="onFileSelected($event)" hidden>
+              <button mat-flat-button color="primary" type="button" (click)="fileInput.click()">Upload</button>
+              <span *ngIf="profilePictureName">{{ profilePictureName }}</span>
+              <button *ngIf="profilePictureName" mat-icon-button color="warn" type="button" (click)="removeFile()">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
 
+            <ng-container *ngIf="alertMessage">
+              <div class="alert" [class.success]="alertType==='success'" [class.error]="alertType==='error'">
+                {{ alertMessage }}
+              </div>
+            </ng-container>
 
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>Password*</mat-label>
-          <input
-            matInput
-            [type]="hidePassword ? 'password' : 'text'"
-            name="password"
-            placeholder="Password"
-            [(ngModel)]="password"
-            required
-            #p="ngModel">
-          <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()" tabindex="-1">
-            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-          </button>
-          <mat-error *ngIf="p.invalid && (p.dirty || p.touched)">Password is required</mat-error>
-        </mat-form-field>
-
-
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>Birthday*</mat-label>
-          <input
-            matInput
-            [matDatepicker]="picker"
-            name="birthDate"
-            [(ngModel)]="birthDate"
-            required
-            #b="ngModel">
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
-          <mat-error *ngIf="b.invalid && (b.dirty || b.touched)">Birthday is required</mat-error>
-        </mat-form-field>
-
-
-        <div class="file-upload">
-          <label for="fileInput" class="upload-label">select ProfilePicture (optional) <br>(JPEG only)</label>
-          <input #fileInput id="fileInput" type="file" accept=".jpg, .jpeg" (change)="onFileSelected($event)" hidden>
-
-          <button mat-flat-button color="primary" type="button" (click)="fileInput.click()">Upload</button>
-
-          <span *ngIf="profilePictureName">{{ profilePictureName }}</span>
-
-          <button
-            *ngIf="profilePictureName"
-            mat-icon-button
-            color="warn"
-            type="button"
-            (click)="removeFile()">
-            <mat-icon>close</mat-icon>
-          </button>
-        </div>
-        <ng-container *ngIf="alertMessage">
-          <div class="alert" [class.success]="alertType==='success'" [class.error]="alertType==='error'">
-            {{ alertMessage }}
+            <div class="register-button-container">
+              <button mat-flat-button color="primary" [disabled]="form.invalid" type="submit">Register</button>
+            </div>
           </div>
-        </ng-container>
-
-
-
-        <div class="register-button-container">
-          <button
-            mat-flat-button
-            color="primary"
-            [disabled]="form.invalid"
-            type="submit">
-            Register
-          </button>
-        </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
 </div>
-
-
-
-
-

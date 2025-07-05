@@ -30,6 +30,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
+import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
 
 @NgModule({
   declarations: [
@@ -62,7 +63,10 @@ import { MatOptionModule } from '@angular/material/core';
     MatButtonToggleModule,
     MatRadioModule,
     MatSelectModule,
-    MatOptionModule
+    MatOptionModule,
+    MatMenu,
+    MatMenuTrigger,
+    MatMenuItem
   ],
   exports: [
     ButtonComponent,

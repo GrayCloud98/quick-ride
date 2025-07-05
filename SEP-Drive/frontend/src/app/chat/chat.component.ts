@@ -4,17 +4,19 @@ import {
   OnInit,
   OnDestroy,
   ViewChild,
-  ElementRef
+  ElementRef,
+  Optional
 } from '@angular/core';
 import { ChatSocketService } from '../shared/services/chat-socket.service';
 import { HttpClient } from '@angular/common/http';
 import { Subscription, firstValueFrom } from 'rxjs';
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-chat',
   standalone: false,
   templateUrl: './chat.component.html',
-  styleUrl: './chat.component.scss'
+  styleUrls: ['./chat.component.scss']
 })
 export class ChatComponent implements OnInit, OnDestroy {
   @Input() chatId!: string;
@@ -26,11 +28,15 @@ export class ChatComponent implements OnInit, OnDestroy {
   messages: any[] = [];
   newMessage = '';
   editingMessageId: number | null = null;
+  showEmojiPicker = false;
+  menuContext: any = null;
+
   private messageSub!: Subscription;
 
   constructor(
-    private chatSocketService: ChatSocketService,
-    private http: HttpClient
+      private chatSocketService: ChatSocketService,
+      private http: HttpClient,
+      @Optional() private dialogRef: MatDialogRef<ChatComponent>
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -51,8 +57,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       msg.read = Boolean(msg.read);
 
       const isRecipient =
-        msg.recipientUsername?.toLowerCase() === this.username?.toLowerCase();
-
+          msg.recipientUsername?.toLowerCase() === this.username?.toLowerCase();
       if (isRecipient && !msg.read) {
         this.chatSocketService.markMessageAsRead(msg.id);
       }
@@ -84,24 +89,24 @@ export class ChatComponent implements OnInit, OnDestroy {
     if (!token) return;
 
     if (this.editingMessageId !== null) {
-      const payload = {
-        messageId: this.editingMessageId,
-        newContent: trimmed
-      };
-      this.chatSocketService.editMessage(payload, token);
+      this.chatSocketService.editMessage(
+          { messageId: this.editingMessageId, newContent: trimmed },
+          token
+      );
       this.editingMessageId = null;
     } else {
-      const payload = {
+      this.chatSocketService.sendMessage({
         chatId: this.chatId,
         senderUsername: this.username,
         recipientUsername: this.recipient,
         content: trimmed,
         timestamp: new Date().toISOString()
-      };
-      this.chatSocketService.sendMessage(payload);
+      });
     }
 
     this.newMessage = '';
+    this.showEmojiPicker = false;
+    this.menuContext = null;
   }
 
   cancelEdit(): void {
@@ -112,21 +117,27 @@ export class ChatComponent implements OnInit, OnDestroy {
   startEdit(msg: any): void {
     this.editingMessageId = msg.id;
     this.newMessage = msg.content;
+    this.menuContext = null;
   }
 
   deleteMessage(msg: any): void {
     const token = localStorage.getItem('authToken');
     if (!token) return;
 
-    const payload = {
-      messageId: msg.id,
-      otherUsername: this.recipient
-    };
-    this.chatSocketService.deleteMessage(payload, token);
+    this.chatSocketService.deleteMessage(
+        { messageId: msg.id, otherUsername: this.recipient },
+        token
+    );
+
+    this.menuContext = null;
   }
 
   canEditOrDelete(msg: any): boolean {
     return msg.sender === this.username && !msg.read && !msg.deleted;
+  }
+
+  appendEmoji(emoji: string): void {
+    this.newMessage += emoji;
   }
 
   private loadChatHistory(): void {
@@ -136,29 +147,38 @@ export class ChatComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.http.get<any[]>(`/messages/${this.chatId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    }).subscribe({
-      next: (data) => {
-        this.messages = data.map(msg => ({
-          ...msg,
-          sender: msg.senderUsername,
-          read: Boolean(msg.read)
-        }));
+    this.http
+        .get<any[]>(`/messages/${this.chatId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        .subscribe({
+          next: data => {
+            this.messages = data.map(msg => ({
+              ...msg,
+              sender: msg.senderUsername,
+              read: Boolean(msg.read)
+            }));
 
-        this.messages.forEach(msg => {
-          const isRecipient = msg.recipientUsername?.toLowerCase() === this.username?.toLowerCase();
-          if (isRecipient && !msg.read) {
-            this.chatSocketService.markMessageAsRead(msg.id);
+            this.messages.forEach(msg => {
+              const isRecipient =
+                  msg.recipientUsername?.toLowerCase() === this.username?.toLowerCase();
+              if (isRecipient && !msg.read) {
+                this.chatSocketService.markMessageAsRead(msg.id);
+              }
+            });
+
+            this.scrollToBottom();
+          },
+          error: err => {
+            console.error('[CHAT] Failed to load chat history:', err);
           }
         });
+  }
 
-        this.scrollToBottom();
-      },
-      error: (err) => {
-        console.error('[CHAT] Failed to load chat history:', err);
-      }
-    });
+  closeChat(): void {
+    if (this.dialogRef) {
+      this.dialogRef.close();
+    }
   }
 
   private scrollToBottom(): void {
@@ -170,5 +190,9 @@ export class ChatComponent implements OnInit, OnDestroy {
         console.warn('[CHAT] Failed to scroll:', err);
       }
     });
+  }
+
+  setMenuContext(msg: any): void {
+    this.menuContext = msg;
   }
 }
