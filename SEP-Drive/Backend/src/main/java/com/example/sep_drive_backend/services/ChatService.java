@@ -96,7 +96,6 @@ public class ChatService {
 
         message.setDeleted(true);
         ChatMessage saved = chatMessageRepository.save(message);
-        chatMessageRepository.delete(saved);
         return new ChatMessageDTO(saved);
     }
 
