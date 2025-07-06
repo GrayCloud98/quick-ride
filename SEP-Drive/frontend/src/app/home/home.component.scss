@@ -1,22 +1,23 @@
 .landing-page {
   text-align: center;
   padding: 100px 20px;
-  color: #f8fafc;
-  background: linear-gradient(135deg, #0f172a, #1e293b);
-  min-height: calc(100vh - 64px);
+  color: #000949;
+  background-color: rgba(215, 227, 255, 0.31);
+  width: 100%;
 
   h1 {
     font-size: 3rem;
     margin-bottom: 16px;
 
-    span {
-      color: #38bdf8;
+    img {
+      height: 1em;
+      vertical-align: middle;
     }
   }
 
   p {
     font-size: 1.2rem;
-    color: #cbd5e1;
-    margin-bottom: 0;
+    color: #000949;
+    font-weight: 500
   }
 }
