@@ -49,7 +49,8 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // 🧩 Form Controls
   newStopoverControl = new FormControl<Location | string>('', [Validators.required]);
-  isCustomer = false;
+  isCustomer: boolean | null = null;
+  userHasActiveSimulation: boolean | null = null;
 
   // 🛠️ Constructor
   constructor(private dialog: MatDialog,
@@ -58,7 +59,12 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
               private simService: SimulationService) {}
 
   ngOnInit(): void {
-    this.isCustomer = this.authService.currentUserValue.role === 'Customer'
+    if(this.authService.currentUserValue) {
+      this.isCustomer = this.authService.currentUserValue.role === 'Customer'
+      this.simService.activeSimulationStatus$.subscribe({
+        next: status => this.userHasActiveSimulation = status
+      })
+    }
   }
 
   // 🔄 Lifecycle

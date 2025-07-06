@@ -2,35 +2,34 @@ import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../../../auth/auth.service';
 import {OfferService} from '../../services/offer.service';
 import {Offer} from '../../models/offer.model';
-import {filter, switchMap, tap} from 'rxjs';
 import {RideRequestService} from '../../services/ride-request.service';
 import {Router} from '@angular/router';
 import {SimulationService} from '../../../simulation/simulation.service';
 
 interface SortOption {
-key: keyof Offer,
-label: string
+  key: keyof Offer,
+  label: string
 }
 @Component({
-selector: 'ride-offers-page',
-standalone: false,
-templateUrl: './ride-offers-page.component.html',
-styleUrl: './ride-offers-page.component.scss'
+  selector: 'ride-offers-page',
+  standalone: false,
+  templateUrl: './ride-offers-page.component.html',
+  styleUrl: './ride-offers-page.component.scss'
 })
 export class RideOffersPageComponent implements OnInit {
-accessAllowed: boolean = false;
-username: string = '';
+  accessAllowed: boolean = false;
+  userHasActiveSimulation: boolean = false;
+  offers: Offer[] = [];
+  sortOptions: SortOption[] = [
+    { key: 'offerID', label: 'Offer ID' },
+    { key: 'driverName', label: 'Driver Name' },
+    { key: 'driverRating', label: 'Driver Rating' },
+    { key: 'driverVehicle', label: 'Driver Vehicle' },
+    { key: 'ridesCount', label: 'Rides Count' },
+    { key: 'travelledDistance', label: 'Travelled Distance' },
+  ];
 
-offers: Offer[] = [];
-sortOptions: SortOption[] = [
-{ key: 'offerID', label: 'Offer ID' },
-{ key: 'driverName', label: 'Driver Name' },
-{ key: 'driverRating', label: 'Driver Rating' },
-{ key: 'driverVehicle', label: 'Driver Vehicle' },
-{ key: 'ridesCount', label: 'Rides Count' },
-{ key: 'travelledDistance', label: 'Travelled Distance' },
-];
-constructor(private authService: AuthService,
+  constructor(private authService: AuthService,
               private rideService: RideRequestService,
               private offerService: OfferService,
               private simService: SimulationService,
@@ -70,14 +69,13 @@ constructor(private authService: AuthService,
   }
 
   ngOnInit() {
-    this.authService.currentUser.pipe(
-      filter(user => !!user?.username),
-      tap(user => this.username = user!.username!),
-      switchMap(() => this.authService.isCustomer()),
-      tap(isCustomer => this.accessAllowed = isCustomer)
-    ).subscribe({
-      error: err => console.log(err)
-    })
+    if(this.authService.currentUserValue) {
+      this.accessAllowed = this.authService.currentUserValue.role === 'Customer'
+      this.simService.activeSimulationStatus$.subscribe({
+        next: userHasActiveSimulation => this.userHasActiveSimulation = userHasActiveSimulation
+      })
+    }
+    if(!this.accessAllowed || this.userHasActiveSimulation) return;
 
     this.loadOffers();
   }

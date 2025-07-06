@@ -1,4 +1,4 @@
-<div class="main-container">
+<div class="main-container" *ngIf="isCustomer !== null && userHasActiveSimulation">
   <div class="left-container">
 
     <div class="fix">
@@ -92,4 +92,12 @@
   <div class="right-container map">
     <div #mapContainer class="sep-map"></div>
   </div>
+</div>
+
+<div *ngIf="isCustomer !== null && !userHasActiveSimulation" class="alert error mini centered-box">
+  Please ensure an Offer has been accepted.
+</div>
+
+<div *ngIf="isCustomer === null" class="alert error mini centered-box">
+  Please log in first.
 </div>
