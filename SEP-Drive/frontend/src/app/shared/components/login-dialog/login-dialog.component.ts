@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { TwoFaComponent } from '../two-fa/two-fa.component';
 import { AuthService } from '../../../auth/auth.service';
@@ -7,8 +7,10 @@ import { AuthService } from '../../../auth/auth.service';
   selector: 'app-login-dialog',
   standalone: false,
   templateUrl: './login-dialog.component.html',
-  styleUrl: './login-dialog.component.scss'
+  styleUrl: './login-dialog.component.scss',
+  encapsulation: ViewEncapsulation.None
 })
+
 export class LoginDialogComponent {
   username = '';
   password = '';
