@@ -5,9 +5,9 @@ import {BehaviorSubject, Observable, Subject, switchMap} from 'rxjs';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {AuthService} from '../auth/auth.service';
 import {Point} from './simulation-page/simulation.component'
+import {VehicleClass} from '../ride/models/ride.model';
 
 export interface Update {
-  //todo driver vehicle type?
   rideSimulationId: number,
   paused: boolean,
   hasStarted: boolean,
@@ -40,7 +40,7 @@ export class SimulationService {
   private client: Client;
   private simulationUpdateSubject = new Subject<any>();
 
-  private simulationId = 1;
+  private simulationId: number | null = null;
   private baseUrl = 'http://localhost:8080/api/ride-requests';
 
   constructor(private http: HttpClient,
@@ -123,13 +123,17 @@ export class SimulationService {
     });
   }
 
+  getVehicleClass(): Observable<VehicleClass>{
+    return this.http.get<VehicleClass>(this.baseUrl + '/sim/driver/vehicle-class');
+  }
+
   getSimulationUpdates(): Observable<any> {
     return this.simulationUpdateSubject.asObservable();
   }
 
   rate(rate: number): Observable<any> {
     const params = new HttpParams()
-      .set('rideSimulationId', this.simulationId.toString())
+      .set('rideSimulationId', this.simulationId!.toString())
       .set('rate', rate.toString());
 
     return this.authService.isCustomer().pipe(

@@ -7,6 +7,7 @@ import {Location} from '../../ride/models/location.model';
 import {DistanceService} from '../../ride/services/distance.service';
 import {VehicleClass} from '../../ride/models/ride.model';
 import {AuthService} from '../../auth/auth.service';
+import {WalletService} from '../../shared/services/wallet.service';
 
 export interface Point {
   name?: string,
@@ -35,7 +36,9 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // 🚘 Route/Stopovers State
   points: Point[] = [];
-  ride = {vehicleClass: VehicleClass.LARGE, estimatedDistance: 0, estimatedDuration: 0, estimatedPrice: 0}
+  ride = {estimatedDistance: 0, estimatedDuration: 0, estimatedPrice: 0}
+  vehicleClass: VehicleClass | null = null;
+  balance = 0;
   currentIndex = 0;
   duration = 30;
   nextStopoverPosition = 1;
@@ -56,13 +59,19 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(private dialog: MatDialog,
               private authService: AuthService,
               private distanceService: DistanceService,
-              private simService: SimulationService) {}
+              private simService: SimulationService,
+              private walletService: WalletService) {}
 
   ngOnInit(): void {
     if(this.authService.currentUserValue) {
       this.isCustomer = this.authService.currentUserValue.role === 'Customer'
       this.simService.activeSimulationStatus$.subscribe({
-        next: status => this.userHasActiveSimulation = status
+        next: userHasActiveSimulation => {
+          this.userHasActiveSimulation = userHasActiveSimulation
+
+          if(userHasActiveSimulation) this.simService.getVehicleClass().subscribe( {next: vehicleClass => this.vehicleClass = vehicleClass} )
+          this.walletService.getBalance().subscribe({next: balance => this.balance = balance/100})
+        }
       })
     }
   }
@@ -412,7 +421,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       const destination = { lat: this.points[i + 1].lat, lng: this.points[i + 1].lng };
 
       try {
-        const res = await this.distanceService.getDistanceDurationAndPrice(origin, destination, this.ride.vehicleClass);
+        const res = await this.distanceService.getDistanceDurationAndPrice(origin, destination, this.vehicleClass!);
         totalDistance += res.distance;
         totalDuration += res.duration;
         totalEstimatedPrice += res.estimatedPrice;

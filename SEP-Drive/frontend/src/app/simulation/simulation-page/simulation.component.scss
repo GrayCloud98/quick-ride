@@ -40,25 +40,6 @@
   flex-direction: column;
   gap: 20px;
   height: 100%;
-
-  .fix {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    flex: 0 0 auto;
-  }
-
-  .scroll {
-    border-top: 1px solid #e0e0e0;
-    scrollbar-width: none;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    flex: 1 1 auto;
-    overflow-y: auto;
-    min-height: 0;
-    padding: 20px 20px 36px 20px;
-  }
 }
 
 .bottom-padding {
@@ -69,4 +50,13 @@
   border-top: 1px solid #e0e0e0;
   padding-top: 20px;
   padding-bottom: 20px;
+}
+
+.ride-detail {
+  margin-top: 5px;
+}
+
+.control {
+  margin: auto;
+  padding-bottom: 10px;
 }
