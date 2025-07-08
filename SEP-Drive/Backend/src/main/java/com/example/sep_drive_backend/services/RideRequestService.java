@@ -1,6 +1,7 @@
 package com.example.sep_drive_backend.services;
 
 import com.example.sep_drive_backend.constants.RideStatus;
+import com.example.sep_drive_backend.constants.VehicleClassEnum;
 import com.example.sep_drive_backend.dto.*;
 import com.example.sep_drive_backend.models.*;
 import com.example.sep_drive_backend.repository.*;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -481,5 +483,12 @@ public class RideRequestService {
         }
 
         throw new RuntimeException("User not found: " + username);
+    }
+
+    public Optional<VehicleClassEnum> getCustomerActiveSimDriverVehicleClass(String username) {
+        List<RideStatus> activeStatuses = List.of(RideStatus.CREATED, RideStatus.IN_PROGRESS);
+        return rideSimulationRepository
+                .findFirstByCustomerUsernameAndRideStatusIn(username, activeStatuses)
+                .map(sim -> sim.getDriver().getVehicleClass());
     }
 }

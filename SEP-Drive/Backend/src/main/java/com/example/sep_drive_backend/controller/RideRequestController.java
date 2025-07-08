@@ -1,5 +1,6 @@
 package com.example.sep_drive_backend.controller;
 
+import com.example.sep_drive_backend.constants.VehicleClassEnum;
 import com.example.sep_drive_backend.dto.*;
 import com.example.sep_drive_backend.models.JwtTokenProvider;
 import com.example.sep_drive_backend.models.RideOffer;
@@ -210,6 +211,13 @@ DRIVER: is active when they create an offer, till it's completed, rejected, or c
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/sim/driver/vehicle-class")
+    public ResponseEntity<VehicleClassEnum> getCustomerActiveSimDriverVehicleClass(HttpServletRequest request) {
+        String username = loginService.extractUsername(request);
+        Optional<VehicleClassEnum> vehicleClass = rideRequestService.getCustomerActiveSimDriverVehicleClass(username);
+        return vehicleClass.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
     //to rate the driver of the ride
     @PostMapping("/rate/driver")
     public void rateDriver(@RequestParam Long rideSimulationId, @RequestParam int rate){
