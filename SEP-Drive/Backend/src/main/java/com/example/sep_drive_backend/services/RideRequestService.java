@@ -264,7 +264,17 @@ public class RideRequestService {
                 .orElseThrow(() -> new NoSuchElementException("Ride offer with id " + rideOfferId + " not found"));
 
         RideRequest rideRequest = selectedOffer.getRideRequest();
+        double newEstimatedPrice = 0.0;
+        if (selectedOffer.getDriver().getVehicleClass() == VehicleClassEnum.Large){
+            newEstimatedPrice = rideRequest.getDistance() * 10;
+        } else if (selectedOffer.getDriver().getVehicleClass() == VehicleClassEnum.Medium) {
+            newEstimatedPrice = rideRequest.getDistance() * 2;
 
+        } else if (selectedOffer.getDriver().getVehicleClass() == VehicleClassEnum.Small) {
+            newEstimatedPrice = rideRequest.getDistance() * 1;
+        }
+
+        rideRequest.setEstimatedPrice(newEstimatedPrice);
         if (!rideRequest.getCustomer().getUsername().equals(customerUsername)) {
             throw new SecurityException("User is not authorized to accept this offer");
         }
@@ -311,7 +321,6 @@ public class RideRequestService {
         rideSimulationRepository.save(rideSimulation);
         rideOfferRepository.save(selectedOffer);
         rideRequestRepository.save(rideRequest);
-
         notificationService.sendAcceptNotification(selectedOffer.getDriver().getUsername());
 
     }
