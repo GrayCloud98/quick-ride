@@ -334,10 +334,10 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       index: 0,
       passed: false
     };
-    this.addStopover(newPoint);
+    void this.addStopover(newPoint);
   }
 
-  private addStopover(newStopover: Point) {
+  private async addStopover(newStopover: Point) {
     if(this.currentIndex >= this.path.length - 1)
       this.points.push(newStopover);
 
@@ -349,10 +349,11 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     else
       this.points.splice(this.desiredStopoverPosition, 0, newStopover);
 
+    await this.updateRideInfo();
     this.simService.control(Control.CHANGE, this.currentIndex, this.points, this.ride.estimatedDistance, this.ride.estimatedDuration);
   }
 
-  removeStopover(index: number) {
+  async removeStopover(index: number) {
     const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
 
     if (this.hasStarted && index === this.nextStopoverPosition)  {
@@ -364,6 +365,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     else
       this.points.splice(index, 1);
 
+    await this.updateRideInfo();
     this.simService.control(Control.CHANGE, this.currentIndex, this.points, this.ride.estimatedDistance, this.ride.estimatedDuration);
   }
 

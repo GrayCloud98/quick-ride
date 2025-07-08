@@ -128,16 +128,41 @@ constructor(
   });
 }
 
+  // todo wtf is this
   updateDistanceInfo() {
     if (this.pickupPicked && this.dropoffPicked) {
-      const origin = { lat: this.ride.pickup.latitude, lng: this.ride.pickup.longitude };
-      const destination = { lat: this.ride.dropoff.latitude, lng: this.ride.dropoff.longitude };
+      const points = [
+        this.ride.pickup,
+        ...this.ride.stopovers!,
+        this.ride.dropoff
+      ];
 
-      this.distanceService.getDistanceDurationAndPrice(origin, destination, this.ride.vehicleClass)
-        .then(res => {
-          this.ride.distance = res.distance;
-          this.ride.duration = res.duration;
-          this.ride.estimatedPrice = res.estimatedPrice;
+      let totalDistance = 0;
+      let totalDuration = 0;
+      let totalEstimatedPrice = 0;
+
+      const promises = [];
+
+      for (let i = 0; i < points.length - 1; i++) {
+        const origin = { lat: points[i].latitude, lng: points[i].longitude };
+        const destination = { lat: points[i + 1].latitude, lng: points[i + 1].longitude };
+
+        promises.push(
+          this.distanceService.getDistanceDurationAndPrice(origin, destination, this.ride.vehicleClass)
+        );
+      }
+
+      Promise.all(promises)
+        .then(results => {
+          results.forEach(res => {
+            totalDistance += res.distance;
+            totalDuration += res.duration;
+            totalEstimatedPrice += res.estimatedPrice;
+          });
+
+          this.ride.distance = totalDistance;
+          this.ride.duration = totalDuration;
+          this.ride.estimatedPrice = totalEstimatedPrice;
         })
         .catch(err => console.error('Google Distance API error', err));
     }
