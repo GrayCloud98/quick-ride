@@ -46,6 +46,16 @@
       RideHistory
     </button>
   </div>
+  <div *ngIf="isLoggedIn && !isCustomer ">
+    <button
+      mat-raised-button
+      color="accent"
+      class="nav-btn"
+      (click)="goToStatistics()"
+    >
+      Statistics
+    </button>
+  </div>
 
   <!--leaderboard-->
   <div *ngIf="isLoggedIn">

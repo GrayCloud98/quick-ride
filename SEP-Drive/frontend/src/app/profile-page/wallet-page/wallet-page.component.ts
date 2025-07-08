@@ -91,6 +91,7 @@ export class WalletPageComponent implements OnInit {
           this.success = `${this.selectedAmount} € were successfully charged!`;
           this.selectedAmount = null;
           this.loadBalance();
+          this.walletService.updateBalance();
         },
         error: () => {
           this.error = 'Charging failed.';

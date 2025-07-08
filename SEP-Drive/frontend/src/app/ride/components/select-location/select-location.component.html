@@ -7,7 +7,7 @@
            [formControl]="control"
            [matAutocomplete]="auto"
            [attr.aria-label]="label"
-    >
+           [disabled]="!isSimulationPaused">
 
     <button mat-icon-button matSuffix *ngIf="removable"
             (click)="remove()" type="button" class="delete-btn"
@@ -17,7 +17,9 @@
     </button>
 
     <button mat-icon-button matSuffix *ngIf="geoLocationButton"
-            (click)="myLocation()" type="button" class="mylocation-btn"
+            (click)="myLocation()" type="button"
+            [disabled]="!isSimulationPaused"
+            class="mylocation-btn"
             matTooltip="Use current location"
             matTooltipPosition="right">
       <mat-icon>my_location</mat-icon>
@@ -27,7 +29,7 @@
             class="toggle-btn"
             matTooltip="Switch to manual coordinate entry"
             matTooltipPosition="right"
-    >
+            [disabled]="!isSimulationPaused">
       <mat-icon>location_on</mat-icon>
     </button>
 
@@ -37,8 +39,8 @@
 
     <mat-autocomplete #auto="matAutocomplete"
                       [displayWith]="displayFn"
-                      (optionSelected)="onLocationSelected($event.option.value)"
-    >
+                      (optionSelected)="onLocationSelected($event.option.value)">
+
       <mat-option *ngFor="let loc of filteredLocations | async" [value]="loc">
         {{ loc.name }}
         <br>
@@ -47,6 +49,7 @@
     </mat-autocomplete>
   </mat-form-field>
 </ng-container>
+
 
 <ng-container *ngIf="manualMode">
   <div class="manual-mode-box">
@@ -68,7 +71,7 @@
 
     <div class="actions centered-box">
       <button class="btn" mat-button type="button" (click)="useManualCoordinates()"
-              [disabled]="latitude.invalid || longitude.invalid"
+              [disabled]="latitude.invalid || longitude.invalid || !isSimulationPaused"
       >
         Set Location
       </button>

@@ -8,6 +8,7 @@ import {AuthService} from '../../../auth/auth.service';
 import {RideRequestService} from '../../../ride/services/ride-request.service';
 import {RidehistoryComponent} from '../ridehistory/ridehistory.component';
 import {SimulationService} from '../../../simulation/simulation.service';
+import {StatisticsComponent} from '../statistics/statistics.component';
 import { WalletService } from '../../services/wallet.service';
 import {LeaderboardComponent} from '../../../leaderboard/leaderboard.component';
 @Component({
@@ -40,9 +41,11 @@ export class NavbarComponent implements OnInit {
   }
 
   loadBalance() {
-    this.walletService.getBalance().subscribe(balance => {
-      this.walletBalance = balance/100;
-    });
+    this.walletService.updateBalance();
+    this.walletService.balance$.subscribe({
+      next: balance => this.walletBalance = balance/100
+    })
+
     this.authService.currentUser.subscribe((user) => {
       if (user) {
         this.isLoggedIn = true;
@@ -100,6 +103,9 @@ export class NavbarComponent implements OnInit {
   }
   goToridehistory(){
     this.router.navigate([`/history`])
+  }
+  goToStatistics(){
+    this.router.navigate([`/statistics`])
   }
  goToLeaderboard(){
     this.router.navigate([`/leaderboard`])

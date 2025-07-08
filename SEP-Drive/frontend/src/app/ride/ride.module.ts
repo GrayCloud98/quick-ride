@@ -59,7 +59,9 @@ import {MatButtonModule} from '@angular/material/button';
     OfferService
   ],
   exports: [
-    NotificationComponent
+    NotificationComponent,
+    SelectLocationComponent,
+    LocationCardComponent
   ]
 })
 export class RideModule {

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 export interface Transaction {
   id: number;
@@ -37,5 +37,14 @@ export class WalletService {
 
   getTransactions(): Observable<Transaction[]> {
     return this.http.get<Transaction[]>(`${this.apiUrl}/transactions`);
+  }
+
+  private balance = new BehaviorSubject<number>(0);
+  public balance$ = this.balance.asObservable();
+
+  updateBalance(): void {
+    this.getBalance().subscribe({
+      next: balance => this.balance.next(balance),
+    });
   }
 }

@@ -2,6 +2,14 @@ package com.example.sep_drive_backend.dto;
 
 import com.example.sep_drive_backend.constants.RideStatus;
 import com.example.sep_drive_backend.models.RideSimulation;
+import com.example.sep_drive_backend.models.Waypoint;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RideSimulationUpdate {
 
@@ -16,6 +24,45 @@ public class RideSimulationUpdate {
     private String startLocationName;
     private String destinationLocationName;
     private int currentIndex;
+    private List<WaypointDTO> waypoints;
+    private String startAddress;
+    private String destinationAddress;
+
+    public String getStartAddress() {
+        return startAddress;
+    }
+
+    public void setStartAddress(String startAddress) {
+        this.startAddress = startAddress;
+    }
+
+    public String getDestinationAddress() {
+        return destinationAddress;
+    }
+
+    public void setDestinationAddress(String destinationAddress) {
+        this.destinationAddress = destinationAddress;
+    }
+
+    private boolean hasChanged;
+
+
+    public List<WaypointDTO> getWaypoints() {
+        return waypoints;
+    }
+
+    public void setWaypoints(List<WaypointDTO> waypoints) {
+        this.waypoints = waypoints;
+    }
+
+    public boolean isHasChanged() {
+        return hasChanged;
+    }
+
+    public void setHasChanged(boolean hasChanged) {
+        this.hasChanged = hasChanged;
+    }
+
 
     public int getCurrentIndex() {
         return currentIndex;
