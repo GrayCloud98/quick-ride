@@ -211,6 +211,7 @@ DRIVER: is active when they create an offer, till it's completed, rejected, or c
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    //Get the Customer Active rideSimulation's(Created(i.e. accepted an offer) or In_prog(pressed started))'s driver's vehicle class
     @GetMapping("/sim/driver/vehicle-class")
     public ResponseEntity<VehicleClassEnum> getCustomerActiveSimDriverVehicleClass(HttpServletRequest request) {
         String username = loginService.extractUsername(request);
