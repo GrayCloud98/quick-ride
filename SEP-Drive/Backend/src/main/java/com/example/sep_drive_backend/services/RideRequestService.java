@@ -219,14 +219,12 @@ public class RideRequestService {
         }).collect(Collectors.toList());
     }
 
-
-    // IDK?
-    public Long getRideRequestIdIfDriverOffer(String username) {
+    public Optional<Long> getRideRequestIdIfDriverOffer(String username) {
+        List<RideStatus> activeStatuses = List.of(RideStatus.CREATED, RideStatus.IN_PROGRESS);
         return driverRepository.findByUsername(username)
-                .filter(Driver::getActive)
-                .flatMap(rideOfferRepository::findByDriver)
-                .map(rideOffer -> rideOffer.getRideRequest() != null ? rideOffer.getRideRequest().getId() : null)
-                .orElse(null);
+                .flatMap(driver -> rideOfferRepository
+                        .findFirstByDriverAndRideStatusIn(driver, activeStatuses)
+                        .map(rideOffer -> rideOffer.getRideRequest().getId()));
     }
 
     public void rejectOffer(Long rideOfferId) {

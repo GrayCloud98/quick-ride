@@ -18,6 +18,7 @@ public interface RideOfferRepository extends JpaRepository<RideOffer, Long> {
     List<RideOffer> findByDriverUsernameAndRideStatus(String username, RideStatus status);
     Optional<RideOffer> findByRideRequestId(Long rideRequestId);
     Optional<RideOffer> findFirstByDriverAndRideStatus(Driver driver, RideStatus rideStatus);
+    Optional<RideOffer> findFirstByDriverAndRideStatusIn(Driver driver, List<RideStatus> rideStatuses);
 
 
 
