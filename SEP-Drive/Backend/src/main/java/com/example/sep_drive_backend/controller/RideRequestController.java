@@ -155,16 +155,13 @@ DRIVER: is active when they create an offer, till it's completed, rejected, or c
         }
     }
 
-    // this might be broken now idk what it does
+    //return the driver's active offer(with the status created, or in_prog) 's RideRequest's Id
     @GetMapping("/offer-request-id")
-    public ResponseEntity<?> getDriverOfferRideRequestId(HttpServletRequest request) {
+    public ResponseEntity<Long> getDriverOfferRideRequestId(HttpServletRequest request) {
         String username = loginService.extractUsername(request);
-        Long rideRequestId = rideRequestService.getRideRequestIdIfDriverOffer(username);
-        if (rideRequestId != null) {
-            return ResponseEntity.ok(rideRequestId);
-        } else {
-            return ResponseEntity.noContent().build();
-        }
+        Optional<Long> rideRequestId = rideRequestService.getRideRequestIdIfDriverOffer(username);
+        return rideRequestId.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
     // returns offers to customer if their current active ride request has the status CREATED
