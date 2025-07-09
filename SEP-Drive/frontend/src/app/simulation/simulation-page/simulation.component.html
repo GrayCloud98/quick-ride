@@ -14,15 +14,15 @@
         </div>
         <div class="field">
           <span class="title">Price:</span>
-          <span class="value bold">{{ ride.estimatedPrice | number:'1.2-2' }} €</span>
+          <span class="value bold">{{ rideDetails.price | number:'1.2-2' }} €</span>
         </div>
         <div class="field">
           <span class="title">Distance:</span>
-          <span class="value">{{ ride.estimatedDistance }} km</span>
+          <span class="value">{{ rideDetails.distance | number:'1.2-2' }} km</span>
         </div>
         <div class="field">
           <span class="title">Duration:</span>
-          <span class="value">{{ ride.estimatedDuration }} minutes</span>
+          <span class="value">{{ rideDetails.duration }} minutes</span>
         </div>
       </mat-card-content>
 
@@ -92,10 +92,10 @@
           <button *ngIf="!hasStarted" class="btn" mat-fab extended (click)="start()">Start</button>
           <button *ngIf="hasStarted && paused" class="btn" mat-fab extended (click)="resume()" [disabled]="currentIndex >= path.length - 1">Resume</button>
           <button *ngIf="hasStarted && !paused" class="btn" mat-fab extended (click)="pause()">Pause</button>
-          <button *ngIf="isCustomer && hasStarted" class="btn warn" mat-fab extended (click)="complete()" [disabled]="!paused || balance < ride.estimatedPrice">Complete</button>
+          <button *ngIf="isCustomer && hasStarted" class="btn warn" mat-fab extended (click)="complete()" [disabled]="!paused || balance < rideDetails.price">Complete</button>
         </div>
       </mat-card-content>
-        <div class="alert error centered-box" *ngIf="isCustomer && balance < ride.estimatedPrice">You need more Balance</div>
+        <div class="alert error centered-box" *ngIf="isCustomer && balance < rideDetails.price">Please Top-Up enough Balance to complete this Simulation</div>
     </mat-card>
 
     <div *ngFor="let point of points; let i = index">

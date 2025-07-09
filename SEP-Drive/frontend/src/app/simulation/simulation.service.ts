@@ -83,7 +83,12 @@ export class SimulationService {
     }
   }
 
-  control(control: Control, currentIndexOrDuration?: number, points?: Point[], estimatedDistance?: number, estimatedDuration?: number): void {
+  control(
+    control: Control,
+    currentIndexOrDuration?: number,
+    points?: Point[],
+    rideDetails?: { distance: number; duration: number; price: number }
+  ): void {
     const payload: any = { rideSimulationId: this.simulationId };
 
     switch (control) {
@@ -108,8 +113,9 @@ export class SimulationService {
         payload.startPoint = { lat: points[0].lat,lng: points[0].lng };
         payload.endPoint = { lat: points[points.length - 1].lat, lng: points[points.length - 1].lng };
         payload.waypoints = points.slice(1, points.length - 1).map((p, i) => cleanWaypoint(p, i));
-        payload.distance = estimatedDistance;
-        payload.duration = estimatedDuration;
+        payload.distance = rideDetails?.distance;
+        payload.duration = rideDetails?.duration;
+        payload.price = rideDetails?.price;
         break;
 
       default:

@@ -36,7 +36,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // 🚘 Route/Stopovers State
   points: Point[] = [];
-  ride = {estimatedDistance: 0, estimatedDuration: 0, estimatedPrice: 0}
+  rideDetails = {distance: 0, duration: 0, price: 0}
   vehicleClass: VehicleClass | null = null;
   balance = 0;
   currentIndex = 0;
@@ -94,6 +94,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
         }
 
         if (update.rideStatus === 'COMPLETED' && !this.hasCompleted) {
+          if(this.isCustomer) this.hasCompleted = true;
           this.complete();
           return;
         }
@@ -295,7 +296,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.simService.control(Control.SPEED, this.duration);
   }
 
-  complete(): void {
+  async complete() {
     if (this.hasCompleted) return;
     this.hasCompleted = true;
 
@@ -305,9 +306,10 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
       this.points.push(currentPoint);
 
-      void this.updateRideInfo();
       this.renderPins();
       this.drawRoute();
+      await this.updateRideInfo();
+      this.simService.control(Control.CHANGE, this.currentIndex, this.points, this.rideDetails);
     }
 
     this.simService.control(Control.COMPLETE);
@@ -350,7 +352,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.points.splice(this.desiredStopoverPosition, 0, newStopover);
 
     await this.updateRideInfo();
-    this.simService.control(Control.CHANGE, this.currentIndex, this.points, this.ride.estimatedDistance, this.ride.estimatedDuration);
+    this.simService.control(Control.CHANGE, this.currentIndex, this.points, this.rideDetails);
   }
 
   async removeStopover(index: number) {
@@ -366,7 +368,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.points.splice(index, 1);
 
     await this.updateRideInfo();
-    this.simService.control(Control.CHANGE, this.currentIndex, this.points, this.ride.estimatedDistance, this.ride.estimatedDuration);
+    this.simService.control(Control.CHANGE, this.currentIndex, this.points, this.rideDetails);
   }
 
   // 🧮 Helpers
@@ -432,8 +434,8 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
-    this.ride.estimatedDistance = totalDistance;
-    this.ride.estimatedDuration = totalDuration;
-    this.ride.estimatedPrice = totalEstimatedPrice;
+    this.rideDetails.distance = totalDistance;
+    this.rideDetails.duration = totalDuration;
+    this.rideDetails.price = totalEstimatedPrice;
   }
 }
