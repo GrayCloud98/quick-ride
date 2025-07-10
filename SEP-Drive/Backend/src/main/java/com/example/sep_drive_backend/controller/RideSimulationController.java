@@ -102,7 +102,7 @@ public class RideSimulationController {
         if (simulation.getRideStatus() == RideStatus.COMPLETED) {
             return;
         }
-        double estimatedPriceInCents = 1000 * simulation.getRideOffer().getRideRequest().getEstimatedPrice();
+        double estimatedPriceInCents = 100 * simulation.getRideOffer().getRideRequest().getEstimatedPrice();
         if (simulation.getCustomer().getWallet().getBalanceCents() < estimatedPriceInCents){
             SimulationErrorMessage error = new SimulationErrorMessage();
             error.setMessage("Insufficient Customer balance to complete the Ride.");
