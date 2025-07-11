@@ -22,9 +22,9 @@
     </div>
   </mat-card-content>
 
-  <br>
-  <div class="button-container">
-    <button *ngIf="removable" class="btn warn" mat-fab extended (click)="remove()" [disabled]="!isSimulationPaused">
+  <div class="button-container" *ngIf="removable">
+    <br>
+    <button class="btn warn" mat-fab extended (click)="remove()" [disabled]="!isSimulationPaused">
       Remove Stopover
     </button>
   </div>

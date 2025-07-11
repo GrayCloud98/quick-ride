@@ -46,13 +46,19 @@ body {
 }
 
 .card {
-  padding: 16px;
+  background: rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  padding: 16px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+  color: #000000 !important;
 
-  &.small {
-    max-width: 600px;
-  }
-  &.big {
-    max-width: 1000px;
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   }
 
   .header {
@@ -61,41 +67,39 @@ body {
     gap: 8px;
     margin-bottom: 12px;
 
-    .label {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: #3f51b5;
+    mat-icon {
+      color: #6863df;
     }
 
-    mat-icon {
-      color: #3f51b5;
+    .label {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #8092ff;
     }
   }
 
   .field {
     display: flex;
-    padding: 4px 0;
+    justify-content: space-between;
+    margin-bottom: 6px;
 
     .title {
-      font-weight: 500;
-      color: #555;
-      width: 90px;
+      color: #000000;
+      font-size: 0.95rem;
     }
 
     .value {
-      font-weight: 400;
-      color: #222;
-      text-align: left;
-      flex: 1;
-    }
+      color: #000000;
+      font-size: 0.95rem;
 
-    .bold {
-      font-weight: 700;
-    }
+      &.bold {
+        font-weight: 600;
+      }
 
-    .grey-italic {
-      font-style: italic;
-      color: #888;
+      &.grey-italic {
+        color: #000000;
+        font-style: italic;
+      }
     }
   }
 }
