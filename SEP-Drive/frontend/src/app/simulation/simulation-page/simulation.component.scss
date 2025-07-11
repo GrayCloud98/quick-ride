@@ -52,11 +52,15 @@
   padding-bottom: 20px;
 }
 
-.ride-detail {
-  margin-top: 5px;
-}
-
 .control {
   margin: auto;
   padding-bottom: 10px;
+}
+
+.card {
+  .field {
+    .title {
+      width: 80px;
+    }
+  }
 }

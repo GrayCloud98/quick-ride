@@ -78,6 +78,7 @@ body {
     }
 
     .label {
+      text-align: left;
       font-weight: 600;
       font-size: 1.1rem;
       color: #8092ff;
@@ -86,24 +87,28 @@ body {
 
   .field {
     display: flex;
+    padding: 4px 0;
 
     .title {
-      color: #000000;
-      font-size: 0.95rem;
+      font-weight: 500;
+      color: #555;
+      width: 90px;
     }
 
     .value {
-      color: #000000;
-      font-size: 0.95rem;
+      font-weight: 400;
+      color: #222;
+      text-align: left;
+      flex: 1;
+    }
 
-      &.bold {
-        font-weight: 600;
-      }
+    .bold {
+      font-weight: 700;
+    }
 
-      &.grey-italic {
-        color: #000000;
-        font-style: italic;
-      }
+    .grey-italic {
+      font-style: italic;
+      color: #888;
     }
   }
 }

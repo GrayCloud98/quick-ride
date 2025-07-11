@@ -47,3 +47,9 @@ app-location-card {
   flex-direction: column;
   gap: 20px;
 }
+
+.header.field {
+  .label {
+    width: 260px;
+  }
+}
