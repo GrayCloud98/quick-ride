@@ -22,7 +22,7 @@ interface SortOption {
 export class AvailableRidesPageComponent implements OnInit {
   accessAllowed: boolean = false;
   userHasActiveSimulation: boolean = false;
-
+  username!: string;
   currentPositionControl = new FormControl<Location | string>('', [Validators.required]);
   currentPosition!: Location;
   positionSet = false;
@@ -89,6 +89,7 @@ export class AvailableRidesPageComponent implements OnInit {
 
   ngOnInit() {
     if(this.authService.currentUserValue) {
+      this.username = this.authService.currentUserValue.username;
       this.accessAllowed = this.authService.currentUserValue.role === 'Driver'
       this.simService.activeSimulationStatus$.subscribe({
         next: userHasActiveSimulation => this.userHasActiveSimulation = userHasActiveSimulation

@@ -77,7 +77,7 @@
       </td>
       <td>{{ driver.username }}</td>
       <td>{{ driver.fullName }}</td>
-      <td>{{ driver.totalDistanceDriven }}</td>
+      <td>{{ driver.totalDistanceDriven | number:'1.2-2' }}</td>
       <td>{{ driver.averageRating | number: '1.1-2' }}</td>
       <td>{{ driver.totalDriveTime }}</td>
       <td>{{ driver.numberOfRides }}</td>
