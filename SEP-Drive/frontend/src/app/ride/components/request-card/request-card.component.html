@@ -124,12 +124,11 @@
       >
         Please withdraw your active Offer first
       </button>
-    </div>
-    <div class="chat-button-container centered-box">
-      <button mat-raised-button
-              (click)="openChat()"
-              [disabled]="offerState !== OfferState.OFFERED || request.requestID !== RequestIdOfOffer"
-              class="chat-btn-with-badge">
+
+      <button
+        *ngIf="offerState === OfferState.OFFERED && request.requestID === RequestIdOfOffer"
+        class="btn chat" mat-fab extended (click)="openChat()"
+      >
         <mat-icon>chat</mat-icon>
         Chat
         <span *ngIf="hasUnreadMessages" class="chat-badge"></span>
