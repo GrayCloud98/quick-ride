@@ -121,16 +121,3 @@ mat-select {
 .stats-card * {
   color: #fff !important;
 }
-
-@media (max-width: 850px) {
-  .glass.stats-card {
-    padding: 12px 2vw 14px 2vw;
-    max-width: 98vw;
-  }
-
-  .stats-controls {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
-}
