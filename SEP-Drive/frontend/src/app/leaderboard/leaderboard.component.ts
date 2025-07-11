@@ -25,8 +25,8 @@ export class LeaderboardComponent implements OnInit {
   get filteredLeaderboard(): DriverBoard[] {
     const term = this.searchTerm.toLowerCase();
     return this.leaderboard.filter(driver =>
-      driver.username.toLowerCase().includes(term) ||
-      driver.fullName.toLowerCase().includes(term)
+      driver.username.toLowerCase().startsWith(term) ||
+      driver.fullName.toLowerCase().startsWith(term)
     );
   }
 

@@ -68,7 +68,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let driver of leaderboard; let i = index" [class.top]="i < 3">
+    <tr *ngFor="let driver of filteredLeaderboard; let i = index" [class.top]="i < 3">
       <td>
         <span *ngIf="i === 0">🥇</span>
         <span *ngIf="i === 1">🥈</span>
