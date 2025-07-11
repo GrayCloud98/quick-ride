@@ -76,10 +76,10 @@ class LeaderboardServiceTest {
 
         assertNotNull(entry1);
         assertEquals("Alice Anderson", entry1.getFullName());
-        assertEquals(15.5, entry1.getTotalDistance(), 0.01);
-        assertEquals(35.0, entry1.getTotalEarnings(), 0.01);
-        assertEquals(45L, entry1.getTotalDuration());
-        assertEquals(2, entry1.getTripCount());
+        assertEquals(15.5, entry1.getTotalDistanceDriven(), 0.01);
+        assertEquals(35.0, entry1.getMoneyEarned(), 0.01);
+        assertEquals(45L, entry1.getTotalDriveTime());
+        assertEquals(2, entry1.getNumberOfRides());
         assertEquals(4.5, entry1.getAverageRating(), 0.01);
 
         LeaderboardEntryDTO entry2 = leaderboard.stream()
@@ -88,10 +88,10 @@ class LeaderboardServiceTest {
 
         assertNotNull(entry2);
         assertEquals("Bob Brown", entry2.getFullName());
-        assertEquals(20.0, entry2.getTotalDistance(), 0.01);
-        assertEquals(40.0, entry2.getTotalEarnings(), 0.01);
-        assertEquals(45L, entry2.getTotalDuration());
-        assertEquals(1, entry2.getTripCount());
+        assertEquals(20.0, entry2.getTotalDistanceDriven(), 0.01);
+        assertEquals(40.0, entry2.getMoneyEarned(), 0.01);
+        assertEquals(45L, entry2.getTotalDriveTime());
+        assertEquals(1, entry2.getNumberOfRides());
         assertEquals(3.0, entry2.getAverageRating(), 0.01);
     }
 }
