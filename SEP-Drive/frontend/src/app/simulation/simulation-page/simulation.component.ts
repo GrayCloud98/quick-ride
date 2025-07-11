@@ -14,6 +14,8 @@ export interface Point {
   address?: string,
   lat: number,
   lng: number,
+
+  // LIVE-ÄNDERUNGEN
   index: number,
   passed: boolean
 }
@@ -56,16 +58,16 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.isCustomer = this.authService.currentUserValue.role === 'Customer'
       this.simService.activeSimulationStatus$.subscribe({
         next: userHasActiveSimulation => {
-          this.userHasActiveSimulation = userHasActiveSimulation
-
-          if(userHasActiveSimulation) this.simService.getVehicleClass().subscribe( {next: vehicleClass => this.vehicleClass = vehicleClass} )
+          this.userHasActiveSimulation = userHasActiveSimulation;
           this.walletService.getBalance().subscribe({next: balance => this.balance = balance/100})
+
+          if(userHasActiveSimulation)
+            this.simService.getVehicleClass().subscribe( {next: vehicleClass => this.vehicleClass = vehicleClass} )
         }
       })
     }
   }
 
-  // 🔄 Lifecycle
   ngAfterViewInit(): void {
     this.simService.connect();
 
@@ -138,12 +140,11 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
         map: this.map,
         position: point,
         title: point.name,
-        content: this.createStyledMarker(type, index)
+        content: this.createPin(type, index)
       });
       this.pins.push(marker);
     });
   }
-
 
   private drawRoute(): void {
     if (this.directionsRenderer) {
@@ -165,7 +166,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       {
         origin: start,
         destination: end,
-        waypoints: waypoints, // stopovers
+        waypoints: waypoints,
         travelMode: google.maps.TravelMode.DRIVING
       },
       (result, status) => {
@@ -193,14 +194,15 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
-    this.assignStopoverIndices(); // live changes
-
     this.pointer = new google.maps.marker.AdvancedMarkerElement({
       position: this.path[this.currentIndex],
       map: this.map,
       title: 'You',
       content: this.createCar()
     });
+
+    // LIVE-ÄNDERUNGEN
+    this.assignStopoverIndices();
   }
 
   private animate(): void {
@@ -218,15 +220,15 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.currentIndex = Math.floor(startIndex + totalSteps * progressRatio);
       this.pointer.position = this.path[Math.min(this.currentIndex, totalSteps - 1)];
 
-      this.points.forEach( // live changes
+      // LIVE-ÄNDERUNGEN
+      this.points.forEach(
         point => {
           if (!point.passed && this.currentIndex >= point.index) {
             point.passed = true;
             this.nextStopoverPosition += 1;
             if (this.desiredStopoverPosition < this.nextStopoverPosition) this.desiredStopoverPosition += 1;
-          }
-        }
-      );
+          }});
+      // ENDE DER LIVE-ÄNDERUNGEN
 
       if (this.currentIndex >= totalSteps - 1) {
         this.currentIndex = this.path.length -1;
@@ -287,7 +289,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dialog.open(RatingPopupComponent, { disableClose: true }).afterClosed().subscribe();
   }
 
-  private createStyledMarker(type: 'pickup' | 'dropoff' | 'stopover', index: number): HTMLElement {
+  private createPin(type: 'pickup' | 'dropoff' | 'stopover', index: number): HTMLElement {
     const pin = document.createElement('div');
 
     let svg;
@@ -295,7 +297,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       svg = `<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"> <circle cx="20" cy="20" r="18" fill="limegreen" stroke="white" stroke-width="3"/> <polygon points="16,13 28,20 16,27" fill="white"/> </svg>`;
     else if (type === 'dropoff')
       svg = `<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"> <circle cx="20" cy="20" r="18" fill="tomato" stroke="white" stroke-width="3"/> <path d="M14 27 L14 13 L28 16 L28 24 Z" fill="white" stroke="white" stroke-width="1"/> </svg>`;
-    else //stopover
+    else
       svg = `<svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"> <circle cx="18" cy="18" r="16" fill="#14B8A6" stroke="white" stroke-width="3"/> <text x="18" y="23" text-anchor="middle" fill="white" font-size="14" font-family="Arial" font-weight="bold">${index}</text> </svg>`;
 
     pin.innerHTML = svg;
@@ -313,66 +315,56 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     return car;
   }
 
-  // -------------------------------------------------------------------------------------------------------------------
+  // ================================================= LIVE-ÄNDERUNGEN =================================================
+  rideDetails = { distance: 0, duration: 0, price: 0 };
+  vehicleClass: VehicleClass | null = null;
+  balance = 0;
 
-  rideDetails = {distance: 0, duration: 0, price: 0} // todo
-  vehicleClass: VehicleClass | null = null; // todo
-  balance = 0; // todo
-  nextStopoverPosition = 1; // todo
-  desiredStopoverPosition = 1; // todo
-  newStopoverControl = new FormControl<Location | string>('', [Validators.required]); // todo
+  nextStopoverPosition = 1;
+  desiredStopoverPosition = 1;
+  newStopoverControl = new FormControl<Location | string>('', [Validators.required]);
 
-  // ➕ Stopover Management
   onLocationSelected(loc: Location) {
     this.newStopoverControl.setValue(loc);
-    const newPoint: Point = {
-      name: loc.name,
-      address: loc.address,
-      lat: loc.latitude,
-      lng: loc.longitude,
-      index: 0,
-      passed: false
-    };
+    const newPoint: Point = { name: loc.name, address: loc.address, lat: loc.latitude, lng: loc.longitude, index: 0, passed: false };
     void this.addStopover(newPoint);
   }
 
   private async addStopover(newStopover: Point) {
-    if(this.currentIndex >= this.path.length - 1)
+    if (this.points[this.points.length -1].passed) {
       this.points.push(newStopover);
-
-    else if (this.hasStarted && this.desiredStopoverPosition === this.nextStopoverPosition) {
+    } else if (this.hasStarted && this.desiredStopoverPosition === this.nextStopoverPosition) {
       const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
       this.points.splice(this.desiredStopoverPosition, 0, currentPoint, newStopover);
-    }
-
-    else
+    } else {
       this.points.splice(this.desiredStopoverPosition, 0, newStopover);
+    }
 
     await this.updateRideInfo();
     this.simService.control(Control.CHANGE, this.currentIndex, this.points, this.rideDetails);
   }
 
-  async removeStopover(index: number) {
+  async removeStopover(stopoverPosition: number) {
     const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
 
-    if (this.hasStarted && index === this.nextStopoverPosition)  {
-      this.points.splice(index, 1, currentPoint);
+    if (this.hasStarted && stopoverPosition === this.nextStopoverPosition) {
+      this.points.splice(stopoverPosition, 1, currentPoint);
       this.nextStopoverPosition += 1;
+    } else if (stopoverPosition === this.points.length) {
+      this.points.splice(stopoverPosition - 1, 1, currentPoint);
+    } else {
+      this.points.splice(stopoverPosition, 1);
     }
-    else if (index === this.points.length)
-      this.points.splice(index - 1, 1, currentPoint);
-    else
-      this.points.splice(index, 1);
 
     await this.updateRideInfo();
     this.simService.control(Control.CHANGE, this.currentIndex, this.points, this.rideDetails);
   }
 
-  // 🧮 Helpers
   private assignStopoverIndices() {
     this.points.forEach(point => {
       let closestIndex = 0;
       let minDist = Number.MAX_VALUE;
+
       this.path.forEach((p, i) => {
         const dist = Math.hypot(p.lat - point.lat, p.lng - point.lng);
         if (dist < minDist) {
@@ -382,7 +374,6 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       });
       point.index = closestIndex;
     });
-
 
     this.points.forEach(p => p.passed = p.index <= this.currentIndex);
     this.nextStopoverPosition = this.points.findIndex(p => !p.passed);
@@ -415,4 +406,5 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.rideDetails.duration = totalDuration;
     this.rideDetails.price = totalEstimatedPrice;
   }
+  // ============================================= ENDE DER LIVE-ÄNDERUNGEN ============================================
 }
