@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../../../auth/auth.service';
+import {SimulationService} from '../../../simulation/simulation.service';
 
 @Component({
   selector: 'app-request-ride-page',
@@ -8,23 +9,17 @@ import {AuthService} from '../../../auth/auth.service';
   styleUrl: './request-ride-page.component.scss'
 })
 export class RequestRidePageComponent implements OnInit {
-  username: string = '';
   accessAllowed: boolean = false;
-  constructor(private authService: AuthService) {}
+  userHasActiveSimulation: boolean = false;
+  constructor(private authService: AuthService,
+              private simService: SimulationService) {}
 
   ngOnInit() {
-    this.authService.currentUser.subscribe({
-      next: user => {
-        if (user) {
-          if (!user.username) return;
-          this.username = user.username;
-          this.authService.isCustomer().subscribe({
-            next: isCustomer => this.accessAllowed = isCustomer,
-            error: err => console.log(err),
-          });
-        }
-      },
-      error: err => console.log(err)
-    });
+    if(this.authService.currentUserValue) {
+      this.accessAllowed = this.authService.currentUserValue.role === 'Customer'
+      this.simService.activeSimulationStatus$.subscribe({
+        next: userHasActiveSimulation => this.userHasActiveSimulation = userHasActiveSimulation
+      })
+    }
   }
 }

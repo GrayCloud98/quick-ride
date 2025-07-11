@@ -5,6 +5,8 @@ import { AppComponent } from './app.component';
 import { SharedModule } from './shared/shared.module';
 import { RideModule } from './ride/ride.module';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 
 import { RegisterComponent } from './auth/register/register.component';
 import { TwoFaComponent } from './shared/components/two-fa/two-fa.component';
@@ -13,13 +15,11 @@ import { WalletPageComponent } from './profile-page/wallet-page/wallet-page.comp
 import { SimulationComponent } from './simulation/simulation-page/simulation.component';
 import { RatingPopupComponent } from './simulation/rating-popup/rating-popup.component';
 import { HomeComponent } from './home/home.component';
+import { LeaderboardComponent } from './leaderboard/leaderboard.component';
+import { ChatModalComponent } from './chat/chat-modal.component';
 
 import { GoogleMapsModule } from '@angular/google-maps';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { SimulationService } from './simulation/simulation.service';
-import { AuthInterceptor } from './auth/services/auth.interceptor';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { HttpClientModule } from '@angular/common/http';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
@@ -31,8 +31,10 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSortModule } from '@angular/material/sort';
 import { MatSliderModule } from '@angular/material/slider';
-import { ChatModalComponent } from './chat/chat-modal.component';
+
 import { provideNativeDateAdapter } from '@angular/material/core';
+import { SimulationService } from './simulation/simulation.service';
+import { AuthInterceptor } from './auth/services/auth.interceptor';
 
 @NgModule({
   declarations: [
@@ -44,7 +46,8 @@ import { provideNativeDateAdapter } from '@angular/material/core';
     SimulationComponent,
     RatingPopupComponent,
     HomeComponent,
-    ChatModalComponent
+    ChatModalComponent,
+    LeaderboardComponent
   ],
   imports: [
     BrowserModule,
@@ -66,8 +69,8 @@ import { provideNativeDateAdapter } from '@angular/material/core';
     MatSortModule,
     MatSliderModule,
     HttpClientModule,
-    MatButtonToggleModule,
-    MatButtonModule
+    CommonModule,
+    MatButtonToggleModule
   ],
   providers: [
     provideNativeDateAdapter(),

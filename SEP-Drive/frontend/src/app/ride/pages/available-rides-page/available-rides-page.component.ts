@@ -1,12 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
-import {filter, of, switchMap, tap} from 'rxjs';
+import {of, switchMap, tap} from 'rxjs';
 import {AuthService} from '../../../auth/auth.service';
 import {OfferService} from '../../services/offer.service';
 import {Location} from '../../models/location.model';
 import {Request} from '../../models/request.model';
 import {OfferState} from '../../models/offer.model';
 import {DistanceService} from '../../services/distance.service';
+import {SimulationService} from '../../../simulation/simulation.service';
 
 interface SortOption {
   key: keyof Request,
@@ -20,7 +21,7 @@ interface SortOption {
 })
 export class AvailableRidesPageComponent implements OnInit {
   accessAllowed: boolean = false;
-  username: string = '';
+  userHasActiveSimulation: boolean = false;
 
   currentPositionControl = new FormControl<Location | string>('', [Validators.required]);
   currentPosition!: Location;
@@ -28,21 +29,21 @@ export class AvailableRidesPageComponent implements OnInit {
 
   allActiveRequests: Request[] = [];
   sortOptions: SortOption[] = [
-  { key: 'driverToPickupDistance', label: 'Distance to Pickup' },
-  { key: 'desiredVehicleClass', label: 'Requested Vehicle Type' },
-  { key: 'customerName', label: 'Customer Name' },
-  { key: 'customerRating', label: 'Customer Rating' },
-  { key: 'createdAt', label: 'Request Time' },
-  { key: 'requestID', label: 'Request ID' },
+    { key: 'driverToPickupDistance', label: 'Distance to Pickup' },
+    { key: 'desiredVehicleClass', label: 'Requested Vehicle Type' },
+    { key: 'customerName', label: 'Customer Name' },
+    { key: 'customerRating', label: 'Customer Rating' },
+    { key: 'createdAt', label: 'Request Time' },
+    { key: 'requestID', label: 'Request ID' },
   ];
 
   offerState = OfferState.NONE;
   requestIdOfOffer: number | null = null;
 
   constructor(private offerService: OfferService,
-                private authService: AuthService,
-                private distanceService: DistanceService,) {
-  }
+              private authService: AuthService,
+              private distanceService: DistanceService,
+              private simService: SimulationService) {}
 
   onLocationSelected(pos: Location) {
     this.currentPosition = pos;
@@ -87,14 +88,12 @@ export class AvailableRidesPageComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.authService.currentUser.pipe(
-      filter(user => !!user?.username),
-      tap(user => this.username = user!.username!),
-      switchMap(() => this.authService.isCustomer()),
-      tap(isCustomer => this.accessAllowed = !isCustomer)
-    ).subscribe({
-      error: err => console.log(err)
-    })
+    if(this.authService.currentUserValue) {
+      this.accessAllowed = this.authService.currentUserValue.role === 'Driver'
+      this.simService.activeSimulationStatus$.subscribe({
+        next: userHasActiveSimulation => this.userHasActiveSimulation = userHasActiveSimulation
+      })
+    }
   }
 
   loadRequests() {

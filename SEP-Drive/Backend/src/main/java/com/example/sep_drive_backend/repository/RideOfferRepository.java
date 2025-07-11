@@ -27,4 +27,9 @@ public interface RideOfferRepository extends JpaRepository<RideOffer, Long> {
             "AND ro.rideStatus = 'CREATED'")
     boolean existsByDriverUsernameAndCustomerUsername(@Param("driverUsername") String driverUsername,
                                                       @Param("customerUsername") String customerUsername);
+    Optional<RideOffer> findFirstByDriverAndRideStatusIn(Driver driver, List<RideStatus> rideStatuses);
+
+
+
+
 }

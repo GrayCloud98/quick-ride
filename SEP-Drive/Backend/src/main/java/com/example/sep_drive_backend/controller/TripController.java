@@ -1,8 +1,6 @@
 package com.example.sep_drive_backend.controller;
 
 import com.example.sep_drive_backend.dto.LeaderboardEntryDTO;
-import com.example.sep_drive_backend.dto.TripeDTO;
-import com.example.sep_drive_backend.dto.TripCompleteRequest;
 import com.example.sep_drive_backend.models.JwtTokenProvider;
 import com.example.sep_drive_backend.services.LeaderboardService;
 import com.example.sep_drive_backend.services.TripService;

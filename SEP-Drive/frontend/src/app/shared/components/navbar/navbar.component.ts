@@ -10,6 +10,7 @@ import {RidehistoryComponent} from '../ridehistory/ridehistory.component';
 import {SimulationService} from '../../../simulation/simulation.service';
 import {StatisticsComponent} from '../statistics/statistics.component';
 import { WalletService } from '../../services/wallet.service';
+import {LeaderboardComponent} from '../../../leaderboard/leaderboard.component';
 @Component({
   selector: 'app-navbar',
   standalone: false,
@@ -104,6 +105,10 @@ export class NavbarComponent implements OnInit {
   goToStatistics(){
     this.router.navigate([`/statistics`])
   }
+ goToLeaderboard(){
+    this.router.navigate([`/leaderboard`])
+  }
+
   goHome() {
     this.router.navigate(['/']);
   }

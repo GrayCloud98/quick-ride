@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {Control, SimulationService, Update} from '../simulation.service';
+import {Control, SimulationService} from '../simulation.service';
 import {MatDialog} from '@angular/material/dialog';
 import {RatingPopupComponent} from '../rating-popup/rating-popup.component';
 import {FormControl, Validators} from '@angular/forms';
@@ -7,6 +7,7 @@ import {Location} from '../../ride/models/location.model';
 import {DistanceService} from '../../ride/services/distance.service';
 import {VehicleClass} from '../../ride/models/ride.model';
 import {AuthService} from '../../auth/auth.service';
+import {WalletService} from '../../shared/services/wallet.service';
 
 export interface Point {
   name?: string,
@@ -24,7 +25,6 @@ export interface Point {
   styleUrl: './simulation.component.scss'
 })
 export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
-  // 🗺️ Map and Animation
   @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef;
   private map!: google.maps.Map;
   private pointer!: google.maps.marker.AdvancedMarkerElement;
@@ -33,73 +33,70 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
   private pins: google.maps.marker.AdvancedMarkerElement[] = [];
   path: google.maps.LatLngLiteral[] = [];
 
-  // 🚘 Route/Stopovers State
   points: Point[] = [];
-  ride = {vehicleClass: VehicleClass.LARGE, estimatedDistance: 0, estimatedDuration: 0, estimatedPrice: 0}
   currentIndex = 0;
   duration = 30;
-  nextStopoverPosition = 1;
-  desiredStopoverPosition = 1;
 
-  // ⏱️ State Flags
   hasStarted = false;
   hasCompleted = false;
   paused = true;
   metadataLoaded = false;
 
-  // 🧩 Form Controls
-  newStopoverControl = new FormControl<Location | string>('', [Validators.required]);
-  isCustomer = false;
+  isCustomer: boolean | null = null;
+  userHasActiveSimulation: boolean | null = null;
 
-  // 🛠️ Constructor
   constructor(private dialog: MatDialog,
               private authService: AuthService,
               private distanceService: DistanceService,
-              private simService: SimulationService) {}
+              private simService: SimulationService,
+              private walletService: WalletService) {}
 
   ngOnInit(): void {
-    this.isCustomer = this.authService.currentUserValue.role === 'Customer'
+    if(this.authService.currentUserValue) {
+      this.isCustomer = this.authService.currentUserValue.role === 'Customer'
+      this.simService.activeSimulationStatus$.subscribe({
+        next: userHasActiveSimulation => {
+          this.userHasActiveSimulation = userHasActiveSimulation
+
+          if(userHasActiveSimulation) this.simService.getVehicleClass().subscribe( {next: vehicleClass => this.vehicleClass = vehicleClass} )
+          this.walletService.getBalance().subscribe({next: balance => this.balance = balance/100})
+        }
+      })
+    }
   }
 
   // 🔄 Lifecycle
   ngAfterViewInit(): void {
     this.simService.connect();
 
-    this.simService.getSimulationUpdates().subscribe(
-      (update: Update) => {
-        this.duration = update.duration;
-        this.currentIndex = update.currentIndex;
-
-        if (update.hasChanged || !this.metadataLoaded) {
-          this.points = [
-            { name: update.startLocationName, address: update.startAddress, lat: update.startPoint.lat, lng: update.startPoint.lng, index: 0, passed: true },
-            ...update.waypoints.map(wp => ({ name: wp.name, address: wp.address, lat: wp.latitude, lng: wp.longitude, index: 0, passed: false })),
-            { name: update.destinationLocationName, address: update.destinationAddress, lat: update.endPoint.lat, lng: update.endPoint.lng, index: 0, passed: false }
-          ];
-        }
-
-        if (update.rideStatus === 'COMPLETED' && !this.hasCompleted) {
+    this.simService.simulationUpdate$.subscribe(
+      update => {
+        if (update.rideStatus === 'COMPLETED' && !this.isCustomer) {
           this.complete();
           return;
         }
 
-        if (!this.hasStarted && update.hasStarted){
+        this.duration = update.duration;
+        this.currentIndex = update.currentIndex;
+        if (update.hasChanged || !this.metadataLoaded) {
+          const { startLocationName, startAddress, startPoint, waypoints, destinationLocationName, destinationAddress, endPoint } = update;
+          this.points = [
+            { name: startLocationName, address: startAddress, lat: startPoint.lat, lng: startPoint.lng, index: 0, passed: true },
+            ...waypoints.map(wp => ({ name: wp.name, address: wp.address, lat: wp.latitude, lng: wp.longitude, index: 0, passed: false })),
+            { name: destinationLocationName, address: destinationAddress, lat: endPoint.lat, lng: endPoint.lng, index: 0, passed: false }
+          ];
+        }
+
+        if (update.hasStarted && !this.hasStarted) {
           this.start();
           this.hasStarted = true;
-        }
-        else if (update.hasChanged){
+        } else if (update.hasChanged) {
           void this.updateRideInfo();
-          this.renderPins()
-          this.drawRoute()
-        }
-        else {
-          if (this.paused !== update.paused) {
-            if (update.paused)
-              this.pause();
-            else
-              this.resume();
-            this.paused = update.paused;
-          }
+          this.renderPins();
+          this.drawRoute();
+        } else if (this.paused !== update.paused) {
+          update.paused ? this.pause() : this.resume();
+          this.paused = update.paused;
         }
 
         if (!this.metadataLoaded) {
@@ -114,7 +111,6 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     await this.simService.disconnect();
   }
 
-  // 🗺️ Map Setup
   private initializeMap(): void {
     const mapOptions: google.maps.MapOptions = {
       center: this.points[0],
@@ -169,7 +165,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       {
         origin: start,
         destination: end,
-        waypoints: waypoints,
+        waypoints: waypoints, // stopovers
         travelMode: google.maps.TravelMode.DRIVING
       },
       (result, status) => {
@@ -197,11 +193,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
-    this.assignStopoverIndices();
-    this.points.forEach(p => p.passed = p.index <= this.currentIndex);
-    this.nextStopoverPosition = this.points.findIndex(p => !p.passed);
-    this.nextStopoverPosition = this.nextStopoverPosition === -1 ? this.points.length : this.nextStopoverPosition;
-    this.desiredStopoverPosition = Math.max(this.desiredStopoverPosition, this.nextStopoverPosition);
+    this.assignStopoverIndices(); // live changes
 
     this.pointer = new google.maps.marker.AdvancedMarkerElement({
       position: this.path[this.currentIndex],
@@ -226,7 +218,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.currentIndex = Math.floor(startIndex + totalSteps * progressRatio);
       this.pointer.position = this.path[Math.min(this.currentIndex, totalSteps - 1)];
 
-      this.points.forEach(
+      this.points.forEach( // live changes
         point => {
           if (!point.passed && this.currentIndex >= point.index) {
             point.passed = true;
@@ -237,7 +229,8 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       );
 
       if (this.currentIndex >= totalSteps - 1) {
-        this.pointer.position = this.path[totalSteps - 1];
+        this.currentIndex = this.path.length -1;
+        this.pointer.position = this.path[this.path.length -1];
         this.simService.control(Control.PAUSE, this.currentIndex)
         return;
       }
@@ -248,7 +241,6 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     requestAnimationFrame(step);
   }
 
-  // 🚗 Simulation Controls
   start(): void {
     if (!this.path.length) return;
 
@@ -280,21 +272,9 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.simService.control(Control.SPEED, this.duration);
   }
 
-  complete(): void {
+  complete() {
     if (this.hasCompleted) return;
     this.hasCompleted = true;
-
-    const firstNotPassedIndex = this.points.findIndex(p => !p.passed);
-    if (firstNotPassedIndex !== -1) {
-      this.points.splice(firstNotPassedIndex);
-      const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
-      this.points.push(currentPoint);
-
-      void this.updateRideInfo();
-      this.renderPins();
-      this.drawRoute();
-    }
-
     this.simService.control(Control.COMPLETE);
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
@@ -303,69 +283,8 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.openRating();
   }
 
-  // ⭐ Rating
   private openRating() {
     this.dialog.open(RatingPopupComponent, { disableClose: true }).afterClosed().subscribe();
-  }
-
-  // ➕ Stopover Management
-  onLocationSelected(loc: Location) {
-    this.newStopoverControl.setValue(loc);
-    const newPoint: Point = {
-      name: loc.name,
-      address: loc.address,
-      lat: loc.latitude,
-      lng: loc.longitude,
-      index: 0,
-      passed: false
-    };
-    this.addStopover(newPoint);
-  }
-
-  private addStopover(newStopover: Point) {
-    if(this.currentIndex >= this.path.length - 1)
-      this.points.push(newStopover);
-
-    else if (this.hasStarted && this.desiredStopoverPosition === this.nextStopoverPosition) {
-      const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
-      this.points.splice(this.desiredStopoverPosition, 0, currentPoint, newStopover);
-    }
-
-    else
-      this.points.splice(this.desiredStopoverPosition, 0, newStopover);
-
-    this.simService.control(Control.CHANGE, this.currentIndex, this.points, this.ride.estimatedDistance, this.ride.estimatedDuration);
-  }
-
-  removeStopover(index: number) {
-    const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
-
-    if (this.hasStarted && index === this.nextStopoverPosition)  {
-      this.points.splice(index, 1, currentPoint);
-      this.nextStopoverPosition += 1;
-    }
-    else if (index === this.points.length)
-      this.points.splice(index - 1, 1, currentPoint);
-    else
-      this.points.splice(index, 1);
-
-    this.simService.control(Control.CHANGE, this.currentIndex, this.points, this.ride.estimatedDistance, this.ride.estimatedDuration);
-  }
-
-  // 🧮 Helpers
-  private assignStopoverIndices() {
-    this.points.forEach(point => {
-      let closestIndex = 0;
-      let minDist = Number.MAX_VALUE;
-      this.path.forEach((p, i) => {
-        const dist = Math.hypot(p.lat - point.lat, p.lng - point.lng);
-        if (dist < minDist) {
-          minDist = dist;
-          closestIndex = i;
-        }
-      });
-      point.index = closestIndex;
-    });
   }
 
   private createStyledMarker(type: 'pickup' | 'dropoff' | 'stopover', index: number): HTMLElement {
@@ -376,7 +295,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       svg = `<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"> <circle cx="20" cy="20" r="18" fill="limegreen" stroke="white" stroke-width="3"/> <polygon points="16,13 28,20 16,27" fill="white"/> </svg>`;
     else if (type === 'dropoff')
       svg = `<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"> <circle cx="20" cy="20" r="18" fill="tomato" stroke="white" stroke-width="3"/> <path d="M14 27 L14 13 L28 16 L28 24 Z" fill="white" stroke="white" stroke-width="1"/> </svg>`;
-    else
+    else //stopover
       svg = `<svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"> <circle cx="18" cy="18" r="16" fill="#14B8A6" stroke="white" stroke-width="3"/> <text x="18" y="23" text-anchor="middle" fill="white" font-size="14" font-family="Arial" font-weight="bold">${index}</text> </svg>`;
 
     pin.innerHTML = svg;
@@ -394,6 +313,83 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     return car;
   }
 
+  // -------------------------------------------------------------------------------------------------------------------
+
+  rideDetails = {distance: 0, duration: 0, price: 0} // todo
+  vehicleClass: VehicleClass | null = null; // todo
+  balance = 0; // todo
+  nextStopoverPosition = 1; // todo
+  desiredStopoverPosition = 1; // todo
+  newStopoverControl = new FormControl<Location | string>('', [Validators.required]); // todo
+
+  // ➕ Stopover Management
+  onLocationSelected(loc: Location) {
+    this.newStopoverControl.setValue(loc);
+    const newPoint: Point = {
+      name: loc.name,
+      address: loc.address,
+      lat: loc.latitude,
+      lng: loc.longitude,
+      index: 0,
+      passed: false
+    };
+    void this.addStopover(newPoint);
+  }
+
+  private async addStopover(newStopover: Point) {
+    if(this.currentIndex >= this.path.length - 1)
+      this.points.push(newStopover);
+
+    else if (this.hasStarted && this.desiredStopoverPosition === this.nextStopoverPosition) {
+      const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
+      this.points.splice(this.desiredStopoverPosition, 0, currentPoint, newStopover);
+    }
+
+    else
+      this.points.splice(this.desiredStopoverPosition, 0, newStopover);
+
+    await this.updateRideInfo();
+    this.simService.control(Control.CHANGE, this.currentIndex, this.points, this.rideDetails);
+  }
+
+  async removeStopover(index: number) {
+    const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
+
+    if (this.hasStarted && index === this.nextStopoverPosition)  {
+      this.points.splice(index, 1, currentPoint);
+      this.nextStopoverPosition += 1;
+    }
+    else if (index === this.points.length)
+      this.points.splice(index - 1, 1, currentPoint);
+    else
+      this.points.splice(index, 1);
+
+    await this.updateRideInfo();
+    this.simService.control(Control.CHANGE, this.currentIndex, this.points, this.rideDetails);
+  }
+
+  // 🧮 Helpers
+  private assignStopoverIndices() {
+    this.points.forEach(point => {
+      let closestIndex = 0;
+      let minDist = Number.MAX_VALUE;
+      this.path.forEach((p, i) => {
+        const dist = Math.hypot(p.lat - point.lat, p.lng - point.lng);
+        if (dist < minDist) {
+          minDist = dist;
+          closestIndex = i;
+        }
+      });
+      point.index = closestIndex;
+    });
+
+
+    this.points.forEach(p => p.passed = p.index <= this.currentIndex);
+    this.nextStopoverPosition = this.points.findIndex(p => !p.passed);
+    this.nextStopoverPosition = this.nextStopoverPosition === -1 ? this.points.length : this.nextStopoverPosition;
+    this.desiredStopoverPosition = Math.max(this.desiredStopoverPosition, this.nextStopoverPosition);
+  }
+
   async updateRideInfo(): Promise<void> {
     if (this.points.length < 2) return;
 
@@ -406,7 +402,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       const destination = { lat: this.points[i + 1].lat, lng: this.points[i + 1].lng };
 
       try {
-        const res = await this.distanceService.getDistanceDurationAndPrice(origin, destination, this.ride.vehicleClass);
+        const res = await this.distanceService.getDistanceDurationAndPrice(origin, destination, this.vehicleClass!);
         totalDistance += res.distance;
         totalDuration += res.duration;
         totalEstimatedPrice += res.estimatedPrice;
@@ -415,8 +411,8 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
-    this.ride.estimatedDistance = totalDistance;
-    this.ride.estimatedDuration = totalDuration;
-    this.ride.estimatedPrice = totalEstimatedPrice;
+    this.rideDetails.distance = totalDistance;
+    this.rideDetails.duration = totalDuration;
+    this.rideDetails.price = totalEstimatedPrice;
   }
 }

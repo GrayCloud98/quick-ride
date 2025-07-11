@@ -57,6 +57,17 @@
     </button>
   </div>
 
+  <div *ngIf="isLoggedIn">
+    <button
+      mat-raised-button
+      color="accent"
+      class="nav-btn"
+      (click)="goToLeaderboard()"
+    >
+      Leaderboard
+    </button>
+  </div>
+
   <span class="spacer"></span>
 
   <div class="search-wrapper">
@@ -70,6 +81,7 @@
       <mat-icon>search</mat-icon>
     </button>
   </div>
+
 
   <button
     *ngIf="!isLoggedIn"

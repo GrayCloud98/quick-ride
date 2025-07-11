@@ -1,4 +1,4 @@
-<div class="main-container" *ngIf="accessAllowed && userHasActiveRide">
+<div class="main-container" *ngIf="accessAllowed && userHasActiveRide && !userHasActiveSimulation">
 
   <!-- Left Side: Ride Info Panel -->
   <div class="left-container scroll">
@@ -68,7 +68,11 @@
   </div>
 </div>
 
-<div *ngIf="accessAllowed && !userHasActiveRide" class="alert error mini centered-box">
+<div *ngIf="accessAllowed && userHasActiveSimulation" class="alert error mini centered-box">
+  Please complete your Simulation first.
+</div>
+
+<div *ngIf="accessAllowed && !userHasActiveRide && !userHasActiveSimulation" class="alert error mini centered-box">
   Please submit a request first.
 </div>
 

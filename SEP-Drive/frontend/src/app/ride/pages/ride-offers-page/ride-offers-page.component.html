@@ -1,4 +1,4 @@
-<div class="main-container" *ngIf="accessAllowed">
+<div class="main-container" *ngIf="accessAllowed && !userHasActiveSimulation">
   <div class="left-container scroll">
 
     <h1 class="sort-header">Sort by</h1>
@@ -47,6 +47,11 @@
     </div>
   </div>
 </div>
+
+<div *ngIf="accessAllowed && userHasActiveSimulation" class="alert error mini centered-box">
+  Please complete your Simulation first.
+</div>
+
 
 <div *ngIf="!accessAllowed" class="mini centered-box alert error">
   Please log in as a Customer first.

@@ -1,4 +1,4 @@
-<div *ngIf="accessAllowed" class="main-container">
+<div *ngIf="accessAllowed && !userHasActiveSimulation" class="main-container">
   <div class="left-container scroll">
     <ride-form/>
   </div>
@@ -7,6 +7,11 @@
     <app-map/>
   </div>
 </div>
+
+<div *ngIf="accessAllowed && userHasActiveSimulation" class="alert error mini centered-box">
+  Please complete your Simulation first.
+</div>
+
 
 <div *ngIf="!accessAllowed" class="mini centered-box alert error">
   Please log in as a Customer first.

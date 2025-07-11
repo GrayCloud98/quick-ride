@@ -1,0 +1,106 @@
+.search-wrapper {
+  display: flex;
+  justify-content: center;  // centers the input horizontally
+  margin-bottom: 1.5rem;
+}
+
+.search-input {
+  width: 100%;
+  max-width: 400px;        // reasonable width for desktop
+  padding: 10px 15px;      // comfy padding inside input
+  border: 1px solid #ddd;  // subtle border
+  border-radius: 25px;     // rounded edges like modern inputs
+  font-size: 1rem;
+  outline: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  &:focus {
+    border-color: #3897f0;              // Instagram-like blue
+    box-shadow: 0 0 8px #3897f0cc;     // subtle glow on focus
+  }
+
+  &::placeholder {
+    color: #999;
+    font-style: italic;
+  }
+}
+
+.no-results {
+  text-align: center;
+  font-style: italic;
+  color: #888;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.leaderboard-title {
+  text-align: center;
+  margin: 2rem 0 1rem;
+  font-size: 2rem;
+  color: #333;
+}
+
+.leaderboard-container {
+  display: flex;
+  justify-content: center;
+  padding: 0 1rem;
+  overflow-x: auto;
+}
+
+.leaderboard-table {
+  width: 100%;
+  max-width: 1000px;
+  border-collapse: collapse;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.leaderboard-table thead {
+  background-color: #1976d2;
+  color: white;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.leaderboard-table tbody tr:nth-child(even) {
+  background-color: #f4f4f4;
+}
+
+.leaderboard-table tbody tr:hover {
+  background-color: #e3f2fd;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.leaderboard-table tbody tr.top {
+  font-weight: bold;
+  background-color: #fffbe6;
+}
+
+@media (max-width: 768px) {
+  .leaderboard-title {
+    font-size: 1.5rem;
+  }
+
+  .leaderboard-table th,
+  .leaderboard-table td {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+}

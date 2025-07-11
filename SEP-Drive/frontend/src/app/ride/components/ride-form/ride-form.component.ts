@@ -128,40 +128,45 @@ constructor(
   });
 }
 
-  updateDistanceInfo(): void {
-    if (!this.ride.pickup || !this.ride.dropoff) {
-      console.warn('Pickup and dropoff must be selected.');
-      return;
-    }
+  // todo wtf is this
+  updateDistanceInfo() {
+    if (this.pickupPicked && this.dropoffPicked) {
+      const points = [
+        this.ride.pickup,
+        ...this.ride.stopovers!,
+        this.ride.dropoff
+      ];
 
-    const points: google.maps.LatLngLiteral[] = [
-      {
-        lat: this.ride.pickup.latitude,
-        lng: this.ride.pickup.longitude,
-      },
-      ...this.ride.stopovers?.map(stop => ({
-        lat: stop.latitude,
-        lng: stop.longitude,
-      })) || [],
-      {
-        lat: this.ride.dropoff.latitude,
-        lng: this.ride.dropoff.longitude,
+      let totalDistance = 0;
+      let totalDuration = 0;
+      let totalEstimatedPrice = 0;
+
+      const promises = [];
+
+      for (let i = 0; i < points.length - 1; i++) {
+        const origin = { lat: points[i].latitude, lng: points[i].longitude };
+        const destination = { lat: points[i + 1].latitude, lng: points[i + 1].longitude };
+
+        promises.push(
+          this.distanceService.getDistanceDurationAndPrice(origin, destination, this.ride.vehicleClass)
+        );
       }
-    ];
 
-    this.distanceService.getDistanceDurationAndPriceForMultiplePoints(points, this.ride.vehicleClass)
-      .then(result => {
-        this.ride.distance = result.distance;
-        this.ride.duration = result.duration;
-        this.ride.estimatedPrice = result.estimatedPrice;
-      })
-      .catch(error => {
-        console.error('Failed to calculate distance/duration/price:', error);
-      });
+      Promise.all(promises)
+        .then(results => {
+          results.forEach(res => {
+            totalDistance += res.distance;
+            totalDuration += res.duration;
+            totalEstimatedPrice += res.estimatedPrice;
+          });
+
+          this.ride.distance = totalDistance;
+          this.ride.duration = totalDuration;
+          this.ride.estimatedPrice = totalEstimatedPrice;
+        })
+        .catch(err => console.error('Google Distance API error', err));
+    }
   }
-
-
-
 
   addStopover() {
     const control = new FormControl<Location | string>('', { validators: [Validators.required], nonNullable: true });
@@ -180,6 +185,5 @@ constructor(
         }))
       );
     }
-    this.updateDistanceInfo();
   }
 }
