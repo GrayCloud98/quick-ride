@@ -46,8 +46,6 @@ export class RideFormComponent implements OnInit {
     estimatedPrice: 0
   };
 
-submitFailed = false;
-
 constructor(
     private rideService: RideRequestService,
     private authService: AuthService,
@@ -124,12 +122,10 @@ constructor(
       this.rideService.updateActiveRideStatus();
       void this.router.navigate(['/ride/active']);
     },
-    error: () => this.submitFailed = true
   });
 }
 
-  // todo wtf is this
-  updateDistanceInfo() {
+  async updateDistanceInfo() {
     if (this.pickupPicked && this.dropoffPicked) {
       const points = [
         this.ride.pickup,
@@ -141,30 +137,24 @@ constructor(
       let totalDuration = 0;
       let totalEstimatedPrice = 0;
 
-      const promises = [];
-
       for (let i = 0; i < points.length - 1; i++) {
         const origin = { lat: points[i].latitude, lng: points[i].longitude };
         const destination = { lat: points[i + 1].latitude, lng: points[i + 1].longitude };
 
-        promises.push(
-          this.distanceService.getDistanceDurationAndPrice(origin, destination, this.ride.vehicleClass)
-        );
+        try {
+          const res = await this.distanceService.getDistanceDurationAndPrice(origin, destination, this.ride.vehicleClass);
+          totalDistance += res.distance;
+          totalDuration += res.duration;
+          totalEstimatedPrice += res.estimatedPrice;
+        } catch (err) {
+          console.error(`Distance API error between point ${i} and ${i + 1}`, err);
+        }
       }
 
-      Promise.all(promises)
-        .then(results => {
-          results.forEach(res => {
-            totalDistance += res.distance;
-            totalDuration += res.duration;
-            totalEstimatedPrice += res.estimatedPrice;
-          });
+      this.ride.distance = totalDistance;
+      this.ride.duration = totalDuration;
+      this.ride.estimatedPrice = totalEstimatedPrice;
 
-          this.ride.distance = totalDistance;
-          this.ride.duration = totalDuration;
-          this.ride.estimatedPrice = totalEstimatedPrice;
-        })
-        .catch(err => console.error('Google Distance API error', err));
     }
   }
 
