@@ -113,7 +113,7 @@ constructor(
           }))
         )
     }
-    this.updateDistanceInfo();
+    void this.updateDistanceInfo();
   }
 
   submit() {
@@ -175,5 +175,6 @@ constructor(
         }))
       );
     }
+    void this.updateDistanceInfo();
   }
 }

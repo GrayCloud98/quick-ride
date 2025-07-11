@@ -314,65 +314,55 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // -------------------------------------------------------------------------------------------------------------------
+  rideDetails = { distance: 0, duration: 0, price: 0 };
+  vehicleClass: VehicleClass | null = null;
+  balance = 0;
 
-  rideDetails = {distance: 0, duration: 0, price: 0} // todo
-  vehicleClass: VehicleClass | null = null; // todo
-  balance = 0; // todo
-  nextStopoverPosition = 1; // todo
-  desiredStopoverPosition = 1; // todo
-  newStopoverControl = new FormControl<Location | string>('', [Validators.required]); // todo
+  nextStopoverPosition = 1;
+  desiredStopoverPosition = 1;
+  newStopoverControl = new FormControl<Location | string>('', [Validators.required]);
 
-  // ➕ Stopover Management
   onLocationSelected(loc: Location) {
     this.newStopoverControl.setValue(loc);
-    const newPoint: Point = {
-      name: loc.name,
-      address: loc.address,
-      lat: loc.latitude,
-      lng: loc.longitude,
-      index: 0,
-      passed: false
-    };
+    const newPoint: Point = { name: loc.name, address: loc.address, lat: loc.latitude, lng: loc.longitude, index: 0, passed: false };
     void this.addStopover(newPoint);
   }
 
   private async addStopover(newStopover: Point) {
-    if(this.currentIndex >= this.path.length - 1)
+    if (this.points[this.points.length -1].passed) {
       this.points.push(newStopover);
-
-    else if (this.hasStarted && this.desiredStopoverPosition === this.nextStopoverPosition) {
+    } else if (this.hasStarted && this.desiredStopoverPosition === this.nextStopoverPosition) {
       const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
       this.points.splice(this.desiredStopoverPosition, 0, currentPoint, newStopover);
-    }
-
-    else
+    } else {
       this.points.splice(this.desiredStopoverPosition, 0, newStopover);
+    }
 
     await this.updateRideInfo();
     this.simService.control(Control.CHANGE, this.currentIndex, this.points, this.rideDetails);
   }
 
-  async removeStopover(index: number) {
+  async removeStopover(stopoverPosition: number) {
     const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
 
-    if (this.hasStarted && index === this.nextStopoverPosition)  {
-      this.points.splice(index, 1, currentPoint);
+    if (this.hasStarted && stopoverPosition === this.nextStopoverPosition) {
+      this.points.splice(stopoverPosition, 1, currentPoint);
       this.nextStopoverPosition += 1;
+    } else if (stopoverPosition === this.points.length) {
+      this.points.splice(stopoverPosition - 1, 1, currentPoint);
+    } else {
+      this.points.splice(stopoverPosition, 1);
     }
-    else if (index === this.points.length)
-      this.points.splice(index - 1, 1, currentPoint);
-    else
-      this.points.splice(index, 1);
 
     await this.updateRideInfo();
     this.simService.control(Control.CHANGE, this.currentIndex, this.points, this.rideDetails);
   }
 
-  // 🧮 Helpers
   private assignStopoverIndices() {
     this.points.forEach(point => {
       let closestIndex = 0;
       let minDist = Number.MAX_VALUE;
+
       this.path.forEach((p, i) => {
         const dist = Math.hypot(p.lat - point.lat, p.lng - point.lng);
         if (dist < minDist) {
@@ -382,7 +372,6 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       });
       point.index = closestIndex;
     });
-
 
     this.points.forEach(p => p.passed = p.index <= this.currentIndex);
     this.nextStopoverPosition = this.points.findIndex(p => !p.passed);
