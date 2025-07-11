@@ -9,11 +9,11 @@
 
     <div *ngIf="accessAllowed" class="topup-section">
       <label>Select Amount:</label>
-      <mat-radio-group [(ngModel)]="selectedAmount" class="amount-radio-group">
-        <mat-radio-button [value]="10">10 €</mat-radio-button>
-        <mat-radio-button [value]="25">25 €</mat-radio-button>
-        <mat-radio-button [value]="50">50 €</mat-radio-button>
-      </mat-radio-group>
+      <mat-button-toggle-group [(ngModel)]="selectedAmount" class="amount-radio-group">
+        <mat-button-toggle [value]="10">10 €</mat-button-toggle>
+        <mat-button-toggle [value]="25">25 €</mat-button-toggle>
+        <mat-button-toggle [value]="50">50 €</mat-button-toggle>
+      </mat-button-toggle-group>
 
       <input
         type="number"

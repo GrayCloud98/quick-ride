@@ -15,13 +15,11 @@ import { RatingPopupComponent } from './simulation/rating-popup/rating-popup.com
 import { HomeComponent } from './home/home.component';
 
 import { GoogleMapsModule } from '@angular/google-maps';
-
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { SimulationService } from './simulation/simulation.service';
 import { AuthInterceptor } from './auth/services/auth.interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
-
-// Angular Material modules
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
@@ -56,8 +54,6 @@ import { provideNativeDateAdapter } from '@angular/material/core';
     ReactiveFormsModule,
     FormsModule,
     GoogleMapsModule,
-
-    // Material modules
     MatFormFieldModule,
     MatInputModule,
     MatRadioModule,
@@ -69,7 +65,9 @@ import { provideNativeDateAdapter } from '@angular/material/core';
     MatDialogModule,
     MatSortModule,
     MatSliderModule,
-    HttpClientModule
+    HttpClientModule,
+    MatButtonToggleModule,
+    MatButtonModule
   ],
   providers: [
     provideNativeDateAdapter(),
