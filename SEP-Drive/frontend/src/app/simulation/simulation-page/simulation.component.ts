@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {Control, SimulationService, Update} from '../simulation.service';
+import {Control, SimulationService} from '../simulation.service';
 import {MatDialog} from '@angular/material/dialog';
 import {RatingPopupComponent} from '../rating-popup/rating-popup.component';
 import {FormControl, Validators} from '@angular/forms';
@@ -25,7 +25,6 @@ export interface Point {
   styleUrl: './simulation.component.scss'
 })
 export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
-  // 🗺️ Map and Animation
   @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef;
   private map!: google.maps.Map;
   private pointer!: google.maps.marker.AdvancedMarkerElement;
@@ -34,27 +33,23 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
   private pins: google.maps.marker.AdvancedMarkerElement[] = [];
   path: google.maps.LatLngLiteral[] = [];
 
-  // 🚘 Route/Stopovers State
   points: Point[] = [];
   currentIndex = 0;
   duration = 30;
 
-  // ⏱️ State Flags
   hasStarted = false;
   hasCompleted = false;
   paused = true;
   metadataLoaded = false;
 
-  // 🧩 Form Controls
   isCustomer: boolean | null = null;
   userHasActiveSimulation: boolean | null = null;
 
-  // 🛠️ Constructor
   constructor(private dialog: MatDialog,
               private authService: AuthService,
-              private distanceService: DistanceService, // live changes
+              private distanceService: DistanceService,
               private simService: SimulationService,
-              private walletService: WalletService) {} // live changes
+              private walletService: WalletService) {}
 
   ngOnInit(): void {
     if(this.authService.currentUserValue) {
@@ -76,39 +71,32 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.simService.simulationUpdate$.subscribe(
       update => {
-        this.duration = update.duration;
-        this.currentIndex = update.currentIndex;
-
-        if (update.hasChanged || !this.metadataLoaded) {
-          this.points = [
-            { name: update.startLocationName, address: update.startAddress, lat: update.startPoint.lat, lng: update.startPoint.lng, index: 0, passed: true },
-            ...update.waypoints.map(wp => ({ name: wp.name, address: wp.address, lat: wp.latitude, lng: wp.longitude, index: 0, passed: false })), // stopovers
-            { name: update.destinationLocationName, address: update.destinationAddress, lat: update.endPoint.lat, lng: update.endPoint.lng, index: 0, passed: false }
-          ];
-        }
-
         if (update.rideStatus === 'COMPLETED' && !this.isCustomer) {
           this.complete();
           return;
         }
 
-        if (!this.hasStarted && update.hasStarted){
+        this.duration = update.duration;
+        this.currentIndex = update.currentIndex;
+        if (update.hasChanged || !this.metadataLoaded) {
+          const { startLocationName, startAddress, startPoint, waypoints, destinationLocationName, destinationAddress, endPoint } = update;
+          this.points = [
+            { name: startLocationName, address: startAddress, lat: startPoint.lat, lng: startPoint.lng, index: 0, passed: true },
+            ...waypoints.map(wp => ({ name: wp.name, address: wp.address, lat: wp.latitude, lng: wp.longitude, index: 0, passed: false })),
+            { name: destinationLocationName, address: destinationAddress, lat: endPoint.lat, lng: endPoint.lng, index: 0, passed: false }
+          ];
+        }
+
+        if (update.hasStarted && !this.hasStarted) {
           this.start();
           this.hasStarted = true;
-        }
-        else if (update.hasChanged){ // live changes
+        } else if (update.hasChanged) {
           void this.updateRideInfo();
-          this.renderPins()
-          this.drawRoute()
-        }
-        else {
-          if (this.paused !== update.paused) {
-            if (update.paused)
-              this.pause();
-            else
-              this.resume();
-            this.paused = update.paused;
-          }
+          this.renderPins();
+          this.drawRoute();
+        } else if (this.paused !== update.paused) {
+          update.paused ? this.pause() : this.resume();
+          this.paused = update.paused;
         }
 
         if (!this.metadataLoaded) {
@@ -123,7 +111,6 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     await this.simService.disconnect();
   }
 
-  // 🗺️ Map Setup
   private initializeMap(): void {
     const mapOptions: google.maps.MapOptions = {
       center: this.points[0],
@@ -142,7 +129,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.pins = [];
 
     this.points.forEach((point, index) => {
-      let type: 'pickup' | 'dropoff' | 'stopover' = 'stopover'; //stopovers
+      let type: 'pickup' | 'dropoff' | 'stopover' = 'stopover';
 
       if (index === 0) type = 'pickup';
       else if (index === this.points.length - 1) type = 'dropoff';
@@ -169,7 +156,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const start = this.points[0];
     const end = this.points[this.points.length - 1];
-    const waypoints = this.points.slice(1, this.points.length - 1).map(p => ({ // stopovers
+    const waypoints = this.points.slice(1, this.points.length - 1).map(p => ({
       location: p,
       stopover: true
     }));
@@ -254,7 +241,6 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     requestAnimationFrame(step);
   }
 
-  // 🚗 Simulation Controls
   start(): void {
     if (!this.path.length) return;
 
@@ -297,7 +283,6 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.openRating();
   }
 
-  // ⭐ Rating
   private openRating() {
     this.dialog.open(RatingPopupComponent, { disableClose: true }).afterClosed().subscribe();
   }
