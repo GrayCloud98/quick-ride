@@ -14,6 +14,8 @@ export interface Point {
   address?: string,
   lat: number,
   lng: number,
+
+  // LIVE-ÄNDERUNGEN
   index: number,
   passed: boolean
 }
@@ -56,16 +58,16 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.isCustomer = this.authService.currentUserValue.role === 'Customer'
       this.simService.activeSimulationStatus$.subscribe({
         next: userHasActiveSimulation => {
-          this.userHasActiveSimulation = userHasActiveSimulation
-
-          if(userHasActiveSimulation) this.simService.getVehicleClass().subscribe( {next: vehicleClass => this.vehicleClass = vehicleClass} )
+          this.userHasActiveSimulation = userHasActiveSimulation;
           this.walletService.getBalance().subscribe({next: balance => this.balance = balance/100})
+
+          if(userHasActiveSimulation)
+            this.simService.getVehicleClass().subscribe( {next: vehicleClass => this.vehicleClass = vehicleClass} )
         }
       })
     }
   }
 
-  // 🔄 Lifecycle
   ngAfterViewInit(): void {
     this.simService.connect();
 
@@ -138,12 +140,11 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
         map: this.map,
         position: point,
         title: point.name,
-        content: this.createStyledMarker(type, index)
+        content: this.createPin(type, index)
       });
       this.pins.push(marker);
     });
   }
-
 
   private drawRoute(): void {
     if (this.directionsRenderer) {
@@ -165,7 +166,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       {
         origin: start,
         destination: end,
-        waypoints: waypoints, // stopovers
+        waypoints: waypoints,
         travelMode: google.maps.TravelMode.DRIVING
       },
       (result, status) => {
@@ -193,14 +194,15 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
-    this.assignStopoverIndices(); // live changes
-
     this.pointer = new google.maps.marker.AdvancedMarkerElement({
       position: this.path[this.currentIndex],
       map: this.map,
       title: 'You',
       content: this.createCar()
     });
+
+    // LIVE-ÄNDERUNGEN
+    this.assignStopoverIndices();
   }
 
   private animate(): void {
@@ -218,15 +220,15 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.currentIndex = Math.floor(startIndex + totalSteps * progressRatio);
       this.pointer.position = this.path[Math.min(this.currentIndex, totalSteps - 1)];
 
-      this.points.forEach( // live changes
+      // LIVE-ÄNDERUNGEN
+      this.points.forEach(
         point => {
           if (!point.passed && this.currentIndex >= point.index) {
             point.passed = true;
             this.nextStopoverPosition += 1;
             if (this.desiredStopoverPosition < this.nextStopoverPosition) this.desiredStopoverPosition += 1;
-          }
-        }
-      );
+          }});
+      // ENDE DER LIVE-ÄNDERUNGEN
 
       if (this.currentIndex >= totalSteps - 1) {
         this.currentIndex = this.path.length -1;
@@ -287,7 +289,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dialog.open(RatingPopupComponent, { disableClose: true }).afterClosed().subscribe();
   }
 
-  private createStyledMarker(type: 'pickup' | 'dropoff' | 'stopover', index: number): HTMLElement {
+  private createPin(type: 'pickup' | 'dropoff' | 'stopover', index: number): HTMLElement {
     const pin = document.createElement('div');
 
     let svg;
@@ -295,7 +297,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       svg = `<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"> <circle cx="20" cy="20" r="18" fill="limegreen" stroke="white" stroke-width="3"/> <polygon points="16,13 28,20 16,27" fill="white"/> </svg>`;
     else if (type === 'dropoff')
       svg = `<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"> <circle cx="20" cy="20" r="18" fill="tomato" stroke="white" stroke-width="3"/> <path d="M14 27 L14 13 L28 16 L28 24 Z" fill="white" stroke="white" stroke-width="1"/> </svg>`;
-    else //stopover
+    else
       svg = `<svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"> <circle cx="18" cy="18" r="16" fill="#14B8A6" stroke="white" stroke-width="3"/> <text x="18" y="23" text-anchor="middle" fill="white" font-size="14" font-family="Arial" font-weight="bold">${index}</text> </svg>`;
 
     pin.innerHTML = svg;
@@ -313,7 +315,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     return car;
   }
 
-  // -------------------------------------------------------------------------------------------------------------------
+  // ================================================= LIVE-ÄNDERUNGEN =================================================
   rideDetails = { distance: 0, duration: 0, price: 0 };
   vehicleClass: VehicleClass | null = null;
   balance = 0;
@@ -404,4 +406,5 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.rideDetails.duration = totalDuration;
     this.rideDetails.price = totalEstimatedPrice;
   }
+  // ============================================= ENDE DER LIVE-ÄNDERUNGEN ============================================
 }

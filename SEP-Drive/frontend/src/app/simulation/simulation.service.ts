@@ -67,9 +67,8 @@ export class SimulationService {
       });
     };
 
-    this.client.onStompError = (frame) => console.error('⚠️ STOMP Error:', frame)
-
-    this.client.onWebSocketClose = () => console.warn('🚪 WebSocket closed')
+    this.client.onStompError = (frame) => console.error('STOMP Error:', frame)
+    this.client.onWebSocketClose = () => console.warn('WebSocket closed')
   }
 
   connect(): void {
@@ -84,57 +83,11 @@ export class SimulationService {
     }
   }
 
-  control(
-    control: Control,
-    currentIndexOrDuration?: number,
-    points?: Point[],
-    rideDetails?: { distance: number; duration: number; price: number }
-  ): void {
-    const payload: any = { rideSimulationId: this.simulationId };
-
-    switch (control) {
-      case Control.SPEED:
-        payload.duration = currentIndexOrDuration;
-        break;
-
-      case Control.CHANGE:
-        if (!points || points.length < 2) return;
-
-        const cleanWaypoint = (point: Point, index: number) => ({
-              latitude: point.lat,
-              longitude: point.lng,
-              address: point.address,
-              name: point.name,
-              sequenceOrder: index,
-            });
-
-        payload.currentIndex = currentIndexOrDuration;
-        payload.destinationLocationName = points[points.length - 1].name;
-        payload.destinationAddress = points[points.length - 1].address;
-        payload.startPoint = { lat: points[0].lat,lng: points[0].lng };
-        payload.endPoint = { lat: points[points.length - 1].lat, lng: points[points.length - 1].lng };
-        payload.waypoints = points.slice(1, points.length - 1).map((p, i) => cleanWaypoint(p, i));
-        payload.distance = rideDetails?.distance;
-        payload.duration = rideDetails?.duration;
-        payload.price = rideDetails?.price;
-        break;
-
-      default:
-        payload.currentIndex = currentIndexOrDuration;
-        break;
-    }
-
-    this.client.publish({
-      destination: `/app/simulation/${control}`,
-      body: JSON.stringify(payload)
-    });
-  }
-
   getVehicleClass(): Observable<VehicleClass>{
     return this.http.get<VehicleClass>(this.baseUrl + '/sim/driver/vehicle-class');
   }
 
-  rate(rate: number): Observable<any> {
+  rate(rate: number) {
     const params = new HttpParams()
       .set('rideSimulationId', this.simulationId!.toString())
       .set('rate', rate.toString());
@@ -148,6 +101,52 @@ export class SimulationService {
         }
       )
     );
+  }
+
+  control(control: Control, currentIndexOrDuration?: number,
+
+    // LIVE-ÄNDERUNGEN
+    points?: Point[], rideDetails?: { distance: number; duration: number; price: number }
+  ): void {
+    const payload: any = { rideSimulationId: this.simulationId };
+
+    switch (control) {
+      case Control.SPEED:
+        payload.duration = currentIndexOrDuration;
+        break;
+
+      // =============================================== LIVE-ÄNDERUNGEN ===============================================
+      case Control.CHANGE:
+        if (!points || points.length < 2) return;
+        const cleanWaypoint = (point: Point, index: number) => ({
+          latitude: point.lat,
+          longitude: point.lng,
+          address: point.address,
+          name: point.name,
+          sequenceOrder: index,
+        });
+
+        payload.currentIndex = currentIndexOrDuration;
+        payload.startPoint = { lat: points[0].lat,lng: points[0].lng };
+        payload.waypoints = points.slice(1, points.length - 1).map((p, i) => cleanWaypoint(p, i));
+        payload.endPoint = { lat: points[points.length - 1].lat, lng: points[points.length - 1].lng };
+        payload.destinationLocationName = points[points.length - 1].name;
+        payload.destinationAddress = points[points.length - 1].address;
+        payload.distance = rideDetails?.distance;
+        payload.duration = rideDetails?.duration;
+        payload.price = rideDetails?.price;
+        break;
+      // =========================================== ENDE DER LIVE-ÄNDERUNGEN ==========================================
+
+      default:
+        payload.currentIndex = currentIndexOrDuration;
+        break;
+    }
+
+    this.client.publish({
+      destination: `/app/simulation/${control}`,
+      body: JSON.stringify(payload)
+    });
   }
 
   private activeSimulationStatus = new BehaviorSubject<boolean>(false);
