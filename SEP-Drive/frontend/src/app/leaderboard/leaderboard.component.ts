@@ -12,6 +12,7 @@ export class LeaderboardComponent implements OnInit {
   leaderboard: DriverBoard[] = [];
   sortDirection: 'asc' | 'desc' = 'asc';
   currentSortColumn: keyof DriverBoard | '' = '';
+  searchTerm: string = '';
 
   constructor(private leaderboardService: LeaderboardService) {}
 
@@ -19,6 +20,14 @@ export class LeaderboardComponent implements OnInit {
     this.leaderboardService.getLeaderboard().subscribe((data: DriverBoard[]) => {
       this.leaderboard = data;
     });
+  }
+
+  get filteredLeaderboard(): DriverBoard[] {
+    const term = this.searchTerm.toLowerCase();
+    return this.leaderboard.filter(driver =>
+      driver.username.toLowerCase().includes(term) ||
+      driver.fullName.toLowerCase().includes(term)
+    );
   }
 
   sortBy(column: keyof DriverBoard): void {

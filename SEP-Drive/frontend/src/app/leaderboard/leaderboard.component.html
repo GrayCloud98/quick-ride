@@ -1,6 +1,19 @@
 <h2 class="leaderboard-title">🚗 Driver Leaderboard</h2>
 
-<div class="leaderboard-container">
+<div class="search-wrapper">
+  <input
+    type="text"
+    placeholder="Search by username or full name..."
+    [(ngModel)]="searchTerm"
+    class="search-input"
+  />
+</div>
+
+<div *ngIf="filteredLeaderboard.length === 0" class="no-results">
+  No drivers found matching "{{ searchTerm }}"
+</div>
+
+<div class="leaderboard-container" *ngIf="filteredLeaderboard.length > 0">
   <table class="leaderboard-table">
     <thead>
     <tr>
