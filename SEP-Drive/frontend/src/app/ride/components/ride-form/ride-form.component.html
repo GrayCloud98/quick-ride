@@ -31,6 +31,7 @@
     (locationSelected)="onLocationSelected($event, updateType.dropoff)">
   </select-location>
 
+  <br><br>
   <div class="label">Select a vehicle class:</div>
   <mat-radio-group
     [(ngModel)]="ride.vehicleClass"
@@ -60,7 +61,7 @@
 </form>
 
 <div *ngIf="ride.distance != null && ride.duration != null && ride.estimatedPrice != null">
-  <p><strong>Distance:</strong> {{ ride.distance | number:'1.1-2' }} km</p>
-  <p><strong>Duration:</strong> {{ ride.duration | number:'1.0-0' }} mins</p>
-  <p><strong>Estimated Price:</strong> {{ ride.estimatedPrice | number:'1.2-2' }} €</p>
+  <p><span class="label">Distance:</span> {{ ride.distance | number:'1.1-2' }} km</p>
+  <p><span class="label">Duration:</span> {{ ride.duration | number:'1.0-0' }} minutes</p>
+  <p><span class="label">Estimated Price:</span> {{ ride.estimatedPrice | number:'1.2-2' }} €</p>
 </div>
