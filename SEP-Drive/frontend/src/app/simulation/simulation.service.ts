@@ -38,7 +38,8 @@ export enum Control {
 })
 export class SimulationService {
   private client: Client;
-  private simulationUpdateSubject = new Subject<any>();
+  private simulationUpdate = new Subject<Update>();
+  public simulationUpdate$ = this.simulationUpdate.asObservable();
 
   private simulationId: number | null = null;
   private baseUrl = 'http://localhost:8080/api/ride-requests';
@@ -58,7 +59,7 @@ export class SimulationService {
           this.simulationId = id;
           this.client.subscribe(
             `/topic/simulation/${this.simulationId}`,
-            (message: IMessage) => this.simulationUpdateSubject.next( JSON.parse(message.body) )
+            (message: IMessage) => this.simulationUpdate.next( JSON.parse(message.body) )
           );
           this.control(Control.FETCH);
         },
@@ -131,10 +132,6 @@ export class SimulationService {
 
   getVehicleClass(): Observable<VehicleClass>{
     return this.http.get<VehicleClass>(this.baseUrl + '/sim/driver/vehicle-class');
-  }
-
-  getSimulationUpdates(): Observable<any> {
-    return this.simulationUpdateSubject.asObservable();
   }
 
   rate(rate: number): Observable<any> {

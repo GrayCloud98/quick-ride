@@ -36,13 +36,13 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // 🚘 Route/Stopovers State
   points: Point[] = [];
-  rideDetails = {distance: 0, duration: 0, price: 0}
-  vehicleClass: VehicleClass | null = null;
-  balance = 0;
+  rideDetails = {distance: 0, duration: 0, price: 0} // todo
+  vehicleClass: VehicleClass | null = null; // todo
+  balance = 0; // todo
   currentIndex = 0;
   duration = 30;
-  nextStopoverPosition = 1;
-  desiredStopoverPosition = 1;
+  nextStopoverPosition = 1; // todo
+  desiredStopoverPosition = 1; // todo
 
   // ⏱️ State Flags
   hasStarted = false;
@@ -51,16 +51,16 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
   metadataLoaded = false;
 
   // 🧩 Form Controls
-  newStopoverControl = new FormControl<Location | string>('', [Validators.required]);
+  newStopoverControl = new FormControl<Location | string>('', [Validators.required]); // todo
   isCustomer: boolean | null = null;
   userHasActiveSimulation: boolean | null = null;
 
   // 🛠️ Constructor
   constructor(private dialog: MatDialog,
               private authService: AuthService,
-              private distanceService: DistanceService,
+              private distanceService: DistanceService, // todo
               private simService: SimulationService,
-              private walletService: WalletService) {}
+              private walletService: WalletService) {} // todo
 
   ngOnInit(): void {
     if(this.authService.currentUserValue) {
@@ -80,8 +80,8 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.simService.connect();
 
-    this.simService.getSimulationUpdates().subscribe(
-      (update: Update) => {
+    this.simService.simulationUpdate$.subscribe(
+      update => {
         this.duration = update.duration;
         this.currentIndex = update.currentIndex;
 
@@ -93,8 +93,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
           ];
         }
 
-        if (update.rideStatus === 'COMPLETED' && !this.hasCompleted) {
-          if(this.isCustomer) this.hasCompleted = true;
+        if (update.rideStatus === 'COMPLETED' && !this.isCustomer) {
           this.complete();
           return;
         }
@@ -214,10 +213,6 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.assignStopoverIndices();
-    this.points.forEach(p => p.passed = p.index <= this.currentIndex);
-    this.nextStopoverPosition = this.points.findIndex(p => !p.passed);
-    this.nextStopoverPosition = this.nextStopoverPosition === -1 ? this.points.length : this.nextStopoverPosition;
-    this.desiredStopoverPosition = Math.max(this.desiredStopoverPosition, this.nextStopoverPosition);
 
     this.pointer = new google.maps.marker.AdvancedMarkerElement({
       position: this.path[this.currentIndex],
@@ -296,22 +291,9 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.simService.control(Control.SPEED, this.duration);
   }
 
-  async complete() {
+  complete() {
     if (this.hasCompleted) return;
     this.hasCompleted = true;
-
-    const firstNotPassedIndex = this.points.findIndex(p => !p.passed);
-    if (firstNotPassedIndex !== -1) {
-      this.points.splice(firstNotPassedIndex);
-      const currentPoint: Point = { name: 'Midway Point', address: 'undefined', lat: this.path[this.currentIndex].lat, lng: this.path[this.currentIndex].lng, passed: true, index: this.currentIndex };
-      this.points.push(currentPoint);
-
-      this.renderPins();
-      this.drawRoute();
-      await this.updateRideInfo();
-      this.simService.control(Control.CHANGE, this.currentIndex, this.points, this.rideDetails);
-    }
-
     this.simService.control(Control.COMPLETE);
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
@@ -385,6 +367,12 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       });
       point.index = closestIndex;
     });
+
+
+    this.points.forEach(p => p.passed = p.index <= this.currentIndex);
+    this.nextStopoverPosition = this.points.findIndex(p => !p.passed);
+    this.nextStopoverPosition = this.nextStopoverPosition === -1 ? this.points.length : this.nextStopoverPosition;
+    this.desiredStopoverPosition = Math.max(this.desiredStopoverPosition, this.nextStopoverPosition);
   }
 
   private createStyledMarker(type: 'pickup' | 'dropoff' | 'stopover', index: number): HTMLElement {

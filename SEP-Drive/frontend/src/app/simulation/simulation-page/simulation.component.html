@@ -92,10 +92,17 @@
           <button *ngIf="!hasStarted" class="btn" mat-fab extended (click)="start()">Start</button>
           <button *ngIf="hasStarted && paused" class="btn" mat-fab extended (click)="resume()" [disabled]="currentIndex >= path.length - 1">Resume</button>
           <button *ngIf="hasStarted && !paused" class="btn" mat-fab extended (click)="pause()">Pause</button>
-          <button *ngIf="isCustomer && hasStarted" class="btn warn" mat-fab extended (click)="complete()" [disabled]="!paused || balance < rideDetails.price">Complete</button>
+          <button *ngIf="isCustomer && hasStarted"
+                  class="btn warn" mat-fab extended
+                  (click)="complete()"
+                  [disabled]="!paused || !points[points.length -1].passed || balance < rideDetails.price">
+            {{
+              !points[points.length -1].passed ? 'Please reach your Drop-off to complete this Simulation' :
+                (balance < rideDetails.price ? 'Please Top-Up enough Balance to complete this Simulation' : 'Complete')
+            }}
+          </button>
         </div>
       </mat-card-content>
-        <div class="alert error centered-box" *ngIf="isCustomer && balance < rideDetails.price">Please Top-Up enough Balance to complete this Simulation</div>
     </mat-card>
 
     <div *ngFor="let point of points; let i = index">
