@@ -97,7 +97,7 @@
                   (click)="complete()"
                   [disabled]="!paused || !points[points.length -1].passed || balance < rideDetails.price">
             {{
-              !points[points.length -1].passed ? 'Please reach your Drop-off to complete this Simulation' :
+              !points[points.length -1].passed ? 'Please reach your Drop off to complete this Simulation' :
                 (balance < rideDetails.price ? 'Please Top-Up enough Balance to complete this Simulation' : 'Complete')
             }}
           </button>
@@ -108,7 +108,7 @@
     <div *ngFor="let point of points; let i = index">
       <app-location-card
         [isSimulationPaused]="paused"
-        [removable]="isCustomer && !point.passed"
+        [removable]="hasStarted && isCustomer && !point.passed"
         [location]="{ latitude: point.lat, longitude: point.lng, name: point.name, address: point.address }"
         [label]="i === 0 ? 'Pick up' : i === points.length - 1 ? 'Drop off' : 'Stopover ' + i"
         (onRemove)="removeStopover(i)">

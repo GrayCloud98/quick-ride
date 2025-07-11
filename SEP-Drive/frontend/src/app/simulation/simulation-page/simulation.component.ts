@@ -36,13 +36,8 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // 🚘 Route/Stopovers State
   points: Point[] = [];
-  rideDetails = {distance: 0, duration: 0, price: 0} // todo
-  vehicleClass: VehicleClass | null = null; // todo
-  balance = 0; // todo
   currentIndex = 0;
   duration = 30;
-  nextStopoverPosition = 1; // todo
-  desiredStopoverPosition = 1; // todo
 
   // ⏱️ State Flags
   hasStarted = false;
@@ -51,16 +46,15 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
   metadataLoaded = false;
 
   // 🧩 Form Controls
-  newStopoverControl = new FormControl<Location | string>('', [Validators.required]); // todo
   isCustomer: boolean | null = null;
   userHasActiveSimulation: boolean | null = null;
 
   // 🛠️ Constructor
   constructor(private dialog: MatDialog,
               private authService: AuthService,
-              private distanceService: DistanceService, // todo
+              private distanceService: DistanceService, // live changes
               private simService: SimulationService,
-              private walletService: WalletService) {} // todo
+              private walletService: WalletService) {} // live changes
 
   ngOnInit(): void {
     if(this.authService.currentUserValue) {
@@ -88,7 +82,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
         if (update.hasChanged || !this.metadataLoaded) {
           this.points = [
             { name: update.startLocationName, address: update.startAddress, lat: update.startPoint.lat, lng: update.startPoint.lng, index: 0, passed: true },
-            ...update.waypoints.map(wp => ({ name: wp.name, address: wp.address, lat: wp.latitude, lng: wp.longitude, index: 0, passed: false })),
+            ...update.waypoints.map(wp => ({ name: wp.name, address: wp.address, lat: wp.latitude, lng: wp.longitude, index: 0, passed: false })), // stopovers
             { name: update.destinationLocationName, address: update.destinationAddress, lat: update.endPoint.lat, lng: update.endPoint.lng, index: 0, passed: false }
           ];
         }
@@ -102,7 +96,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
           this.start();
           this.hasStarted = true;
         }
-        else if (update.hasChanged){
+        else if (update.hasChanged){ // live changes
           void this.updateRideInfo();
           this.renderPins()
           this.drawRoute()
@@ -148,7 +142,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.pins = [];
 
     this.points.forEach((point, index) => {
-      let type: 'pickup' | 'dropoff' | 'stopover' = 'stopover';
+      let type: 'pickup' | 'dropoff' | 'stopover' = 'stopover'; //stopovers
 
       if (index === 0) type = 'pickup';
       else if (index === this.points.length - 1) type = 'dropoff';
@@ -175,7 +169,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const start = this.points[0];
     const end = this.points[this.points.length - 1];
-    const waypoints = this.points.slice(1, this.points.length - 1).map(p => ({
+    const waypoints = this.points.slice(1, this.points.length - 1).map(p => ({ // stopovers
       location: p,
       stopover: true
     }));
@@ -184,7 +178,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       {
         origin: start,
         destination: end,
-        waypoints: waypoints,
+        waypoints: waypoints, // stopovers
         travelMode: google.maps.TravelMode.DRIVING
       },
       (result, status) => {
@@ -212,7 +206,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
-    this.assignStopoverIndices();
+    this.assignStopoverIndices(); // live changes
 
     this.pointer = new google.maps.marker.AdvancedMarkerElement({
       position: this.path[this.currentIndex],
@@ -237,7 +231,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.currentIndex = Math.floor(startIndex + totalSteps * progressRatio);
       this.pointer.position = this.path[Math.min(this.currentIndex, totalSteps - 1)];
 
-      this.points.forEach(
+      this.points.forEach( // live changes
         point => {
           if (!point.passed && this.currentIndex >= point.index) {
             point.passed = true;
@@ -248,7 +242,8 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       );
 
       if (this.currentIndex >= totalSteps - 1) {
-        this.pointer.position = this.path[totalSteps - 1];
+        this.currentIndex = this.path.length -1;
+        this.pointer.position = this.path[this.path.length -1];
         this.simService.control(Control.PAUSE, this.currentIndex)
         return;
       }
@@ -306,6 +301,41 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
   private openRating() {
     this.dialog.open(RatingPopupComponent, { disableClose: true }).afterClosed().subscribe();
   }
+
+  private createStyledMarker(type: 'pickup' | 'dropoff' | 'stopover', index: number): HTMLElement {
+    const pin = document.createElement('div');
+
+    let svg;
+    if (type === 'pickup')
+      svg = `<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"> <circle cx="20" cy="20" r="18" fill="limegreen" stroke="white" stroke-width="3"/> <polygon points="16,13 28,20 16,27" fill="white"/> </svg>`;
+    else if (type === 'dropoff')
+      svg = `<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"> <circle cx="20" cy="20" r="18" fill="tomato" stroke="white" stroke-width="3"/> <path d="M14 27 L14 13 L28 16 L28 24 Z" fill="white" stroke="white" stroke-width="1"/> </svg>`;
+    else //stopover
+      svg = `<svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"> <circle cx="18" cy="18" r="16" fill="#14B8A6" stroke="white" stroke-width="3"/> <text x="18" y="23" text-anchor="middle" fill="white" font-size="14" font-family="Arial" font-weight="bold">${index}</text> </svg>`;
+
+    pin.innerHTML = svg;
+    pin.style.position = 'absolute';
+    pin.style.transform = 'translate(-50%, -50%)';
+    return pin;
+  }
+
+  private createCar(): HTMLElement {
+    const car = document.createElement('car');
+    car.innerText = '🚗';
+    car.style.fontSize = '35px';
+    car.style.position = 'absolute';
+    car.style.transform = 'translate(-50%, -50%)';
+    return car;
+  }
+
+  // -------------------------------------------------------------------------------------------------------------------
+
+  rideDetails = {distance: 0, duration: 0, price: 0} // todo
+  vehicleClass: VehicleClass | null = null; // todo
+  balance = 0; // todo
+  nextStopoverPosition = 1; // todo
+  desiredStopoverPosition = 1; // todo
+  newStopoverControl = new FormControl<Location | string>('', [Validators.required]); // todo
 
   // ➕ Stopover Management
   onLocationSelected(loc: Location) {
@@ -373,32 +403,6 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.nextStopoverPosition = this.points.findIndex(p => !p.passed);
     this.nextStopoverPosition = this.nextStopoverPosition === -1 ? this.points.length : this.nextStopoverPosition;
     this.desiredStopoverPosition = Math.max(this.desiredStopoverPosition, this.nextStopoverPosition);
-  }
-
-  private createStyledMarker(type: 'pickup' | 'dropoff' | 'stopover', index: number): HTMLElement {
-    const pin = document.createElement('div');
-
-    let svg;
-    if (type === 'pickup')
-      svg = `<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"> <circle cx="20" cy="20" r="18" fill="limegreen" stroke="white" stroke-width="3"/> <polygon points="16,13 28,20 16,27" fill="white"/> </svg>`;
-    else if (type === 'dropoff')
-      svg = `<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"> <circle cx="20" cy="20" r="18" fill="tomato" stroke="white" stroke-width="3"/> <path d="M14 27 L14 13 L28 16 L28 24 Z" fill="white" stroke="white" stroke-width="1"/> </svg>`;
-    else
-      svg = `<svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"> <circle cx="18" cy="18" r="16" fill="#14B8A6" stroke="white" stroke-width="3"/> <text x="18" y="23" text-anchor="middle" fill="white" font-size="14" font-family="Arial" font-weight="bold">${index}</text> </svg>`;
-
-    pin.innerHTML = svg;
-    pin.style.position = 'absolute';
-    pin.style.transform = 'translate(-50%, -50%)';
-    return pin;
-  }
-
-  private createCar(): HTMLElement {
-    const car = document.createElement('car');
-    car.innerText = '🚗';
-    car.style.fontSize = '35px';
-    car.style.position = 'absolute';
-    car.style.transform = 'translate(-50%, -50%)';
-    return car;
   }
 
   async updateRideInfo(): Promise<void> {
