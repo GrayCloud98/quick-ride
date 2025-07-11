@@ -4,6 +4,7 @@ import com.example.sep_drive_backend.constants.RideStatus;
 import com.example.sep_drive_backend.constants.TripsStatus;
 import com.example.sep_drive_backend.dto.RideSimulationUpdate;
 import com.example.sep_drive_backend.dto.SimulationControlMessage;
+import com.example.sep_drive_backend.dto.SimulationErrorMessage;
 import com.example.sep_drive_backend.dto.SimulationPointsControl;
 import com.example.sep_drive_backend.models.Customer;
 import com.example.sep_drive_backend.models.Driver;
@@ -99,6 +100,15 @@ public class RideSimulationController {
 
         RideSimulation simulation = optionalSim.get();
         if (simulation.getRideStatus() == RideStatus.COMPLETED) {
+            return;
+        }
+        double estimatedPriceInCents = 100 * simulation.getRideOffer().getRideRequest().getEstimatedPrice();
+        if (simulation.getCustomer().getWallet().getBalanceCents() < estimatedPriceInCents){
+            SimulationErrorMessage error = new SimulationErrorMessage();
+            error.setMessage("Insufficient Customer balance to complete the Ride.");
+            error.setCustomerBalance(simulation.getCustomer().getWallet().getBalanceCents());
+            error.setPrice(estimatedPriceInCents);
+            messagingTemplate.convertAndSend("/topic/simulation/" + simulation.getId(), error);
             return;
         }
 

@@ -1,6 +1,7 @@
 package com.example.sep_drive_backend.services;
 
 import com.example.sep_drive_backend.constants.RideStatus;
+import com.example.sep_drive_backend.constants.VehicleClassEnum;
 import com.example.sep_drive_backend.dto.*;
 import com.example.sep_drive_backend.models.*;
 import com.example.sep_drive_backend.repository.*;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -59,13 +61,6 @@ public class RideRequestService {
             throw new IllegalStateException("Customer already has an active or in-progress ride request.");
         }
 
-        long estimatedPriceCents = Math.round(dto.getEstimatedPrice() * 100);
-        long walletBalanceCents = customer.getWallet().getBalanceCents();
-
-        if (walletBalanceCents < estimatedPriceCents) {
-            throw new IllegalStateException("Customer does not have enough funds for this ride. " +
-                    "Available: " + (walletBalanceCents / 100.0) + "€, Required: " + dto.getEstimatedPrice() + "€");
-        }
         RideRequest request = new RideRequest();
         request.setCustomer(customer);
         request.setStartAddress(dto.getStartAddress());
@@ -217,14 +212,12 @@ public class RideRequestService {
         }).collect(Collectors.toList());
     }
 
-
-    // IDK?
-    public Long getRideRequestIdIfDriverOffer(String username) {
+    public Optional<Long> getRideRequestIdIfDriverOffer(String username) {
+        List<RideStatus> activeStatuses = List.of(RideStatus.CREATED, RideStatus.IN_PROGRESS);
         return driverRepository.findByUsername(username)
-                .filter(Driver::getActive)
-                .flatMap(rideOfferRepository::findByDriver)
-                .map(rideOffer -> rideOffer.getRideRequest() != null ? rideOffer.getRideRequest().getId() : null)
-                .orElse(null);
+                .flatMap(driver -> rideOfferRepository
+                        .findFirstByDriverAndRideStatusIn(driver, activeStatuses)
+                        .map(rideOffer -> rideOffer.getRideRequest().getId()));
     }
 
     public void rejectOffer(Long rideOfferId) {
@@ -264,7 +257,17 @@ public class RideRequestService {
                 .orElseThrow(() -> new NoSuchElementException("Ride offer with id " + rideOfferId + " not found"));
 
         RideRequest rideRequest = selectedOffer.getRideRequest();
+        double newEstimatedPrice = 0.0;
+        if (selectedOffer.getDriver().getVehicleClass() == VehicleClassEnum.Large){
+            newEstimatedPrice = rideRequest.getDistance() * 10;
+        } else if (selectedOffer.getDriver().getVehicleClass() == VehicleClassEnum.Medium) {
+            newEstimatedPrice = rideRequest.getDistance() * 2;
 
+        } else if (selectedOffer.getDriver().getVehicleClass() == VehicleClassEnum.Small) {
+            newEstimatedPrice = rideRequest.getDistance() * 1;
+        }
+
+        rideRequest.setEstimatedPrice(newEstimatedPrice);
         if (!rideRequest.getCustomer().getUsername().equals(customerUsername)) {
             throw new SecurityException("User is not authorized to accept this offer");
         }
@@ -311,7 +314,6 @@ public class RideRequestService {
         rideSimulationRepository.save(rideSimulation);
         rideOfferRepository.save(selectedOffer);
         rideRequestRepository.save(rideRequest);
-
         notificationService.sendAcceptNotification(selectedOffer.getDriver().getUsername());
 
     }
@@ -481,5 +483,12 @@ public class RideRequestService {
         }
 
         throw new RuntimeException("User not found: " + username);
+    }
+
+    public Optional<VehicleClassEnum> getCustomerActiveSimDriverVehicleClass(String username) {
+        List<RideStatus> activeStatuses = List.of(RideStatus.CREATED, RideStatus.IN_PROGRESS);
+        return rideSimulationRepository
+                .findFirstByCustomerUsernameAndRideStatusIn(username, activeStatuses)
+                .map(sim -> sim.getDriver().getVehicleClass());
     }
 }

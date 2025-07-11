@@ -14,6 +14,15 @@ public class SimulationPointsControl extends SimulationControlMessage{
     private PointDTO endPoint;
     private String destinationLocationName;
     private String destinationAddress;
+    private double price;
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
 
     public double getDuration() {
         return duration;
