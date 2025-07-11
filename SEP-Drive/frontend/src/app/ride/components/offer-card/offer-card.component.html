@@ -36,17 +36,18 @@
       <span class="value grey-italic">{{ offer.offerID }}</span>
     </div>
   </mat-card-content>
+  <br>
 
-  <div class="button-container centered-box">
+  <div class="button-container">
     <button class="btn" mat-fab extended (click)="accept()">Accept Offer</button>
     <button class="btn warn" mat-fab extended (click)="reject()">Reject Offer</button>
   </div>
-
-  <div class="chat-button-container centered-box">
-    <button mat-raised-button (click)="openChat()" class="chat-btn chat-btn-with-badge">
+  <br>
+  <div class="button-container">
+    <button class="btn chat" mat-fab extended (click)="openChat()">
       <mat-icon>chat</mat-icon>
       Chat
-      <span *ngIf="hasUnreadMessages" class="chat-badge"></span>
+      <span *ngIf="hasUnreadMessages"></span>
     </button>
   </div>
 </mat-card>
