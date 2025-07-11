@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <title>Chat Test mit User c und d</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        input { margin: 5px 0; padding: 5px; width: 400px; }
+        button { padding: 5px 10px; margin-left: 5px; }
+        #messages { margin-top: 20px; max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; }
+        #messages li { list-style-type: none; margin-bottom: 5px; padding: 5px; border-bottom: 1px solid #eee; }
+    </style>
+</head>
+<body>
+<h2>Chat Test mit User c und d</h2>
+<p>Status: <span id="status">DISCONNECTED</span></p>
+
+<button id="connectBtn">Connect</button>
+<button id="disconnectBtn" disabled>Disconnect</button>
+
+<hr>
+
+<label>Sender Username: <strong>c</strong></label><br>
+<label>Receiver Username: <strong>d</strong></label><br>
+
+<input type="text" id="msgInput" placeholder="Nachricht eingeben..." />
+<button id="sendBtn" disabled>Senden</button>
+
+<br><br>
+
+<input type="text" id="readMessageId" placeholder="Message ID zum Lesen markieren..." />
+<button id="readBtn" disabled>Als gelesen markieren</button>
+
+<br><br>
+
+<input type="text" id="editMessageId" placeholder="Message ID bearbeiten..." />
+<input type="text" id="editMessageContent" placeholder="Neuer Inhalt..." />
+<button id="editBtn" disabled>Bearbeiten</button>
+
+<br><br>
+
+<input type="text" id="deleteMessageId" placeholder="Message ID löschen..." />
+<input type="text" id="deleteOtherUsername" placeholder="Anderer Username (z. B. d)" />
+<button id="deleteBtn" disabled>Löschen</button>
+
+<ul id="messages"></ul>
+
+<script>
+    const sender = 'c';
+    const receiver = 'd';
+    const jwtToken = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjIiwiaWF0IjoxNzUxNDAyNzUyLCJleHAiOjE3NTE0MDYzNTJ9.fkJ6jRs-2Eo-nUVnRiyElickX_9D024S6Fp4_L2fEmE";
+
+    let stompClient = null;
+
+    const statusEl = document.getElementById('status');
+    const messagesEl = document.getElementById('messages');
+
+    const connectBtn = document.getElementById('connectBtn');
+    const disconnectBtn = document.getElementById('disconnectBtn');
+    const sendBtn = document.getElementById('sendBtn');
+    const readBtn = document.getElementById('readBtn');
+    const editBtn = document.getElementById('editBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+
+    const msgInput = document.getElementById('msgInput');
+    const readMessageIdInput = document.getElementById('readMessageId');
+    const editMessageIdInput = document.getElementById('editMessageId');
+    const editMessageContentInput = document.getElementById('editMessageContent');
+    const deleteMessageIdInput = document.getElementById('deleteMessageId');
+    const deleteOtherUsernameInput = document.getElementById('deleteOtherUsername');
+
+    connectBtn.addEventListener('click', () => {
+        const socket = new SockJS('http://localhost:8080/ws');
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, frame => {
+            statusEl.textContent = 'CONNECTED';
+
+            stompClient.subscribe('/topic/chat/' + sender, handleIncomingMessage);
+            stompClient.subscribe('/topic/chat/' + receiver, handleIncomingMessage);
+
+            connectBtn.disabled = true;
+            disconnectBtn.disabled = false;
+            sendBtn.disabled = false;
+            readBtn.disabled = false;
+            editBtn.disabled = false;
+            deleteBtn.disabled = false;
+        }, error => {
+            console.error('Connection error:', error);
+            statusEl.textContent = 'ERROR';
+        });
+    });
+
+    disconnectBtn.addEventListener('click', () => {
+        if (stompClient) {
+            stompClient.disconnect(() => {
+                statusEl.textContent = 'DISCONNECTED';
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+                sendBtn.disabled = true;
+                readBtn.disabled = true;
+                editBtn.disabled = true;
+                deleteBtn.disabled = true;
+            });
+        }
+    });
+
+    function handleIncomingMessage(messageOutput) {
+        const msg = JSON.parse(messageOutput.body);
+        const li = document.createElement('li');
+
+        if (msg.action === "delete") {
+            li.textContent = `Nachricht gelöscht (ID ${msg.messageId})`;
+        } else {
+            li.textContent = `[${msg.senderUsername} -> ${msg.receiverUsername}]: ${msg.content}` +
+                (msg.read ? ' (gelesen)' : '') +
+                (msg.edited ? ' (bearbeitet)' : '') +
+                (msg.deleted ? ' (gelöscht)' : '');
+        }
+
+        messagesEl.appendChild(li);
+    }
+
+    sendBtn.addEventListener('click', () => {
+        const msg = msgInput.value.trim();
+        if (msg && stompClient && stompClient.connected) {
+            const chatMessage = {
+                senderUsername: sender,
+                receiverUsername: receiver,
+                content: msg,
+            };
+            stompClient.send("/app/chat/send", {}, JSON.stringify(chatMessage));
+            msgInput.value = '';
+        }
+    });
+
+    readBtn.addEventListener('click', () => {
+        const messageId = readMessageIdInput.value.trim();
+        if (messageId && stompClient && stompClient.connected) {
+            const payload = { messageId: Number(messageId) };
+            stompClient.send("/app/chat/read", { Authorization: jwtToken }, JSON.stringify(payload));
+        }
+    });
+
+    editBtn.addEventListener('click', () => {
+        const messageId = editMessageIdInput.value.trim();
+        const newContent = editMessageContentInput.value.trim();
+        if (messageId && newContent && stompClient && stompClient.connected) {
+            const payload = {
+                messageId: Number(messageId),
+                newContent: newContent
+            };
+            stompClient.send("/app/chat/edit", { Authorization: jwtToken }, JSON.stringify(payload));
+        }
+    });
+
+    deleteBtn.addEventListener('click', () => {
+        const messageId = deleteMessageIdInput.value.trim();
+        const otherUsername = deleteOtherUsernameInput.value.trim();
+        if (messageId && otherUsername && stompClient && stompClient.connected) {
+            const payload = {
+                messageId: Number(messageId),
+                otherUsername: otherUsername
+            };
+            stompClient.send("/app/chat/delete", { Authorization: jwtToken }, JSON.stringify(payload));
+        }
+    });
+</script>
+</body>
+</html>

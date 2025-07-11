@@ -19,6 +19,7 @@ export class OfferService {
         (request: any) => ({
           requestID: request.id,
           createdAt: request.createdAt,
+          customerUsername: request.customerUsername,
           customerName: request.customerName,
           customerRating: request.customerRating,
           driverToPickupDistance: 0,
@@ -53,6 +54,7 @@ export class OfferService {
       map((offers: any[]) => offers.map(
         (offer: any) => ({
           offerID: offer.rideOfferId,
+          driverUsername: offer.driverUsername,
           driverName: offer.driverName,
           driverRating: offer.driverRating,
           driverVehicle: offer.vehicleClass,

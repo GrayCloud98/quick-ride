@@ -12,6 +12,7 @@ public class RidesForDriversDTO {
     private Long id;
     private LocalDateTime createdAt;
     private String customerName;
+    private String customerUsername;
     private float customerRating;
     private String startLocationName;
     private String DestinationLocationName;
@@ -33,6 +34,7 @@ public class RidesForDriversDTO {
         }
         this.id = rideRequest.getId();
         this.createdAt = rideRequest.getCreatedAt();
+        this.customerUsername = rideRequest.getCustomer().getUsername();
         this.customerName = rideRequest.getCustomer().getFirstName()+ " " + rideRequest.getCustomer().getLastName();
         this.customerRating = rideRequest.getCustomer().getRating();
         this.requestedVehicleClass = rideRequest.getVehicleClass();
@@ -151,6 +153,14 @@ public class RidesForDriversDTO {
 
     public void setRequestedVehicleClass(VehicleClassEnum requestedVehicleClass) {
         this.requestedVehicleClass = requestedVehicleClass;
+    }
+
+    public String getCustomerUsername() {
+        return customerUsername;
+    }
+
+    public void setCustomerUsername(String customerUsername) {
+        this.customerUsername = customerUsername;
     }
 
     public List<WaypointDTO> getWaypoints() {

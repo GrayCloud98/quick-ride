@@ -1,19 +1,59 @@
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow: hidden;
+.ride-offers-page {
+  min-height: 100vh;
+  background: linear-gradient(145deg, #0f172a, #1e293b);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 48px 24px;
+  color: #f8fafc;
+  overflow-y: auto;
+  gap: 24px;
+}
+
+.left-container {
+  width: 320px;
+  background: rgba(59, 130, 246, 0.08);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 24px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+  animation: fadeInUp 0.6s ease-out;
+  color: #0f172a;
+
+  .sort-label {
+    color: #0f172a;
+    font-weight: 600;
+  }
+
+  mat-radio-button {
+    color: #0f172a;
+  }
+
+  .sort-header {
+    color: #1d4ed8;
+  }
 }
 
 .right-container {
-  background-color: rgba(215, 227, 255, 0.31);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  gap: 20px;
+
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
 }
 
 .sort-header {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 600;
-  margin-bottom: 1rem;
-  color: #333;
+  margin-bottom: 1.5rem;
+  color: #38bdf8;
+  text-align: center;
 }
 
 .sort-group {
@@ -26,25 +66,90 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #E0E2EC;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  transition: background 0.3s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
 }
 
 .sort-label {
   font-weight: 500;
   flex: 1;
+  color: #000000;
+  font-size: 1rem;
 }
 
 .radio-buttons {
   display: flex;
   gap: 1rem;
+
+  mat-radio-button {
+    color: #000000;
+  }
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+
+  .btn {
+    width: 100%;
+    max-width: 200px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 28px;
+    background: linear-gradient(135deg, #3b82f6, #0ea5e9);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(14, 165, 233, 0.3);
+    border: none;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: linear-gradient(135deg, #2563eb, #0284c7);
+      box-shadow: 0 6px 24px rgba(14, 165, 233, 0.5);
+      transform: scale(1.02);
+    }
+  }
 }
 
 .offer-card-container {
-  min-width: 500px;
-  max-width: 1000px;
-  width: 95%;
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
+.centered-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 16px;
+  color: #e2e8f0;
+
+  &.alert.error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border-radius: 12px;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

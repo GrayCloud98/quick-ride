@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { TwoFaComponent } from '../two-fa/two-fa.component';
 import { AuthService } from '../../../auth/auth.service';
@@ -7,8 +7,10 @@ import { AuthService } from '../../../auth/auth.service';
   selector: 'app-login-dialog',
   standalone: false,
   templateUrl: './login-dialog.component.html',
-  styleUrl: './login-dialog.component.scss'
+  styleUrl: './login-dialog.component.scss',
+  encapsulation: ViewEncapsulation.None
 })
+
 export class LoginDialogComponent {
   username = '';
   password = '';
@@ -37,15 +39,10 @@ export class LoginDialogComponent {
     this.authService.loginUser(this.username, this.password).subscribe({
       next: (response) => {
         console.log("Login successful:", response);
-
-        // 📝 Step 1: Store User Data in Local Storage
+        localStorage.setItem('username', this.username);
         localStorage.setItem('currentUser', JSON.stringify(response));
-
-        // 📝 Step 2: Close the dialog
         this.dialogRef.close();
-
-        // 📝 Step 3: Navigate to the home page or dashboard
-        window.location.href = '/';  // You can change this to router navigation if needed
+        window.location.href = '/';
       },
       error: (err) => {
         console.error("Backend Error Response:", err);
@@ -75,24 +72,13 @@ export class LoginDialogComponent {
       if (code) {
         console.log('2FA Code entered:', code);
 
-        // Send the code to the backend
         this.authService.verifyCode(this.username, code).subscribe({
           next: (response) => {
             console.log("✅ 2FA Verification successful:", response);
-
-            // 🔍 Add this line to check what we are storing
             console.log("🔍 Storing to localStorage:", JSON.stringify(response));
-
-            // 📝 Step 1: Store user data in Local Storage
             localStorage.setItem('currentUser', JSON.stringify(response));
-
-            // 🔍 Check if it is actually stored
             console.log("🔍 Local Storage Value Now:", localStorage.getItem('currentUser'));
-
-            // 📝 Step 2: Close the dialog
             this.dialogRef.close();
-
-            // 📝 Step 3: Navigate to the main page
             window.location.href = '/';
           },
           error: (err) => {

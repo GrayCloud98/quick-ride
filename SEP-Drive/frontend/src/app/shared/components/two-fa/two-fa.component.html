@@ -3,27 +3,37 @@
     <h2 class="dialog-title">2-Factor Authentication</h2>
     <p class="dialog-subtitle">Please enter the confirmation code we sent you.</p>
 
-    <mat-form-field class="full-width" appearance="outline">
-      <mat-label>Verification Code</mat-label>
-      <input matInput [(ngModel)]="verificationCode" maxlength="6" placeholder="123456" required>
-    </mat-form-field>
-    <div *ngIf="errorMessage" class="error-message">
-      {{ errorMessage }}
-    </div>
+    <form (ngSubmit)="verifyCode()">
+      <mat-form-field class="full-width" appearance="outline">
+        <mat-label>Verification Code</mat-label>
+        <input
+          matInput
+          name="code"
+          [(ngModel)]="verificationCode"
+          maxlength="6"
+          placeholder="123456"
+          required
+        />
+      </mat-form-field>
 
-    <div class="action-buttons">
-      <button
-        mat-flat-button
-        color="warn"
-        type="button"
-        class="cancel-button"
-        (click)="closeDialog()"
-      >
-        Cancel
-      </button>
-      <button mat-flat-button color="primary" type="button" (click)="verifyCode()">
-        Confirm
-      </button>
-    </div>
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <div class="action-buttons">
+        <button
+          mat-flat-button
+          color="warn"
+          type="button"
+          class="cancel-button"
+          (click)="closeDialog()"
+        >
+          Cancel
+        </button>
+        <button mat-flat-button color="primary" type="submit">
+          Confirm
+        </button>
+      </div>
+    </form>
   </div>
 </div>

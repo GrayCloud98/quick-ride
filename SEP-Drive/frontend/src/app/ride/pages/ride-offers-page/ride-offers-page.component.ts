@@ -19,6 +19,7 @@ interface SortOption {
 export class RideOffersPageComponent implements OnInit {
   accessAllowed: boolean = false;
   userHasActiveSimulation: boolean = false;
+  username!: string;
   offers: Offer[] = [];
   sortOptions: SortOption[] = [
     { key: 'offerID', label: 'Offer ID' },
@@ -70,6 +71,7 @@ export class RideOffersPageComponent implements OnInit {
 
   ngOnInit() {
     if(this.authService.currentUserValue) {
+      this.username = this.authService.currentUserValue.username;
       this.accessAllowed = this.authService.currentUserValue.role === 'Customer'
       this.simService.activeSimulationStatus$.subscribe({
         next: userHasActiveSimulation => this.userHasActiveSimulation = userHasActiveSimulation

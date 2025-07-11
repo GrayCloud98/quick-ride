@@ -40,10 +40,10 @@ public class LeaderboardService {
             LeaderboardEntryDTO dto = new LeaderboardEntryDTO();
             dto.setUsername(driver.getUsername());
             dto.setFullName(driver.getFirstName() + " " + driver.getLastName());
-            dto.setTotalDistance(totalDistance);
-            dto.setTotalEarnings(totalEarnings);
-            dto.setTotalDuration(totalDuration);
-            dto.setTripCount(tripCount);
+            dto.setTotalDistanceDriven(totalDistance);
+            dto.setMoneyEarned(totalEarnings);
+            dto.setTotalDriveTime(totalDuration);
+            dto.setNumberOfRides(tripCount);
             dto.setAverageRating(averageRating);
 
             return dto;

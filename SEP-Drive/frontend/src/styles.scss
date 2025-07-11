@@ -1,7 +1,12 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global Styles */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
 
 .centered-box {
   margin: 10px auto;
@@ -9,8 +14,8 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   width: fit-content;
 }
 
-.mini{
-  width: 500px
+.mini {
+  width: 500px;
 }
 
 .alert {
@@ -43,8 +48,12 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .card {
   padding: 16px;
 
-  &.small {max-width: 600px}
-  &.big {max-width: 1000px}
+  &.small {
+    max-width: 600px;
+  }
+  &.big {
+    max-width: 1000px;
+  }
 
   .header {
     display: flex;
@@ -91,8 +100,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   }
 }
 
-mat-card{
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19) !important;
+mat-card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2),
+  0 6px 20px rgba(0, 0, 0, 0.19) !important;
 }
 
 .main-container {
@@ -105,6 +115,7 @@ mat-card{
   padding: 16px;
   width: 30%;
   max-width: 500px;
+
   &.scroll {
     overflow-y: auto;
     scrollbar-width: none;
@@ -114,11 +125,84 @@ mat-card{
 .right-container {
   padding: 16px;
   flex: 1;
+
   &.scroll {
     overflow-y: auto;
     scrollbar-width: none;
   }
+
   &.map {
     padding: 16px 16px 16px 0;
+  }
+}
+
+::ng-deep .mat-menu-panel .mat-menu-content {
+  padding: 8px 0;
+  background: rgba(30, 41, 59, 0.95);
+  backdrop-filter: blur(16px);
+  border-radius: 14px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  min-width: 140px;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+::ng-deep .mat-menu-panel .mat-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  width: 100%;
+  border-radius: 8px;
+  transition: background 0.25s ease;
+
+  mat-icon {
+    font-size: 20px;
+    color: #f1f5f9;
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+
+  span {
+    color: #f1f5f9;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  &:hover {
+    background: rgba(56, 189, 248, 0.12);
+
+    mat-icon {
+      transform: scale(1.15);
+      color: #38bdf8;
+    }
+  }
+
+  &[color='warn'] mat-icon {
+    color: #ef4444;
+  }
+
+  &[color='warn']:hover {
+    background: rgba(239, 68, 68, 0.15);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.7;
   }
 }

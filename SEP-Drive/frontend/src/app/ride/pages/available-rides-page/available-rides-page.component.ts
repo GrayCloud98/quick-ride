@@ -22,7 +22,7 @@ interface SortOption {
 export class AvailableRidesPageComponent implements OnInit {
   accessAllowed: boolean = false;
   userHasActiveSimulation: boolean = false;
-
+  username!: string;
   currentPositionControl = new FormControl<Location | string>('', [Validators.required]);
   currentPosition!: Location;
   positionSet = false;
@@ -89,6 +89,7 @@ export class AvailableRidesPageComponent implements OnInit {
 
   ngOnInit() {
     if(this.authService.currentUserValue) {
+      this.username = this.authService.currentUserValue.username;
       this.accessAllowed = this.authService.currentUserValue.role === 'Driver'
       this.simService.activeSimulationStatus$.subscribe({
         next: userHasActiveSimulation => this.userHasActiveSimulation = userHasActiveSimulation
@@ -96,7 +97,7 @@ export class AvailableRidesPageComponent implements OnInit {
     }
   }
 
-  loadRequests(){
+  loadRequests() {
     this.offerService.driverHasActiveOffer().pipe(
       switchMap(driverHasActiveOffer => {
         if (driverHasActiveOffer) {
@@ -118,19 +119,26 @@ export class AvailableRidesPageComponent implements OnInit {
       next: result => {
         this.allActiveRequests = result;
 
-        this.allActiveRequests.forEach(
-          request => {
-            this.distanceService.getDistanceDurationAndPrice(
-              { lat: this.currentPosition.latitude, lng: this.currentPosition.longitude },
-              { lat: request.pickup.latitude, lng: request.pickup.longitude },
-              request.desiredVehicleClass
-            ).then(res => {
+        this.allActiveRequests.forEach(request => {
+          const points = [
+            {
+              lat: this.currentPosition.latitude,
+              lng: this.currentPosition.longitude
+            },
+            {
+              lat: request.pickup.latitude,
+              lng: request.pickup.longitude
+            }
+          ];
+
+          this.distanceService.getDistanceDurationAndPriceForMultiplePoints(points, request.desiredVehicleClass)
+            .then(res => {
               request.driverToPickupDistance = res.distance;
-            }).catch(err => console.error('Google Distance API error', err));
-          }
-        );
+            })
+            .catch(err => console.error('Google Distance API error', err));
+        });
       },
       error: err => console.log(err)
     });
   }
-}
+  }

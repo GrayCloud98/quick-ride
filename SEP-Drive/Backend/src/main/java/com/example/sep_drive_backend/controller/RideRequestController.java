@@ -1,5 +1,6 @@
 package com.example.sep_drive_backend.controller;
 
+import com.example.sep_drive_backend.constants.VehicleClassEnum;
 import com.example.sep_drive_backend.dto.*;
 import com.example.sep_drive_backend.models.JwtTokenProvider;
 import com.example.sep_drive_backend.models.RideOffer;
@@ -54,7 +55,7 @@ DRIVER: is active when they create an offer, till it's completed, rejected, or c
         try {
             String token = jwtTokenProvider.resolveToken(request);
             String username = jwtTokenProvider.getUsername(token);
-            dto.setUserName(username);
+            dto.setCustomerUsername(username);
 
             RideRequest rideRequest = rideRequestService.createRideRequest(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(rideRequest);
@@ -154,16 +155,13 @@ DRIVER: is active when they create an offer, till it's completed, rejected, or c
         }
     }
 
-    // this might be broken now idk what it does
+    //return the driver's active offer(with the status created, or in_prog) 's RideRequest's Id
     @GetMapping("/offer-request-id")
-    public ResponseEntity<?> getDriverOfferRideRequestId(HttpServletRequest request) {
+    public ResponseEntity<Long> getDriverOfferRideRequestId(HttpServletRequest request) {
         String username = loginService.extractUsername(request);
-        Long rideRequestId = rideRequestService.getRideRequestIdIfDriverOffer(username);
-        if (rideRequestId != null) {
-            return ResponseEntity.ok(rideRequestId);
-        } else {
-            return ResponseEntity.noContent().build();
-        }
+        Optional<Long> rideRequestId = rideRequestService.getRideRequestIdIfDriverOffer(username);
+        return rideRequestId.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
     // returns offers to customer if their current active ride request has the status CREATED
@@ -210,6 +208,14 @@ DRIVER: is active when they create an offer, till it's completed, rejected, or c
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    //Get the Customer Active rideSimulation's(Created(i.e. accepted an offer) or In_prog(pressed started))'s driver's vehicle class
+    @GetMapping("/sim/driver/vehicle-class")
+    public ResponseEntity<VehicleClassEnum> getCustomerActiveSimDriverVehicleClass(HttpServletRequest request) {
+        String username = loginService.extractUsername(request);
+        Optional<VehicleClassEnum> vehicleClass = rideRequestService.getCustomerActiveSimDriverVehicleClass(username);
+        return vehicleClass.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
     //to rate the driver of the ride
     @PostMapping("/rate/driver")
     public void rateDriver(@RequestParam Long rideSimulationId, @RequestParam int rate){

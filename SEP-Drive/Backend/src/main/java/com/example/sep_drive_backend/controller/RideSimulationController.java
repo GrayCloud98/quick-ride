@@ -4,6 +4,7 @@ import com.example.sep_drive_backend.constants.RideStatus;
 import com.example.sep_drive_backend.constants.TripsStatus;
 import com.example.sep_drive_backend.dto.RideSimulationUpdate;
 import com.example.sep_drive_backend.dto.SimulationControlMessage;
+import com.example.sep_drive_backend.dto.SimulationErrorMessage;
 import com.example.sep_drive_backend.dto.SimulationPointsControl;
 import com.example.sep_drive_backend.models.Customer;
 import com.example.sep_drive_backend.models.Driver;
@@ -33,9 +34,9 @@ public class RideSimulationController {
     private final CustomerRepository customerRepository;
     private final DriverRepository driverRepository;
     private final TripRepository tripRepository;
-
+    private final ChatMessageRepository chatMessageRepository;
     public RideSimulationController(RideSimulationService rideSimulationService,
-                                    SimpMessagingTemplate messagingTemplate, RideSimulationRepository rideSimulationRepository, RideOfferRepository rideOfferRepository, RideRequestRepository rideRequestRepository, LoginService loginService, CustomerRepository customerRepository, DriverRepository driverRepository, TripRepository tripRepository) {
+                                    SimpMessagingTemplate messagingTemplate, RideSimulationRepository rideSimulationRepository, RideOfferRepository rideOfferRepository, RideRequestRepository rideRequestRepository, LoginService loginService, CustomerRepository customerRepository, DriverRepository driverRepository, TripRepository tripRepository, ChatMessageRepository chatMessageRepository) {
         this.rideSimulationService = rideSimulationService;
         this.messagingTemplate = messagingTemplate;
         this.rideSimulationRepository = rideSimulationRepository;
@@ -45,6 +46,7 @@ public class RideSimulationController {
         this.customerRepository = customerRepository;
         this.driverRepository = driverRepository;
         this.tripRepository = tripRepository;
+        this.chatMessageRepository = chatMessageRepository;
     }
 
     @MessageMapping("/simulation/fetch")
@@ -101,6 +103,15 @@ public class RideSimulationController {
         if (simulation.getRideStatus() == RideStatus.COMPLETED) {
             return;
         }
+        double estimatedPriceInCents = 100 * simulation.getRideOffer().getRideRequest().getEstimatedPrice();
+        if (simulation.getCustomer().getWallet().getBalanceCents() < estimatedPriceInCents){
+            SimulationErrorMessage error = new SimulationErrorMessage();
+            error.setMessage("Insufficient Customer balance to complete the Ride.");
+            error.setCustomerBalance(simulation.getCustomer().getWallet().getBalanceCents());
+            error.setPrice(estimatedPriceInCents);
+            messagingTemplate.convertAndSend("/topic/simulation/" + simulation.getId(), error);
+            return;
+        }
 
         simulation.setRideStatus(RideStatus.COMPLETED);
         simulation.getRideOffer().setRideStatus(RideStatus.COMPLETED);
@@ -143,6 +154,7 @@ public class RideSimulationController {
         rideRequestRepository.save(simulation.getRideOffer().getRideRequest());
 
         broadcastCompleteUpdate(simulation);
+        chatMessageRepository.deleteAll();
     }
 
 

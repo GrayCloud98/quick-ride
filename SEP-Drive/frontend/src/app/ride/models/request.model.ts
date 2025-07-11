@@ -6,6 +6,7 @@ export interface Request {
   requestID: number;
   createdAt: string;
   customerName: string;
+  customerUsername: string;
   customerRating: number;
   driverToPickupDistance: number;
   desiredVehicleClass: VehicleClass;

@@ -57,9 +57,19 @@
     </button>
   </div>
 
+  <div *ngIf="isLoggedIn">
+    <button
+      mat-raised-button
+      color="accent"
+      class="nav-btn"
+      (click)="goToLeaderboard()"
+    >
+      Leaderboard
+    </button>
+  </div>
+
   <span class="spacer"></span>
 
-  <!-- Search Bar -->
   <div class="search-wrapper">
     <input
       class="search-input"
@@ -72,7 +82,7 @@
     </button>
   </div>
 
-  <!-- If the user is not logged in, show the login button -->
+
   <button
     *ngIf="!isLoggedIn"
     mat-raised-button
@@ -87,7 +97,7 @@
     {{ walletBalance | number:'1.2-2' }} €
   </span>
   </div>
-  <!-- If the user is logged in, show the username and photo -->
+
   <div *ngIf="isLoggedIn" class="user-info" (click)="goToProfile()">
     <img
       ngSrc="{{ photoUrl }}"

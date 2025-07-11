@@ -10,13 +10,14 @@ import {RidehistoryComponent} from './shared/components/ridehistory/ridehistory.
 import {SimulationComponent} from './simulation/simulation-page/simulation.component';
 import {StatisticsComponent} from './shared/components/statistics/statistics.component';
 import {HomeComponent} from './home/home.component';
-
+import {LeaderboardComponent} from './leaderboard/leaderboard.component';
 const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
   { path: 'ride', loadChildren: () => RideRoutingModule },
   { path: 'register', component: RegisterComponent },
   { path: 'two-factor', component: TwoFaComponent },
   { path: 'simulation', component: SimulationComponent },
+  { path: 'leaderboard', component: LeaderboardComponent },
   { path: 'wallet', component: WalletPageComponent },
   { path: 'user-not-found', component: UserNotFoundComponent },
   { path: 'history', component:RidehistoryComponent},

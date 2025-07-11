@@ -1,0 +1,103 @@
+<div class="chat-container">
+
+  <div class="chat-header-bar">
+    <div class="chat-title">Chat with {{ recipient }}</div>
+    <button mat-icon-button (click)="closeChat()" class="chat-close-btn">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="chat-messages" #messageContainer>
+    <div
+      *ngFor="let msg of messages"
+      [ngClass]="{ 'my-msg': msg.sender === username, 'their-msg': msg.sender !== username }"
+      class="chat-msg-wrapper"
+    >
+      <div class="msg-bubble">
+        <div class="msg-content" [class.deleted]="msg.deleted">
+          <span *ngIf="!msg.deleted">{{ msg.content }}</span>
+          <i *ngIf="msg.deleted" class="italic text-muted">Message deleted</i>
+        </div>
+
+        <div class="msg-meta">
+          <small>{{ msg.timestamp | date: 'shortTime' }}</small>
+
+          <mat-icon
+            *ngIf="msg.sender === username"
+            class="read-status"
+            [ngClass]="{ read: msg.read }"
+          >
+            {{ msg.read ? 'done_all' : 'done_all' }}
+          </mat-icon>
+
+          <button
+            *ngIf="msg.sender === username && !msg.read && !msg.deleted"
+            mat-icon-button
+            [matMenuTriggerFor]="messageMenu"
+            class="dots-btn custom-chat-menu-trigger"
+            (click)="setMenuContext(msg)"
+            aria-label="More"
+          >
+            <mat-icon>more_vert</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-input">
+    <button mat-icon-button class="emoji-btn" (click)="showEmojiPicker = !showEmojiPicker">
+      <mat-icon>emoji_emotions</mat-icon>
+    </button>
+
+    <div class="emoji-picker-panel" *ngIf="showEmojiPicker">
+      <button (click)="appendEmoji('😀')">😀</button>
+      <button (click)="appendEmoji('😂')">😂</button>
+      <button (click)="appendEmoji('😍')">😍</button>
+      <button (click)="appendEmoji('😎')">😎</button>
+      <button (click)="appendEmoji('😢')">😢</button>
+      <button (click)="appendEmoji('🔥')">🔥</button>
+      <button (click)="appendEmoji('❤️')">❤️</button>
+      <button (click)="appendEmoji('👍')">👍</button>
+      <button (click)="appendEmoji('🎉')">🎉</button>
+      <button (click)="appendEmoji('🙏')">🙏</button>
+      <button (click)="appendEmoji('😅')">😅</button>
+      <button (click)="appendEmoji('🤔')">🤔</button>
+      <button (click)="appendEmoji('🥺')">🥺</button>
+      <button (click)="appendEmoji('🚀')">🚀</button>
+      <button (click)="appendEmoji('💯')">💯</button>
+    </div>
+
+    <input
+      [(ngModel)]="newMessage"
+      (keydown.enter)="send()"
+      placeholder="Type your message..."
+    />
+
+    <button class="send-btn" (click)="send()">
+      {{ editingMessageId ? 'Update' : 'Send' }}
+    </button>
+
+    <button
+      *ngIf="editingMessageId"
+      class="cancel-edit"
+      mat-stroked-button
+      color="warn"
+      (click)="cancelEdit()"
+    >
+      Cancel
+    </button>
+  </div>
+
+  <mat-menu #messageMenu="matMenu" [overlapTrigger]="false" class="chat-message-menu">
+    <button mat-menu-item *ngIf="menuContext" (click)="startEdit(menuContext)">
+      <mat-icon>edit</mat-icon>
+      <span>Edit</span>
+    </button>
+    <button mat-menu-item *ngIf="menuContext" (click)="deleteMessage(menuContext)">
+      <mat-icon color="warn">delete</mat-icon>
+      <span>Delete</span>
+    </button>
+  </mat-menu>
+
+</div>

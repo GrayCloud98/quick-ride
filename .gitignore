@@ -5,6 +5,7 @@
 **/tmp/
 **/out-tsc/
 **/.angular/cache/
+/data/
 
 # === Node ===
 **/node_modules/

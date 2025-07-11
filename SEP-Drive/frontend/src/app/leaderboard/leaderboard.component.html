@@ -1,0 +1,88 @@
+<h2 class="leaderboard-title">🚗 Driver Leaderboard</h2>
+
+<div class="search-wrapper">
+  <input
+    type="text"
+    placeholder="Search by username or full name..."
+    [(ngModel)]="searchTerm"
+    class="search-input"
+  />
+</div>
+
+<div *ngIf="filteredLeaderboard.length === 0" class="no-results">
+  No drivers found matching "{{ searchTerm }}"
+</div>
+
+<div class="leaderboard-container" *ngIf="filteredLeaderboard.length > 0">
+  <table class="leaderboard-table">
+    <thead>
+    <tr>
+      <th>#</th>
+      <th (click)="sortBy('username')" class="sortable">
+        Username
+        <span *ngIf="currentSortColumn === 'username'">
+            {{ sortDirection === 'asc' ? '🔼' : '🔽' }}
+          </span>
+      </th>
+
+      <th (click)="sortBy('fullName')" class="sortable">
+        Full Name
+        <span *ngIf="sortDirection === 'asc'">🔼</span>
+        <span *ngIf="sortDirection === 'desc'">🔽</span>
+      </th>
+
+      <th (click)="sortBy('totalDistanceDriven')" class="sortable">
+        Distance (km)
+        <span *ngIf="currentSortColumn === 'totalDistanceDriven'">
+            {{ sortDirection === 'asc' ? '🔼' : '🔽' }}
+          </span>
+      </th>
+
+      <th (click)="sortBy('averageRating')" class="sortable">
+        Rating
+        <span *ngIf="currentSortColumn === 'averageRating'">
+            {{ sortDirection === 'asc' ? '🔼' : '🔽' }}
+          </span>
+      </th>
+
+      <th (click)="sortBy('totalDriveTime')" class="sortable">
+        Drive Time (min)
+        <span *ngIf="currentSortColumn === 'totalDriveTime'">
+            {{ sortDirection === 'asc' ? '🔼' : '🔽' }}
+          </span>
+      </th>
+
+      <th (click)="sortBy('numberOfRides')" class="sortable">
+        Rides
+        <span *ngIf="currentSortColumn === 'numberOfRides'">
+            {{ sortDirection === 'asc' ? '🔼' : '🔽' }}
+          </span>
+      </th>
+
+      <th (click)="sortBy('moneyEarned')" class="sortable">
+        Money (€)
+        <span *ngIf="currentSortColumn === 'moneyEarned'">
+            {{ sortDirection === 'asc' ? '🔼' : '🔽' }}
+          </span>
+      </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let driver of filteredLeaderboard; let i = index" [class.top]="i < 3">
+      <td>
+        <span *ngIf="i === 0">🥇</span>
+        <span *ngIf="i === 1">🥈</span>
+        <span *ngIf="i === 2">🥉</span>
+        <span *ngIf="i > 2">{{ i + 1 }}</span>
+      </td>
+      <td>{{ driver.username }}</td>
+      <td>{{ driver.fullName }}</td>
+      <td>{{ driver.totalDistanceDriven | number:'1.2-2' }}</td>
+      <td>{{ driver.averageRating | number: '1.1-2' }}</td>
+      <td>{{ driver.totalDriveTime }}</td>
+      <td>{{ driver.numberOfRides }}</td>
+      <td>{{ driver.moneyEarned | currency: 'EUR' }}</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
