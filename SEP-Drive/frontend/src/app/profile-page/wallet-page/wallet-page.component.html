@@ -8,11 +8,13 @@
     <div class="wallet-balance">{{ balance | number:'1.2-2' }} €</div>
 
     <div *ngIf="accessAllowed" class="topup-section">
-      <label>Select Amount:</label>
+    <label>Select Amount:</label>
       <mat-button-toggle-group [(ngModel)]="selectedAmount" class="amount-radio-group">
-        <mat-button-toggle [value]="10">10 €</mat-button-toggle>
-        <mat-button-toggle [value]="25">25 €</mat-button-toggle>
-        <mat-button-toggle [value]="50">50 €</mat-button-toggle>
+        <mat-button-toggle [value]="10">       10 €      </mat-button-toggle>
+        <mat-button-toggle [value]="25">       25 €      </mat-button-toggle>
+        <mat-button-toggle [value]="50">       50 €      </mat-button-toggle>
+        <mat-button-toggle [value]="75">       75 €      </mat-button-toggle>
+        <mat-button-toggle [value]="100">      100 €      </mat-button-toggle>
       </mat-button-toggle-group>
 
       <input
@@ -40,8 +42,8 @@
       <div  *ngIf="showHistory">
         <table style="width:100%; margin-top: 10px;">
           <tr>
-            <th>Datum</th>
-            <th>Betrag</th>
+            <th>Date</th>
+            <th>Amount</th>
           </tr>
           <tr *ngFor="let tx of transactions">
             <td>{{ tx.createdAt | date:'short' }}</td>

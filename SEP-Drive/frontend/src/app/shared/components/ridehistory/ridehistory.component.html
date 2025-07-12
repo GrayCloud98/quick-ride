@@ -1,72 +1,54 @@
 <div class="history-title">
-  <h1>Ride History</h1>
+  <h1>RideHistory</h1>
 </div>
 
 <div class="search-box-wrap">
   <div class="search-box">
-    <input
-      matInput
-      (keyup)="applyFilter($event)"
-      placeholder="Search driver or customer"
-    />
+    <input matInput (keyup)="applyFilter($event)" placeholder="Search driver or customer" />
     <mat-icon class="search-icon">search</mat-icon>
   </div>
 </div>
 
 <div class="table-outer">
   <div class="table-card">
-    <table mat-table [dataSource]="dataSource" matSort class="styled-table">
-
+    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
       <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>
-          {{ getColumnHeader(column) }}
-        </th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ getColumnHeader(column) }}</th>
         <td mat-cell *matCellDef="let row">
           <ng-container [ngSwitch]="column">
-
             <span *ngSwitchCase="'driverRating'">
-              {{ row.driverRating || '-' }}
-              <mat-icon *ngIf="row.driverRating" class="star">star</mat-icon>
+              {{ row.driverRating || '-' }} <span class="star" *ngIf="row.driverRating">&#9733;</span>
             </span>
-
             <span *ngSwitchCase="'customerRating'">
-              {{ row.customerRating || '-' }}
-              <mat-icon *ngIf="row.customerRating" class="star">star</mat-icon>
+              {{ row.customerRating || '-' }} <span class="star" *ngIf="row.customerRating">&#9733;</span>
             </span>
-
             <span *ngSwitchCase="'amount'">
               {{ row.amount | number:'1.2-2' }} €
             </span>
-
             <span *ngSwitchCase="'date'">
-              {{ row.date | date:'dd.MM.yyyy HH:mm:ss' }}
+              {{ row.date | date:'dd-MM-yyyy HH:mm:ss' }}
             </span>
-
             <span *ngSwitchCase="'duration'">
-              {{ row.duration }} min
+              {{ row.duration  }} Min
             </span>
-
             <span *ngSwitchCase="'distance'">
-              {{ row.distance }} km
+              {{ row.distance  }} Km
             </span>
 
             <span *ngSwitchDefault>
               {{ row[column] || '-' }}
             </span>
-
           </ng-container>
         </td>
       </ng-container>
-
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-
     <div *ngIf="!loading && !error && dataSource.filteredData.length === 0" class="no-results-message">
+      <div style="font-size:2.4rem; margin-bottom:0.5rem;">🚗</div>
       <mat-icon>directions_car</mat-icon>
-      <span>No rides found!</span>
+      <span>No rides found !</span>
     </div>
-
     <div *ngIf="error && !loading" class="error-message">
       <mat-icon color="warn">error_outline</mat-icon>
       <span>{{ error }}</span>
