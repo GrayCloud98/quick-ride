@@ -72,11 +72,11 @@
   padding: 2px;
 
   .mat-button-toggle-button {
-    color: #fff !important;
+    color: #fff ;
     font-weight: 600;
     font-size: 1.08rem;
     background: transparent;
-    border-radius: 18px !important;
+    border-radius: 18px ;
   }
 
   .mat-button-toggle-checked {
@@ -91,33 +91,33 @@
 }
 
 mat-select {
-  background: rgba(255, 255, 255, 0.14) !important;
-  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.14) ;
+  border-radius: 10px ;
   font-weight: 600;
   min-width: 110px;
 }
 
 .mat-select-panel {
-  background: #222e3a !important;
-  color: #fff !important;
+  background: #222e3a ;
+  color: #fff ;
 }
 
 .mat-option {
-  color: #fff !important;
+  color: #fff ;
   font-weight: 500;
 
   &:hover,
   &.mat-active {
-    background: #22c55e22 !important;
-    color: #22c55e !important;
+    background: #22c55e22 ;
+    color: #22c55e ;
   }
 }
 
 .mat-form-field-label {
-  color: #fff !important;
+  color: #fff ;
 }
 
 .stats-card,
 .stats-card * {
-  color: #fff !important;
+  color: #fff ;
 }

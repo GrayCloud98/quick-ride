@@ -47,7 +47,6 @@ export class LoginDialogComponent {
       error: (err) => {
         console.error("Backend Error Response:", err);
 
-        // 🔒 2FA Required
         if (err.status === 401 && err.error.includes("Email verification required")) {
           console.log("🔒 2FA Required. Opening Dialog...");
           this.dialogRef.close();

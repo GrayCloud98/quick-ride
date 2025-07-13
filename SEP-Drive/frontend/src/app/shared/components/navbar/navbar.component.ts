@@ -113,7 +113,7 @@ export class NavbarComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  // Buttons Logic: Ride Request, Active Request & Active Simulation
+
   userHasActiveRide: boolean = false;
   userHasActiveSimulation: boolean = false;
   isCustomer: boolean = false;

@@ -24,7 +24,6 @@ export class RegisterComponent {
   CarControl = new FormControl({ value: '', disabled: true });
   alertMessage: string | null = null;
   alertType: 'success' | 'error' | null = null;
-  // 🔹 Passwort-Anzeige umschalten
   hidePassword = true;
   constructor(private usersService: UsersService
   , private router: Router) {
@@ -35,7 +34,7 @@ export class RegisterComponent {
       } else {
         this.CarControl.disable();
         this.CarControl.clearValidators();
-        this.vehicleClass = null;  // Fahrzeugklasse zurücksetzen
+        this.vehicleClass = null;
       }
       this.CarControl.updateValueAndValidity();
     });
@@ -53,14 +52,14 @@ export class RegisterComponent {
       const file = input.files[0];
       const fileType = file.type.toLowerCase();
 
-      // Prüfen, ob der Dateityp JPEG/JPG ist
+
       if (fileType === 'image/jpeg' || fileType === 'image/jpg') {
         this.profilePicture = file;
         this.profilePictureName = file.name;
-        this.alertMessage = '';  // Fehlernachricht zurücksetzen
+        this.alertMessage = '';
       } else {
         this.showAlert('Only JPEG/JPG files are allowed.', 'error');
-        this.removeFile(); // Datei zurücksetzen
+        this.removeFile();
       }
     }
   }
@@ -73,7 +72,6 @@ export class RegisterComponent {
     this.hidePassword = !this.hidePassword;
   }
 
-  // 🔹 Registrierung absenden
   onRegister(): void {
     const formData = new FormData();
     formData.append('username', this.username);

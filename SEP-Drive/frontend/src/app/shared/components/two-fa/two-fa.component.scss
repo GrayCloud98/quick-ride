@@ -47,7 +47,7 @@
   margin-bottom: 1rem;
 
   ::ng-deep .mat-form-field-wrapper {
-    padding: 0 !important;
+    padding: 0 ;
   }
 
   ::ng-deep .mat-form-field-infix {
@@ -58,23 +58,23 @@
 
   ::ng-deep .mat-input-element,
   ::ng-deep input {
-    color: #f8fafc !important;
+    color: #f8fafc ;
     font-size: 1rem;
     font-weight: 500;
   }
 
   ::ng-deep .mat-form-field-label {
-    color: #cbd5e1 !important;
+    color: #cbd5e1 ;
     font-weight: 500;
   }
 
   ::ng-deep input::placeholder {
-    color: #94a3b8 !important;
+    color: #94a3b8 ;
     font-style: italic;
   }
 
   ::ng-deep .mat-form-field-outline {
-    color: transparent !important;
+    color: transparent ;
   }
 }
 
@@ -94,11 +94,11 @@
 }
 
 .cancel-button {
-  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-  color: white !important;
+  background: linear-gradient(135deg, #ef4444, #dc2626) ;
+  color: white ;
 
   &:hover {
-    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+    background: linear-gradient(135deg, #dc2626, #b91c1c) ;
   }
 }
 
