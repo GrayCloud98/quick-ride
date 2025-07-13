@@ -36,32 +36,27 @@ class WalletServiceTest {
 
     @Test
     void testTransferSuccessful() {
-        // Setup "from" Wallet und Customer
         Wallet fromWallet = new Wallet();
-        fromWallet.setBalanceCents(10_000); // 100 EUR
+        fromWallet.setBalanceCents(10_000);
 
         Customer fromCustomer = new Customer();
         fromCustomer.setWallet(fromWallet);
 
-        // Setup "to" Wallet und Driver
+
         Wallet toWallet = new Wallet();
-        toWallet.setBalanceCents(5_000); // 50 EUR
+        toWallet.setBalanceCents(5_000);
 
         Driver toDriver = new Driver();
         toDriver.setWallet(toWallet);
 
-        // Mocks für UserRepository
         when(userRepo.findByUsername("alice")).thenReturn(Optional.of(fromCustomer));
         when(userRepo.findById(2L)).thenReturn(Optional.of(toDriver));
 
-        // Mocks für Speichern (returnen das Objekt direkt)
         when(walletRepo.save(any(Wallet.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(transactionRepo.save(any(Transaction.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Ausführen
         walletService.transfer("alice", 2L, 3_000); // 30 EUR
 
-        // Assertions
         assertEquals(7_000, fromWallet.getBalanceCents()); // 100 - 30 = 70 EUR
         assertEquals(8_000, toWallet.getBalanceCents());   // 50 + 30 = 80 EUR
 
