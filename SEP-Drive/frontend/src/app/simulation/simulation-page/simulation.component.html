@@ -108,7 +108,7 @@
     <div *ngFor="let point of points; let i = index">
       <app-location-card
         [isSimulationPaused]="paused"
-        [removable]="hasStarted && isCustomer && !point.passed"
+        [removable]="isCustomer && !point.passed"
         [location]="{ latitude: point.lat, longitude: point.lng, name: point.name, address: point.address }"
         [label]="i === 0 ? 'Pick up' : i === points.length - 1 ? 'Drop off' : 'Stopover ' + i"
         (onRemove)="removeStopover(i)">
