@@ -22,10 +22,12 @@
     </div>
   </mat-card-content>
 
+  <!--LIVE ÄNDERUNGEN WÄHREND DER FAHRT-->
   <br *ngIf="removable">
   <div class="button-container" *ngIf="removable">
     <button class="btn warn" mat-fab extended (click)="remove()" [disabled]="!isSimulationPaused">
       Remove Stopover
     </button>
   </div>
+  <!--ENDE DER LIVE ÄNDERUNGEN WÄHREND DER FAHRT-->
 </mat-card>

@@ -104,9 +104,7 @@ export class SimulationService {
   }
 
   control(control: Control, currentIndexOrDuration?: number,
-
-    // LIVE-ÄNDERUNGEN
-    points?: Point[], rideDetails?: { distance: number; duration: number; price: number }
+          points?: Point[], rideDetails?: { distance: number; duration: number; price: number } // LIVE ÄNDERUNGEN WÄHREND DER FAHRT
   ): void {
     const payload: any = { rideSimulationId: this.simulationId };
 
@@ -115,7 +113,7 @@ export class SimulationService {
         payload.duration = currentIndexOrDuration;
         break;
 
-      // =============================================== LIVE-ÄNDERUNGEN ===============================================
+      // LIVE ÄNDERUNGEN WÄHREND DER FAHRT
       case Control.CHANGE:
         if (!points || points.length < 2) return;
         const cleanWaypoint = (point: Point, index: number) => ({
@@ -136,7 +134,7 @@ export class SimulationService {
         payload.duration = rideDetails?.duration;
         payload.price = rideDetails?.price;
         break;
-      // =========================================== ENDE DER LIVE-ÄNDERUNGEN ==========================================
+      // ENDE DER LIVE ÄNDERUNGEN WÄHREND DER FAHRT
 
       default:
         payload.currentIndex = currentIndexOrDuration;

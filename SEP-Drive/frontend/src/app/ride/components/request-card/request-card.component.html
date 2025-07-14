@@ -37,6 +37,7 @@
       <span class="value grey-italic">{{ request.requestID }}</span>
     </div>
 
+    <!--FAHRTEN MIT MEHREREN ZWISCHENSTOPPS-->
     <div class="info" *ngIf="request.stopovers?.length">
       <mat-icon>info</mat-icon>
       <span style="margin-left: 8px;">This Request contains Stopovers</span>
@@ -98,6 +99,8 @@
 
         </mat-card-content>
       </mat-card>
+      <!--ENDE DER FAHRTEN MIT MEHREREN ZWISCHENSTOPPS-->
+
       <br>
       <app-location-card label="Drop off at" [location]="request.dropoff"></app-location-card>
       <br>

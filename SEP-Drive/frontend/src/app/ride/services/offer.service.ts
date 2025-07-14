@@ -36,6 +36,8 @@ export class OfferService {
             address: request.destinationAddress,
             name: request.destinationLocationName
           },
+
+          // FAHRTEN MIT MEHREREN ZWISCHENSTOPPS
           stopovers: (request.waypoints ?? []).map(
             (wp: any) => ({
               address: wp.address,
@@ -44,6 +46,7 @@ export class OfferService {
               longitude: wp.longitude
             })
           )
+          // FAHRTEN MIT MEHREREN ZWISCHENSTOPPS
         })
       ))
     );

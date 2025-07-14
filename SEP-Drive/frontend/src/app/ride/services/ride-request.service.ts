@@ -29,6 +29,7 @@ export class RideRequestService {
       duration: ride.duration,
       estimatedPrice: ride.estimatedPrice,
 
+      // FAHRTEN MIT MEHREREN ZWISCHENSTOPPS
       waypoints: ride.stopovers?.map(
         (stopover, index) => ({
           address: stopover.address,
@@ -38,6 +39,7 @@ export class RideRequestService {
           sequenceOrder: index
         })
       ) ?? []
+      // ENDE DER FAHRTEN MIT MEHREREN ZWISCHENSTOPPS
     };
     return this.http.post<Ride>(this.baseUrl, rideJson);
   }
@@ -63,6 +65,7 @@ export class RideRequestService {
         duration: ride.duration || 0,
         estimatedPrice: ride.estimatedPrice || 0,
 
+        // FAHRTEN MIT MEHREREN ZWISCHENSTOPPS
         stopovers: (ride.waypoints ?? []).map(
           (wp: any) => ({
             address: wp.address,
@@ -71,6 +74,7 @@ export class RideRequestService {
             longitude: wp.longitude
           })
         )
+      // ENDE DER FAHRTEN MIT MEHREREN ZWISCHENSTOPPS
       }))
     );
   }

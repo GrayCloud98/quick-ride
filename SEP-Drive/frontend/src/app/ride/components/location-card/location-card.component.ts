@@ -10,6 +10,8 @@ import {Location} from '../../models/location.model';
 export class LocationCardComponent {
   @Input() location!: Location;
   @Input() label: string = 'Location';
+
+  // LIVE ÄNDERUNGEN WÄHREND DER FAHRT
   @Input() removable = false;
   @Input() isSimulationPaused = true;
   @Output() onRemove = new EventEmitter<void>();
@@ -17,4 +19,5 @@ export class LocationCardComponent {
   remove(){
     this.onRemove.emit();
   }
+  // ENDE DER LIVE ÄNDERUNGEN WÄHREND DER FAHRT
 }

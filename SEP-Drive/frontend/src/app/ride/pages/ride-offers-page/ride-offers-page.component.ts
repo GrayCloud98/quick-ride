@@ -22,12 +22,12 @@ export class RideOffersPageComponent implements OnInit {
   username!: string;
   offers: Offer[] = [];
   sortOptions: SortOption[] = [
-    { key: 'offerID', label: 'Offer ID' },
     { key: 'driverName', label: 'Driver Name' },
     { key: 'driverRating', label: 'Driver Rating' },
     { key: 'driverVehicle', label: 'Driver Vehicle' },
     { key: 'ridesCount', label: 'Rides Count' },
     { key: 'travelledDistance', label: 'Travelled Distance' },
+    { key: 'offerID', label: 'Offer ID' },
   ];
 
   constructor(private authService: AuthService,

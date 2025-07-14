@@ -20,10 +20,18 @@ export class SelectLocationComponent implements OnInit, OnChanges {
   @Input() placeholder: string = '';
   @Input() control!: FormControl;
   @Input() geoLocationButton: boolean = false;
-  @Input() removable: boolean = false;
-  @Input() isSimulationPaused: boolean = true;
   @Output() locationSelected = new EventEmitter<Location>();
+
+  // FAHRTEN MIT MEHREREN ZWISCHENSTOPPS
+  @Input() removable: boolean = false;
   @Output() onRemove = new EventEmitter<void>();
+
+  remove(){
+    this.onRemove.emit();
+  }
+  // ENDE DER FAHRTEN MIT MEHREREN ZWISCHENSTOPPS
+
+  @Input() isSimulationPaused: boolean = true;  // LIVE ÄNDERUNGEN WÄHREND DER FAHRT
 
   manualMode = false;
   latitude = new FormControl<number | null>(null, [
@@ -43,12 +51,14 @@ export class SelectLocationComponent implements OnInit, OnChanges {
   ) {
   }
 
+  // LIVE ÄNDERUNGEN WÄHREND DER FAHRT
   ngOnChanges(): void {
     if (this.isSimulationPaused)
       this.control.enable({ emitEvent: false });
     else
       this.control.disable({ emitEvent: false });
   }
+  // ENDE DER LIVE ÄNDERUNGEN WÄHREND DER FAHRT
 
   ngOnInit(): void {
     this.filteredLocations = this.control.valueChanges.pipe(
@@ -97,9 +107,5 @@ export class SelectLocationComponent implements OnInit, OnChanges {
       this.locationSelected.emit(loc);
       this.manualMode = false;
     }
-  }
-
-  remove(){
-    this.onRemove.emit();
   }
 }
