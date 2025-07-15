@@ -60,6 +60,13 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
           this.walletService.getBalance().subscribe({next: balance => this.balance = balance/100})
 
           if(userHasActiveSimulation)
+            this.simService.getRideDetails().subscribe({
+              next: details => {
+                this.rideDetails.price = details.estimatedPrice;
+                this.rideDetails.distance = details.distance;
+                this.rideDetails.duration = details.duration;
+              }
+            });
             this.simService.getVehicleClass().subscribe( {next: vehicleClass => this.vehicleClass = vehicleClass} )
         }
       })
@@ -125,7 +132,6 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     };
 
     this.map = new google.maps.Map(this.mapContainer.nativeElement, mapOptions);
-    void this.updateRideInfo();
     this.renderPins();
     this.drawRoute();
   }

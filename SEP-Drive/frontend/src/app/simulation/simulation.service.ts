@@ -87,6 +87,10 @@ export class SimulationService {
     return this.http.get<VehicleClass>(this.baseUrl + '/sim/driver/vehicle-class');
   }
 
+  getRideDetails(): Observable<any> {
+    return this.http.get<any>(this.baseUrl + '/active-sim-price');
+  }
+
   rate(rate: number) {
     const params = new HttpParams()
       .set('rideSimulationId', this.simulationId!.toString())
