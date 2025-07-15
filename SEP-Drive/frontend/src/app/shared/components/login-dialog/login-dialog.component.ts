@@ -51,8 +51,10 @@ export class LoginDialogComponent {
           console.log("🔒 2FA Required. Opening Dialog...");
           this.dialogRef.close();
           this.open2FADialog();
-        } else {
+        } else if (err.status === 401) {
           this.errorMessage = "Login failed. Incorrect username or password. Please try again.";
+        } else {
+          this.open2FADialog();
         }
       }
     });
