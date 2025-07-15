@@ -26,6 +26,15 @@ public interface RideRequestRepository extends JpaRepository<RideRequest, Long> 
     AND o.rideRequest.endedAt IS NOT NULL
 """)
     List<RideRequest> findCompletedRidesByDriverAndYear(@Param("username") String username, @Param("year") int year);
+    @Query("""
+    SELECT r.estimatedPrice FROM RideRequest r 
+    WHERE r.customer.username = :username 
+    AND r.rideStatus = :status
+""")
+    Optional<Double> findEstimatedPriceByCustomerUsernameAndRideStatus(
+            @Param("username") String username,
+            @Param("status") RideStatus status
+    );
 
 
 }

@@ -1,10 +1,13 @@
 package com.example.sep_drive_backend.controller;
 
+import com.example.sep_drive_backend.constants.RideStatus;
 import com.example.sep_drive_backend.constants.VehicleClassEnum;
 import com.example.sep_drive_backend.dto.*;
 import com.example.sep_drive_backend.models.JwtTokenProvider;
 import com.example.sep_drive_backend.models.RideOffer;
 import com.example.sep_drive_backend.models.RideRequest;
+import com.example.sep_drive_backend.repository.RideRequestRepository;
+import com.example.sep_drive_backend.repository.RideSimulationRepository;
 import com.example.sep_drive_backend.services.LoginService;
 import com.example.sep_drive_backend.services.RideRequestService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,12 +31,16 @@ public class RideRequestController {
     private final RideRequestService rideRequestService;
     private final LoginService loginService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RideSimulationRepository rideSimulationRepository;
+    private final RideRequestRepository rideRequestRepository;
 
     @Autowired
-    public RideRequestController(RideRequestService rideRequestService, LoginService loginService, JwtTokenProvider jwtTokenProvider) {
+    public RideRequestController(RideRequestService rideRequestService, LoginService loginService, JwtTokenProvider jwtTokenProvider, RideSimulationRepository rideSimulationRepository, RideRequestRepository rideRequestRepository) {
         this.rideRequestService = rideRequestService;
         this.loginService = loginService;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.rideSimulationRepository = rideSimulationRepository;
+        this.rideRequestRepository = rideRequestRepository;
     }
 
     /*
@@ -235,5 +242,12 @@ DRIVER: is active when they create an offer, till it's completed, rejected, or c
         String username = loginService.extractUsername(request);
         List<RideHistoryDTO> history = rideRequestService.getUserRideHistory(username);
         return ResponseEntity.ok(history);
+    }
+
+    @GetMapping("/active-sim-price")
+    public ResponseEntity<?> getActiveSimPrice(HttpServletRequest request) {
+        String username = loginService.extractUsername(request);
+         Optional<Double> estimatedPrice = rideRequestRepository.findEstimatedPriceByCustomerUsernameAndRideStatus(username, RideStatus.IN_PROGRESS);
+        return ResponseEntity.ok(estimatedPrice);
     }
 }
