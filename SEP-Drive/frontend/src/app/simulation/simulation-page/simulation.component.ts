@@ -85,6 +85,11 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
             ...waypoints.map(wp => ({ name: wp.name, address: wp.address, lat: wp.latitude, lng: wp.longitude, index: 0, passed: false })),
             { name: destinationLocationName, address: destinationAddress, lat: endPoint.lat, lng: endPoint.lng, index: 0, passed: false }
           ];
+
+          if (!this.metadataLoaded) {
+            this.initializeMap();
+            this.metadataLoaded = true;
+          }
         }
 
         if (update.hasStarted && !this.hasStarted) {
@@ -103,11 +108,6 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
         else if (this.paused !== update.paused) {
           update.paused ? this.pause() : this.resume();
           this.paused = update.paused;
-        }
-
-        if (!this.metadataLoaded) {
-          this.initializeMap();
-          this.metadataLoaded = true;
         }
       }
     );
@@ -233,10 +233,13 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
           }});
       // ENDE DER LIVE ÄNDERUNGEN WÄHREND DER FAHRT
 
-      if (this.currentIndex >= totalSteps - 1) {
-        this.currentIndex = this.path.length -1;
-        this.pointer.position = this.path[this.path.length -1];
-        this.simService.control(Control.PAUSE, this.currentIndex)
+      if (this.currentIndex >= this.path.length - 1) {
+        this.currentIndex = this.path.length - 1;
+        this.pointer.position = this.path[this.currentIndex];
+        this.simService.control(Control.PAUSE, this.currentIndex);
+
+        this.points[this.points.length - 1].passed = true;
+        this.points[this.points.length - 1].index = this.currentIndex;
         return;
       }
 
