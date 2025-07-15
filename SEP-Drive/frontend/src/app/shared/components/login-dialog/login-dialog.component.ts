@@ -51,8 +51,6 @@ export class LoginDialogComponent {
           console.log("🔒 2FA Required. Opening Dialog...");
           this.dialogRef.close();
           this.open2FADialog();
-        } else if (err.status === 500 && err.error === 'Failed to send verification email.') {
-          this.errorMessage = "Unable to send verification email. Please try again later.";
         } else {
           this.errorMessage = "Login failed. Incorrect username or password. Please try again.";
         }
