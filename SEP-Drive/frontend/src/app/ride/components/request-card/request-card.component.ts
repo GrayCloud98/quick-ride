@@ -32,6 +32,7 @@ export class RequestCardComponent {
     this.onWithdraw.emit();
   }
 
+  // FAHRTEN MIT MEHREREN ZWISCHENSTOPPS
   get dataSource() {
     return this.request.stopovers.map((stop, index) => ({
       position: index + 1,
@@ -41,6 +42,7 @@ export class RequestCardComponent {
       longitude: stop.longitude
     }));
   }
+  // ENDE DER FAHRTEN MIT MEHREREN ZWISCHENSTOPPS
 
   openChat(): void {
     const recipientUsername = this.request.customerUsername;

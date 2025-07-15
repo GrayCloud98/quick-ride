@@ -12,5 +12,5 @@ export interface Request {
   desiredVehicleClass: VehicleClass;
   pickup: Location;
   dropoff: Location;
-  stopovers: Location[];
+  stopovers: Location[]; // FAHRTEN MIT MEHREREN ZWISCHENSTOPPS
 }

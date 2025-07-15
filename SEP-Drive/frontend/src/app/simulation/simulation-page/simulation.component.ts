@@ -14,10 +14,8 @@ export interface Point {
   address?: string,
   lat: number,
   lng: number,
-
-  // LIVE-ÄNDERUNGEN
-  index: number,
-  passed: boolean
+  index: number, // LIVE ÄNDERUNGEN WÄHREND DER FAHRT
+  passed: boolean // LIVE ÄNDERUNGEN WÄHREND DER FAHRT
 }
 
 @Component({
@@ -92,11 +90,17 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
         if (update.hasStarted && !this.hasStarted) {
           this.start();
           this.hasStarted = true;
-        } else if (update.hasChanged) {
+        }
+
+        // LIVE ÄNDERUNGEN WÄHREND DER FAHRT
+        else if (update.hasChanged) {
           void this.updateRideInfo();
           this.renderPins();
           this.drawRoute();
-        } else if (this.paused !== update.paused) {
+        }
+        // ENDE DER LIVE ÄNDERUNGEN WÄHREND DER FAHRT
+
+        else if (this.paused !== update.paused) {
           update.paused ? this.pause() : this.resume();
           this.paused = update.paused;
         }
@@ -201,8 +205,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       content: this.createCar()
     });
 
-    // LIVE-ÄNDERUNGEN
-    this.assignStopoverIndices();
+    this.assignStopoverIndices(); // LIVE ÄNDERUNGEN WÄHREND DER FAHRT
   }
 
   private animate(): void {
@@ -220,7 +223,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.currentIndex = Math.floor(startIndex + totalSteps * progressRatio);
       this.pointer.position = this.path[Math.min(this.currentIndex, totalSteps - 1)];
 
-      // LIVE-ÄNDERUNGEN
+      // // LIVE ÄNDERUNGEN WÄHREND DER FAHRT
       this.points.forEach(
         point => {
           if (!point.passed && this.currentIndex >= point.index) {
@@ -228,7 +231,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
             this.nextStopoverPosition += 1;
             if (this.desiredStopoverPosition < this.nextStopoverPosition) this.desiredStopoverPosition += 1;
           }});
-      // ENDE DER LIVE-ÄNDERUNGEN
+      // ENDE DER LIVE ÄNDERUNGEN WÄHREND DER FAHRT
 
       if (this.currentIndex >= totalSteps - 1) {
         this.currentIndex = this.path.length -1;
@@ -315,7 +318,7 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     return car;
   }
 
-  // ================================================= LIVE-ÄNDERUNGEN =================================================
+  // LIVE ÄNDERUNGEN WÄHREND DER FAHRT
   rideDetails = { distance: 0, duration: 0, price: 0 };
   vehicleClass: VehicleClass | null = null;
   balance = 0;
@@ -406,5 +409,5 @@ export class SimulationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.rideDetails.duration = totalDuration;
     this.rideDetails.price = totalEstimatedPrice;
   }
-  // ============================================= ENDE DER LIVE-ÄNDERUNGEN ============================================
+  // ENDE DER LIVE ÄNDERUNGEN WÄHREND DER FAHRT
 }
