@@ -148,7 +148,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
 
     this.http
-        .get<any[]>(`/messages/${this.chatId}`, {
+        .get<any[]>(`http://localhost:8080/messages/${this.chatId}`, {
           headers: { Authorization: `Bearer ${token}` }
         })
         .subscribe({
