@@ -247,7 +247,19 @@ DRIVER: is active when they create an offer, till it's completed, rejected, or c
     @GetMapping("/active-sim-price")
     public ResponseEntity<?> getActiveSimPrice(HttpServletRequest request) {
         String username = loginService.extractUsername(request);
-         Optional<Double> estimatedPrice = rideRequestRepository.findEstimatedPriceByCustomerUsernameAndRideStatus(username, RideStatus.IN_PROGRESS);
-        return ResponseEntity.ok(estimatedPrice);
+        Optional<RideRequest> optionalRideRequest = rideRequestRepository.findByCustomerUsernameAndRideStatusCustom(username, RideStatus.IN_PROGRESS);
+
+        if (optionalRideRequest.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No active ride with status IN_PROGRESS found for user: " + username);
+        }
+
+        RideRequest rideRequest = optionalRideRequest.get();
+        RideSimDetailsDTO dto = new RideSimDetailsDTO();
+        dto.setDuration(rideRequest.getDuration());
+        dto.setDistance(rideRequest.getDistance());
+        dto.setEstimatedPrice(rideRequest.getEstimatedPrice());
+
+        return ResponseEntity.ok(dto);
     }
 }

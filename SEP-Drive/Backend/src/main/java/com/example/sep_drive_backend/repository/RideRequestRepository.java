@@ -27,11 +27,11 @@ public interface RideRequestRepository extends JpaRepository<RideRequest, Long> 
 """)
     List<RideRequest> findCompletedRidesByDriverAndYear(@Param("username") String username, @Param("year") int year);
     @Query("""
-    SELECT r.estimatedPrice FROM RideRequest r 
+    SELECT r FROM RideRequest r 
     WHERE r.customer.username = :username 
     AND r.rideStatus = :status
 """)
-    Optional<Double> findEstimatedPriceByCustomerUsernameAndRideStatus(
+    Optional<RideRequest> findByCustomerUsernameAndRideStatusCustom(
             @Param("username") String username,
             @Param("status") RideStatus status
     );
