@@ -116,9 +116,9 @@ export class StatisticsComponent implements OnInit {
           data,
           fill: true,
           tension: 0.3,
-          borderColor: '#38bdf8', // optional: Linienfarbe
-          backgroundColor: 'rgb(179,10,234)', // optional: Füllung
-          pointBackgroundColor: '#22c55e', // optional: Punkte
+          borderColor: '#38bdf8',
+          backgroundColor: 'rgb(179,10,234)',
+          pointBackgroundColor: '#22c55e',
           pointBorderColor: '#fff'
         }]
       },
@@ -127,7 +127,7 @@ export class StatisticsComponent implements OnInit {
         plugins: {
           legend: {
             labels: {
-              color: '#fff', // LEGENDE weiß!
+              color: '#fff',
               font: { size: 16, weight: 700 }
             }
           },
@@ -144,10 +144,10 @@ export class StatisticsComponent implements OnInit {
           x: {
             ticks: {
               color: '#fff',
-              font: { size: 12, weight: 400 },  // NICHT mehr bold, kleiner!
-              maxRotation: 40,                  // Labels diagonal drehen, bessere Lesbarkeit!
+              font: { size: 12, weight: 400 },
+              maxRotation: 40,
               minRotation: 25,
-              autoSkip: false,                  // Alle anzeigen, oder true falls zu eng
+              autoSkip: false,
             },
             grid: {
               color: 'rgba(255,255,255,0.13)'
