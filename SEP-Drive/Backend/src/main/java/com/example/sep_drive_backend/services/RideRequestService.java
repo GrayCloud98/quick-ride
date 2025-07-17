@@ -288,13 +288,13 @@ public class RideRequestService {
 
         RideSimulation rideSimulation = new RideSimulation();
 
-        RideSimulation.Point startPoint = new RideSimulation.Point(
+        Point startPoint = new Point(
                 rideRequest.getStartLatitude(),
                 rideRequest.getStartLongitude()
         );
         rideSimulation.setStartPoint(startPoint);
 
-        RideSimulation.Point endPoint = new RideSimulation.Point(
+        Point endPoint = new Point(
                 rideRequest.getDestinationLatitude(),
                 rideRequest.getDestinationLongitude()
         );

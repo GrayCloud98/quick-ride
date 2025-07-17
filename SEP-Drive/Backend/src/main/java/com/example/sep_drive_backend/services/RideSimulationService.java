@@ -103,7 +103,7 @@ public class RideSimulationService {
         r.setDestinationLongitude(simPointsControl.getEndPoint().getLng());
         r.setDestinationLatitude(simPointsControl.getEndPoint().getLat());
         PointDTO ep = simPointsControl.getEndPoint();
-        sim.setEndPoint(new RideSimulation.Point(ep.getLat(), ep.getLng()));
+        sim.setEndPoint(new Point(ep.getLat(), ep.getLng()));
 
         r.setDistance(simPointsControl.getDistance());
         r.setDuration(simPointsControl.getDuration());

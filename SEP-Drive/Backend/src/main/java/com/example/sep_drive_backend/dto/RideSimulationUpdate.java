@@ -1,6 +1,7 @@
 package com.example.sep_drive_backend.dto;
 
 import com.example.sep_drive_backend.constants.RideStatus;
+import com.example.sep_drive_backend.models.Point;
 import com.example.sep_drive_backend.models.RideSimulation;
 import com.example.sep_drive_backend.models.Waypoint;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -18,8 +19,8 @@ public class RideSimulationUpdate {
     private boolean paused;
     private boolean hasStarted;
     private double duration;
-    private RideSimulation.Point startPoint;
-    private RideSimulation.Point endPoint;
+    private Point startPoint;
+    private Point endPoint;
     private RideStatus rideStatus;
     private String startLocationName;
     private String destinationLocationName;
@@ -128,19 +129,19 @@ public class RideSimulationUpdate {
         this.duration = duration;
     }
 
-    public RideSimulation.Point getStartPoint() {
+    public Point getStartPoint() {
         return startPoint;
     }
 
-    public void setStartPoint(RideSimulation.Point startPoint) {
+    public void setStartPoint(Point startPoint) {
         this.startPoint = startPoint;
     }
 
-    public RideSimulation.Point getEndPoint() {
+    public Point getEndPoint() {
         return endPoint;
     }
 
-    public void setEndPoint(RideSimulation.Point endPoint) {
+    public void setEndPoint(Point endPoint) {
         this.endPoint = endPoint;
     }
 }

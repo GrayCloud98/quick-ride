@@ -12,14 +12,6 @@ import java.util.Optional;
 
 public interface RideSimulationRepository extends JpaRepository<RideSimulation, Long> {
 
-    @Query("SELECT r FROM RideSimulation r " +
-            "WHERE r.driver.username = :username " +
-            "AND r.rideStatus = 'COMPLETED' " +
-            "AND FUNCTION('YEAR', r.endedAt) = :year")
-    List<RideSimulation> findByDriverUsernameAndYearAndCompleted(
-            @Param("username") String username,
-            @Param("year") int year
-    );
 
 
     @Query("SELECT FUNCTION('MONTH', r.endedAt), " +

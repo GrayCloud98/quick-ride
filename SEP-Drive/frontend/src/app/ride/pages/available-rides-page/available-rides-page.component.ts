@@ -17,7 +17,8 @@ interface SortOption {
   selector: 'requests-list',
   standalone: false,
   templateUrl: './available-rides-page.component.html',
-  styleUrl: './available-rides-page.component.scss'
+  styleUrl: './available-rides-page.component.scss',
+
 })
 export class AvailableRidesPageComponent implements OnInit {
   accessAllowed: boolean = false;
