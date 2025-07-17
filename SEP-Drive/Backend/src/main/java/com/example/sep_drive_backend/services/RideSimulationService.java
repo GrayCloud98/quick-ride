@@ -72,7 +72,6 @@ public class RideSimulationService {
 
         RideSimulation sim = getSimulationById(id);
         RideRequest r = sim.getRideOffer().getRideRequest();
-        //here
         r.getWaypoints().clear();
 
         sim.setCurrentIndex(simPointsControl.getCurrentIndex());
@@ -89,7 +88,6 @@ public class RideSimulationService {
                     w.setRideRequest(r);
                     return w;
                 }).toList();
-        //here
         r.getWaypoints().addAll(mappedWaypoints);
 
 
@@ -97,7 +95,6 @@ public class RideSimulationService {
         r.setDestinationLongitude(simPointsControl.getEndPoint().getLng());
         r.setDestinationLatitude(simPointsControl.getEndPoint().getLat());
 
-        //here
         PointDTO ep = simPointsControl.getEndPoint();
         sim.setEndPoint(new Point(ep.getLat(), ep.getLng()));
 
