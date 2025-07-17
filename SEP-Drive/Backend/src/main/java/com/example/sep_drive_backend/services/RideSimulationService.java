@@ -88,10 +88,9 @@ public class RideSimulationService {
                     w.setSequenceOrder(dto.getSequenceOrder());
                     w.setRideRequest(r);
                     return w;
-                }).collect(Collectors.toList());
+                }).toList();
         //here
         r.getWaypoints().addAll(mappedWaypoints);
-        sim.getRideOffer().getRideRequest().setWaypoints(mappedWaypoints);
 
 
         r.setDestinationLocationName(simPointsControl.getDestinationLocationName());
