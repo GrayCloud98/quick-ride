@@ -72,10 +72,7 @@ public class RideRequest {
         this.endedAt = LocalDateTime.now();
     }
 
-    @PreUpdate
-    protected void onEnd() {
-        this.endedAt = LocalDateTime.now();
-    }
+
 
     public RideRequest() {
     }
@@ -144,9 +141,6 @@ public class RideRequest {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 
     public String getStartLocationName() {
         return startLocationName;
