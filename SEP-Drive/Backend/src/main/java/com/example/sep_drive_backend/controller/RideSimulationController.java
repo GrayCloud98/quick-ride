@@ -1,5 +1,4 @@
 package com.example.sep_drive_backend.controller;
-
 import com.example.sep_drive_backend.constants.RideStatus;
 import com.example.sep_drive_backend.constants.TripsStatus;
 import com.example.sep_drive_backend.dto.RideSimulationUpdate;
@@ -11,15 +10,12 @@ import com.example.sep_drive_backend.models.Driver;
 import com.example.sep_drive_backend.models.RideSimulation;
 import com.example.sep_drive_backend.models.Trips;
 import com.example.sep_drive_backend.repository.*;
-import com.example.sep_drive_backend.services.LoginService;
 import com.example.sep_drive_backend.services.RideSimulationService;
-import com.example.sep_drive_backend.services.WalletService;
 import jakarta.transaction.Transactional;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-
 import java.util.Optional;
 
 @Controller
@@ -30,19 +26,17 @@ public class RideSimulationController {
     private final RideSimulationRepository rideSimulationRepository;
     private final RideOfferRepository rideOfferRepository;
     private final RideRequestRepository rideRequestRepository;
-    private final LoginService loginService;
     private final CustomerRepository customerRepository;
     private final DriverRepository driverRepository;
     private final TripRepository tripRepository;
     private final ChatMessageRepository chatMessageRepository;
     public RideSimulationController(RideSimulationService rideSimulationService,
-                                    SimpMessagingTemplate messagingTemplate, RideSimulationRepository rideSimulationRepository, RideOfferRepository rideOfferRepository, RideRequestRepository rideRequestRepository, LoginService loginService, CustomerRepository customerRepository, DriverRepository driverRepository, TripRepository tripRepository, ChatMessageRepository chatMessageRepository) {
+                                    SimpMessagingTemplate messagingTemplate, RideSimulationRepository rideSimulationRepository, RideOfferRepository rideOfferRepository, RideRequestRepository rideRequestRepository, CustomerRepository customerRepository, DriverRepository driverRepository, TripRepository tripRepository, ChatMessageRepository chatMessageRepository) {
         this.rideSimulationService = rideSimulationService;
         this.messagingTemplate = messagingTemplate;
         this.rideSimulationRepository = rideSimulationRepository;
         this.rideOfferRepository = rideOfferRepository;
         this.rideRequestRepository = rideRequestRepository;
-        this.loginService = loginService;
         this.customerRepository = customerRepository;
         this.driverRepository = driverRepository;
         this.tripRepository = tripRepository;
@@ -153,7 +147,7 @@ public class RideSimulationController {
         rideOfferRepository.save(simulation.getRideOffer());
         rideRequestRepository.save(simulation.getRideOffer().getRideRequest());
 
-        broadcastCompleteUpdate(simulation);
+        broadcastUpdate(simulation);
         chatMessageRepository.deleteAll();
     }
 
@@ -164,12 +158,9 @@ public class RideSimulationController {
     }
 
 
-    private void broadcastCompleteUpdate(RideSimulation sim) {
-        RideSimulationUpdate update = rideSimulationService.completedToDto(sim);
-        messagingTemplate.convertAndSend("/topic/simulation/" + sim.getId(), update);
-    }
     private void broadcastChangedUpdate(RideSimulation sim) {
-        RideSimulationUpdate update = rideSimulationService.changedToDto(sim);
+        RideSimulationUpdate update = rideSimulationService.toDto(sim);
+        update.setHasChanged(true);
         messagingTemplate.convertAndSend("/topic/simulation/" + sim.getId(), update);
     }
 

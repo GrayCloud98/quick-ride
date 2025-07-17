@@ -337,19 +337,6 @@ public class RideRequestService {
         }
     }
 
-//    public Optional<Long> getSimId(String username) {
-//        Optional<Customer> customer = customerRepository.findByUsername(username);
-//        if (customer.isPresent()) {
-//            return rideSimulationRepository.findCurrentCreatedSimulationIdByCustomerUsername(username);
-//        }
-//        Optional<Driver> driver = driverRepository.findByUsername(username);
-//        if (driver.isPresent()) {
-//            return rideSimulationRepository.findCurrentCreatedSimulationIdByDriverUsername(username);
-//        }
-//        return Optional.empty();
-//    }
-
-
     //get sim id created or In_progress, completed sim id not possible yet
     public Optional<Long> getInProgressOrCreatedSimId(String username) {
         List<RideStatus> activeStatuses = List.of(RideStatus.CREATED, RideStatus.IN_PROGRESS);

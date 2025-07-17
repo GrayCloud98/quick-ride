@@ -20,13 +20,6 @@ public interface RideRequestRepository extends JpaRepository<RideRequest, Long> 
     List<RideRequest> findAllByRideStatus(RideStatus status);
 
     @Query("""
-    SELECT o.rideRequest FROM RideOffer o
-    WHERE o.driver.username = :username
-    AND YEAR(o.rideRequest.endedAt) = :year
-    AND o.rideRequest.endedAt IS NOT NULL
-""")
-    List<RideRequest> findCompletedRidesByDriverAndYear(@Param("username") String username, @Param("year") int year);
-    @Query("""
     SELECT r FROM RideRequest r 
     WHERE r.customer.username = :username 
     AND r.rideStatus = :status

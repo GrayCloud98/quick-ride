@@ -55,7 +55,7 @@ DRIVER: is active when they create an offer, till it's completed, rejected, or c
  */
 
 
-    //create ride request for customer if they're not active (i.e. they don't have a Created/In progress ride requests) && they have more in wallet the ride's estimated price
+    //create ride request for customer if they're not active (i.e. they don't have a Created/In progress ride requests)
     @PostMapping
     public ResponseEntity<RideRequest> createRideRequest(
             @RequestBody RideRequestDTO dto, HttpServletRequest request) {
